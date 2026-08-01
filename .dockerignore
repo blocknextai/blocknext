@@ -1,0 +1,25 @@
+# Git & IDE
+.git
+.idea
+.vscode
+.claude
+
+# Environment files (compose injects them via env_file)
+**/.env
+**/.env.*
+
+# Dependencies & build outputs
+**/node_modules
+**/dist
+**/tmp
+**/vendor
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+**/.dockerignore
+
+# Misc
+**/*.log
+**/.DS_Store
+**/*_test.go

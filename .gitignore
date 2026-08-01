@@ -1,0 +1,46 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+.cursorrules
+.cursorignore
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# env
+.env
+*.env
+!.env.example
+*.local
+
+# dependencies & build outputs
+node_modules/
+dist/
+dist-ssr/
+tmp/
+vendor/
+.turbo/
+
+# go binaries & test artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+*.test
+*.out
+
+# logs
+logs/
+*.log
+
+# claude
+CLAUDE.md
+**/.claude/settings.local.json
+**/.claude/plans/
+**/.claude/worktrees/
+**/.claude/specs/
