@@ -16,7 +16,7 @@ Parses flags, connects to Postgres from `DATABASE_*` env vars, and applies (or r
 - `-dry-run` — report migration status without applying.
 
 ## Notes
-- **Module registry requirement:** the hardcoded `modules` slice (common, account, organizations, executions, support, workflows, triggers, web3, marketplace, subscriptions, quota, payments, library, credentials, billing, apikeys, notifications, eventbus) is the source of truth. A new module's migrations will NOT run unless it is added to this slice.
+- **Module registry requirement:** the hardcoded `modules` slice (common, account, organizations, executions, workflows, triggers, credentials, apikeys, notifications, eventbus) is the source of truth. A new module's migrations will NOT run unless it is added to this slice.
 - Each module uses a dedicated `<module>_migrations` tracking table.
 - Migration source path differs in Docker (`/app/migrations/<module>`) vs local (`internal/<module>/infrastructure/database/migrations`), auto-detected via `/app/migrations`.
 - Exits non-zero on failure; logs structured slog with `component=migration`.

@@ -15,7 +15,7 @@ its detailed scope.
 | [`account`](account/README.md) | User identity & authentication (password, magic-link, OAuth sign-in, crypto-wallet) + per-user settings. |
 | [`organizations`](organizations/README.md) | Tenants/workspaces, RBAC members. Auto-provisions a default org on `user.created`. |
 | [`apikeys`](apikeys/README.md) | Organization-scoped programmatic-access keys (issuance, scopes, rotation, validation). |
-| [`oauth`](oauth/README.md) | User-facing OAuth2 authorization-code (PKCE) flow + token refresh for third-party credentials. |
+| [`credentialoauth`](credentialoauth/README.md) | User-facing OAuth2 authorization-code (PKCE) flow + token refresh for third-party credentials. |
 
 ### Workflow Core
 | Context | Scope |
@@ -60,7 +60,7 @@ flowchart TB
         account
         organizations
         apikeys
-        oauth
+        credentialoauth
     end
     subgraph wf[Workflow Core]
         workflows
@@ -88,12 +88,12 @@ flowchart TB
     workflows --> nodeengine
     taskrunner --> nodeengine
     taskrunner --> executions
-    taskrunner --> oauth
+    taskrunner --> credentialoauth
     taskrunner --> llm
     nodeengine --> platform
     credentials --> nodeengine
     credentials --> platform
-    oauth --> credentials
+    credentialoauth --> credentials
     mcp --> nodeengine
     webhooks --> taskrunner
     triggers --> taskrunner

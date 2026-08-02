@@ -8,9 +8,8 @@ pre-defined `UploadRule`, and persists them through the storage provider.
 - **Rule registry** — every upload endpoint is gated by an `UploadRule` keyed by a
   UUID `uploadId`. A rule defines the max size, allowed MIME types, target folder,
   public/private bucket, and whether the filename is overridden. Rules live in
-  [`domain/upload/rules.go`](domain/upload/rules.go) (marketplace covers/gallery/
-  documents, AI node assets, web3 token icons, organization icons/covers, support
-  files, etc.).
+  [`domain/upload/rules.go`](domain/upload/rules.go) (AI node assets — generated
+  audio/images/videos and fetched Google Drive files).
 - **Validation** — enforces the rule's size and MIME constraints before any write.
 - **Filename resolution** — when `IsOverrideFilename` is set, generates a UUIDv7
   name with an extension derived from the content type; otherwise keeps the client

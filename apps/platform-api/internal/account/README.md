@@ -3,7 +3,7 @@
 > Owns user identity, authentication, and per-user account settings across password, email/magic-link, OAuth, and crypto-wallet sign-in.
 
 ## Responsibility
-This context owns the `User` aggregate and everything that authenticates a person and links them to login identities: password credentials, OAuth/crypto linked accounts, sessions with refresh-token rotation, OAuth nonces/PKCE, and one-time verification tokens. It also owns user-facing account settings (preferences, social links) and emits domain events that drive its own transactional emails. It does NOT own organizations, RBAC role/permission definitions (it consumes the common `UserPermissionChecker`), or billing/subscription state.
+This context owns the `User` aggregate and everything that authenticates a person and links them to login identities: password credentials, OAuth/crypto linked accounts, sessions with refresh-token rotation, OAuth nonces/PKCE, and one-time verification tokens. It also owns user-facing account settings (preferences, social links) and emits domain events that drive its own transactional emails. It does NOT own organizations or RBAC role/permission definitions (it consumes the common `UserPermissionChecker`).
 
 ## Domain
 - **Aggregates / key types:**

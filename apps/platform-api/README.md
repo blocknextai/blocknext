@@ -14,7 +14,7 @@ The full stack is orchestrated from the monorepo root — see the root `README.m
 
 ### ⚙️ Configuration
 
-Copy `.env.example` to `.env` and adjust values before running.
+Configuration lives in the single `.env` file at the monorepo root — run `make setup` there to generate it from `.env.example`.
 
 ## 🏗️ Architecture
 
@@ -33,7 +33,7 @@ internal/
 
 ### Modules
 
-`account`, `apikeys`, `billing`, `bootstrap`, `cache`, `common`, `config`, `credentials`, `eventbus`, `executions`, `filegateway`, `library`, `llm`, `marketplace`, `mcp`, `nodeengine`, `notifications`, `oauth`, `organizations`, `payments`, `plans`, `platform`, `quota`, `realtime`, `subscriptions`, `support`, `taskrunner`, `triggers`, `web3`, `webhooks`, `workflows`, `ws`.
+`account`, `apikeys`, `bootstrap`, `cache`, `common`, `config`, `credentialoauth`, `credentials`, `eventbus`, `executions`, `filegateway`, `llm`, `mcp`, `nodeengine`, `notifications`, `organizations`, `platform`, `realtime`, `taskrunner`, `triggers`, `web3`, `webhooks`, `workflows`, `ws`.
 
 ### Binaries
 
@@ -47,10 +47,6 @@ The `cmd/` directory contains the entry points for each runnable service:
 | `mcp-api` | Model Context Protocol (MCP) server |
 | `task-worker` | Redis-based background task consumer |
 | `event-relay-worker` | Drains the transactional outbox (eventbus relay) |
-| `payment-confirmation-worker` | Polls and confirms pending payments |
-| `payment-session-cleanup-worker` | Expires stale payment sessions |
-| `recurring-credit-worker` | Grants recurring plan credits |
-| `subscription-expiration-worker` | Handles subscription expiry transitions |
 
 ## 🛠️ Key Technologies
 
@@ -66,8 +62,7 @@ The `cmd/` directory contains the entry points for each runnable service:
 - **Logging**: `log/slog` (standard library)
 - **Scheduling**: `robfig/cron`
 - **Observability**: OpenTelemetry
-- **Blockchain**: `go-ethereum`, IPFS (`go-cid`, `multibase`)
+- **Blockchain**: `go-ethereum` (wallet-based login signature verification)
 - **AI / LLM**: Gemini and local LLM providers (function-calling, streaming chat)
 - **MCP**: Model Context Protocol server (`modelcontextprotocol/go-sdk`)
 - **Container**: Docker & Docker Compose
-- **Hot Reload**: [Air](https://github.com/air-verse/air) (development)

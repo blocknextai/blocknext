@@ -12,12 +12,12 @@ into each module's dependencies — modules never read the environment directly.
 
 | File | Prefix | Covers |
 | --- | --- | --- |
-| `api.go` | `API_` | Fiber server tuning, CORS, rate limit, trusted proxies |
-| `auth.go` | `AUTH_` | Service key + JWT signing/expiry |
-| `cache.go` | `CACHE_` | Cache type + Redis connection/pool |
-| `storage.go` | `STORAGE_` | Driver selection + S3/Bunny/Local buckets |
-| `download.go` | `DOWNLOAD_` | Remote download size/timeout limits |
-| `metrics.go` | `API_METRICS_` | Prometheus metrics endpoint toggle/port |
+| `api.go` | `FILE_GATEWAY_API_` | Fiber server tuning, CORS, rate limit, trusted proxies |
+| `auth.go` | `FILE_GATEWAY_AUTH_` | Service key + JWT signing/expiry |
+| `cache.go` | `CACHE_` | Cache type + Redis connection/pool (shared with platform-api) |
+| `storage.go` | `FILE_GATEWAY_STORAGE_` | Driver selection + S3/Bunny/Local buckets |
+| `download.go` | `FILE_GATEWAY_DOWNLOAD_` | Remote download size/timeout limits |
+| `metrics.go` | — | Prometheus metrics options (wiring commented out) |
 | `env.go` | `APP_ENV` | App environment helper (`IsProduction`) |
 
-See [`.env.example`](../../.env.example) for the full list of variables.
+See the root [`.env.example`](../../../../.env.example) for the full list of variables.

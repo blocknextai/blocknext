@@ -1,12 +1,10 @@
 # go-packages
 
-Blocknext monorepo of reusable Go packages.
+Reusable Go packages shared by the BlockNext services.
 
-## Installation
+## Usage
 
-```bash
-go get github.com/blocknextai/go-packages
-```
+This module is consumed in-repo: the Go workspace (`go.work`) at the monorepo root and `replace` directives in each app's `go.mod` point `github.com/blocknextai/go-packages` at this directory — no separate publishing or `go get` required.
 
 Requires Go `1.26.5`.
 
