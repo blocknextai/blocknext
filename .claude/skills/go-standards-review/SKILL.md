@@ -277,7 +277,7 @@ grep -rn --include='*.go' -B0 -A0 -E '^\s*Pagination\s+resultPkg\.PaginationRequ
 
 **Allowed exceptions:**
 - Functions that take only `offset, limit` with no `searchQuery` (e.g. `GetAllPublishers`) — already in the canonical order.
-- Functions that take only `limit` and have semantic reasons (e.g. `GetExpiredActiveSubscriptions(ctx, limit int)` — a worker batch size, not a pagination window).
+- Functions that take only `limit` and have semantic reasons (e.g. a worker batch-size parameter, not a pagination window).
 
 **Suggested fix (manual — touches signature + every call site):**
 ```go

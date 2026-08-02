@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest an idea or improvement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before proposing workflow-engine features (loops, sub-workflows, expression languages, ...),
+        please read the **Design decisions** section of [ARCHITECTURE.md](https://github.com/blocknextai/blocknext/blob/main/ARCHITECTURE.md) —
+        BlockNext keeps flows deliberately simple for non-developer users.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the pain point or use case, not just the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - platform (UI)
+        - platform-api
+        - mcp-api
+        - webhook-api
+        - file-gateway-api
+        - go-packages
+        - docker / setup
+        - other
+    validations:
+      required: true

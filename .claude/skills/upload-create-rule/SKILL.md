@@ -13,7 +13,7 @@ Add a new `UploadRule` to `internal/upload/domain/upload/rules.go` and register 
 ## When to use
 
 - User wants to register a new file upload type (new feature, new node, new asset category).
-- User asks to extend marketplace, organization, api.nodes, api.web3, bug_reports, etc. with a new upload target.
+- User asks to extend the `api.nodes.<provider>` area (or introduce a brand-new area) with a new upload target.
 
 ## Data model
 
@@ -22,7 +22,7 @@ Add a new `UploadRule` to `internal/upload/domain/upload/rules.go` and register 
 | Field | Type | Notes                                         |
 |------|-----|-----------------------------------------------|
 | `ID` | `string` | UUID v7, must be unique across rules          |
-| `Title` | `string` | Dot notation (e.g. `marketplace.cover_image`) |
+| `Title` | `string` | Dot notation (e.g. `api.nodes.veo`) |
 | `MaxSize` | `int64` | Bytes — written as `N * 1024 * 1024`          |
 | `AllowedMimes` | `[]string` | One `.AllowedMime(...)` call per entry        |
 | `DefaultFolder` | `string` | Storage folder, must end with `/`             |
@@ -35,10 +35,10 @@ Add a new `UploadRule` to `internal/upload/domain/upload/rules.go` and register 
 
 If any of the following are missing from the user's request, ask via `AskUserQuestion` (one question per missing field, batched in a single call):
 
-1. **Title** — e.g. `marketplace.video_thumbnail`, `api.nodes.openai.tts`.
+1. **Title** — e.g. `api.nodes.openai.tts`, `api.nodes.gemini.nano_banana`.
 2. **Max size in MB** — converted to `N * 1024 * 1024` in code.
 3. **Allowed MIME category** — image, video, audio, document, json, or custom list.
-4. **Default folder** — e.g. `marketplace/video-thumbnails/` (must end with `/`, kebab-case).
+4. **Default folder** — e.g. `nodes/openai/tts/` (must end with `/`, kebab-case).
 5. **Visibility** — public or private.
 6. **Override filename** — usually yes for public uploads, no for private payloads.
 
@@ -51,18 +51,17 @@ uuidgen | tr '[:upper:]' '[:lower:]'
 Verify the UUID is not already present:
 
 ```bash
-grep -i "<new-uuid>" /Users/bilal/workspaces/blocknext/projects/file-gateway-api/internal/upload/domain/upload/rules.go
+grep -i "<new-uuid>" internal/upload/domain/upload/rules.go
 ```
 
 ### 3. Derive variable name
 
 Convert the title to camelCase, following existing conventions in `rules.go`:
 
-- `marketplace.cover_image` → `marketplaceCoverImage`
-- `api.nodes.gemini.imagen` → `apiImagenNode`
-- `api.web3.tokens.icons` → `apiWeb3TokenIcon`
-- `api.organization.icon` → `organizationIconImage`
-- `bug_reports.files` → `bugReportFiles`
+- `api.nodes.elevenlabs` → `apiElevenLabsNode`
+- `api.nodes.gemini.nano_banana` → `apiGeminiNanoBananaNode`
+- `api.nodes.veo` → `apiVeoNode`
+- `api.nodes.google.drive.get_file` → `apiGoogleDriveGetFileNode`
 
 Check for variable name collisions in `rules.go` before proceeding.
 
@@ -88,7 +87,7 @@ image/webp, image/gif, image/heif-sequence, image/heic-sequence
 
 ### 5. Insert the rule
 
-Add the new `var` to `internal/upload/domain/upload/rules.go` near logically-related rules (e.g. a new `marketplace.*` rule goes next to other marketplace rules). Mirror the existing builder pattern exactly:
+Add the new `var` to `internal/upload/domain/upload/rules.go` near logically-related rules (e.g. a new `api.nodes.<provider>` rule goes next to the other node rules). Mirror the existing builder pattern exactly:
 
 ```go
 var <variableName> = NewUploadRuleBuilder().
@@ -121,7 +120,7 @@ Don't worry about column alignment — `gofmt` handles it.
 Always run a build after editing:
 
 ```bash
-cd /Users/bilal/workspaces/blocknext/projects/file-gateway-api && go build ./...
+go build ./...
 ```
 
 If the build fails, fix the issue before reporting completion. Optionally run `go fmt ./internal/upload/...` to lock in formatting.
@@ -129,9 +128,9 @@ If the build fails, fix the issue before reporting completion. Optionally run `g
 ## Conventions (observed in the existing codebase)
 
 - **Public rules** typically chain `.OverrideFilename()` — public assets need predictable, collision-free filenames.
-- **Private rules** (e.g. webhook payloads) typically preserve the original filename — `.OverrideFilename()` is omitted.
+- **Private rules** typically preserve the original filename — `.OverrideFilename()` is omitted.
 - **Folder paths** end with `/` and use kebab-case for multi-word segments (`get-file/`, `image-generation/`).
-- **Title namespaces** use dot notation: `<area>.<feature>.<subfeature>`. Existing areas: `marketplace`, `api.nodes.<provider>`, `api.web3`, `api.organization`, `bug_reports`.
+- **Title namespaces** use dot notation: `<area>.<feature>.<subfeature>`. Existing area: `api.nodes.<provider>`.
 - **Common MaxSize values:** `2 * 1024 * 1024` (images), `5 * 1024 * 1024` (documents/payloads), `10 * 1024 * 1024` (audio/video/large media).
 
 ## Output

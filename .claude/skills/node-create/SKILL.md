@@ -30,9 +30,8 @@ Confirm with the user (ask only what's missing):
 8. **Credential ID** — which credential this node consumes (e.g., `mistral_api`, `notion_oauth2`). Underscore separator. MUST already exist in `internal/nodeengine/credentials/`. If it doesn't, run the `credential-create` skill first.
 9. **Input fields** — names, types, descriptions, optional defaults, optional enums. These become both the JSON schema and the executor input struct.
 10. **Output fields** — names, types, descriptions. Shape of the **per-record** output map; the executor returns an array of these and the OutputSchema wraps it accordingly (see template below).
-11. **Credits** — integer cost per execution. Defaults to `1` for paid/external API calls, `0` for system-only nodes. Credit is charged per tool call via MCP; check the user's intent.
-12. **MCP annotations group** — pick one based on what the tool does (see "Annotations classification" below).
-13. **HTTP base URL + auth header** — for the helpers client (only if the node calls an HTTP API).
+11. **MCP annotations group** — pick one based on what the tool does (see "Annotations classification" below).
+12. **HTTP base URL + auth header** — for the helpers client (only if the node calls an HTTP API).
 
 ## NodeID format
 
@@ -196,7 +195,6 @@ func New<Provider><Action>Node(nodeID string) *<Provider><Action>Node {
 				Destructive: new(false),
 			},
 			HasNaturalLanguage: true, // set false for nodes that should NOT appear in LLM function calling
-			Credits:            1,
 		},
 	}
 }
@@ -410,7 +408,6 @@ If the provider needs `filegateway` (file uploads/downloads), its `Register` sig
 Every node is automatically exposed as an MCP tool when its provider's `mcp.RegisterServer(...)` includes it in `Tools`. The MCP adapter:
 - Reads `node.GetAnnotations()` and forwards to MCP `ToolAnnotations`
 - Wraps `OutputSchema` in `{type: "object", properties: {items: <node-output-schema>}}` so SDK accepts it (SDK rejects top-level non-object schemas)
-- Charges `node.GetCredits()` per tool call (user/org based on API key scope)
 - Resolves `credential:<scope>:<uuid>` references from the tool's `credentials` parameter
 
 No additional work in node.go / executor.go is required to expose to MCP — register.go's `mcp.RegisterServer` call is the only touchpoint.

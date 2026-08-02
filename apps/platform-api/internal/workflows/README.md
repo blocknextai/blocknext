@@ -14,6 +14,33 @@ This context is the system of record for workflow definitions scoped to an organ
   - `Workflow` requires non-nil `OrganizationID` and `OwnerID` and a non-blank `Title` (sentinels `ErrOrganizationIDIsRequired`, `ErrOwnerIDIsRequired`, `ErrTitleIsRequired`; also `ErrWorkflowNotFound`, `ErrTitleTooLong`).
   - `GenerationSession` requires a non-blank title; `GenerationMessage` requires a non-nil `SessionID`.
 
+## The canvas model
+
+**The document is the canvas.** A workflow persists exactly two structural columns — `nodes JSONB` and `edges JSONB` — holding `[]dag.Node` / `[]dag.Edge` (`packages/go-packages/dag`). What the editor renders is byte-for-byte what the runtime executes; there is no separate "compiled" representation. Each `dag.Node` is self-contained: `id` (canvas id), `nodeId` (catalog id, e.g. `gemini.imagen`), optional `instruction` (design-time prose for function calling), full `parameters`, per-node `settings` (`maxRetries`, `retryDelay`, `timeout`, `continueOnError`, `disabled`), `credentials`, and `position`. `runtimeInstruction`/`runtimePrompt` exist on the struct but are injected at run time by the trigger's `RuntimeConfig` overlay — never authored into the stored document.
+
+**Edges declare flow; `$references` carry the data.** An edge `source → target` alone moves nothing — the target node must also contain a `$reference` to the source's output in its `parameters` (or `instruction`). Both halves are required: an edge without a matching reference is an unresolvable dependency, and a reference without an edge is a broken flow. References are plain strings, valid in **any** string field, and resolved by regex substitution in taskrunner's `DataProcessor` against the upstream node's stored outputs:
+
+| Pattern | Meaning |
+| --- | --- |
+| `$<nodeId>_<canvasId>.<field.path>` | Field from the referenced node's output for the current item (node key = catalog `nodeId` + `_` + canvas `id`, e.g. `$gemini.imagen_2.images`) |
+| `$<key>[0].<field>` / `$<key>[*].<field>` | Explicit index / all items collected into an array |
+| `$<key>.first().<field>` / `.last()` / `.get(n)` | Positional access over the node's output list |
+| `$trigger.source` / `.sender` / `.prompt` / `.payload` | Fields of the run's `TriggerContext` (webhook adapter output or runtime prompt) |
+
+**Credentials are referenced, never stored.** The workflow JSON carries no secrets: a node's `credentials` map holds opaque reference strings of the form `credential:<user\|organization>:<uuid>` (`internal/common/domain/credential`). At execution time taskrunner's `CredentialProcessor` parses the reference, resolves the owner scope, and fetches (refreshing OAuth tokens if needed) the actual credential material — which therefore lives only in the credentials store, and a duplicated or exported workflow leaks nothing.
+
+**Deliberate simplicity.** Control flow is intentionally minimal: the only system nodes are `starter`, `condition` (boolean branch — edges carry `condition: "true"|"false"` and `dag.ConditionalChildren` picks the branch from the node's `status` output), and `sleep`. There is **no loop, no sub-workflow, and no generic HTTP node type**, and the graph must be acyclic — `dag.New` runs a topological sort and rejects cycles (`ErrCycleDetected`).
+
+## AI workflow generation
+
+Workflows can be authored by chat: the generation feature (env-gated via `WORKFLOWS_GENERATION_ENABLED`, provider `gemini` or `local` selected by `WORKFLOWS_GENERATION_PROVIDER`) turns a conversation into canvas JSON.
+
+- **Session replay** — `chat.ChatService.SendMessage` persists the user message, then replays the session's full message history (both roles) to the LLM, so the model iterates on its own prior workflow drafts across turns.
+- **Live catalog injection** — the system instruction is a platform-owned markdown file (`WORKFLOWS_GENERATION_SYSTEM_INSTRUCTION_FILE`) with three placeholders — `{AVAILABLE_NODES_JSON}`, `{AVAILABLE_CREDENTIALS_JSON}`, `{AVAILABLE_TRIGGER_VARIABLES_JSON}` — filled at request time by context builders from the live nodeengine registries. The model can only compose nodes that actually exist in this deployment.
+- **Strict output contract** — the prompt pins the exact canvas shape: a single ` ```json:workflow ` block containing `{nodes, edges}` arrays, mandatory `system_starter` node first, edge/`$reference` parity checked per edge, and an explicit ban on emitting a `credentials` field (the runtime resolves credentials at execution). It also enforces a cost rule: prefer static `parameters` (zero-cost substitution) over `instruction` prose, since every instruction triggers a function-calling LLM call on each run.
+- **SSE streaming** — the presentation handler streams the reply as `text/event-stream` (`event: message` chunks, `event: done` / `event: error` terminators); the completed assistant reply is saved back to the session.
+- **Scope guard** — the system prompt restricts the assistant to workflow building only and refuses off-topic requests with a fixed sentence.
+
 ## Use cases (application)
 Workflows (`application/workflows/*`):
 - `createworkflow` — create a workflow.

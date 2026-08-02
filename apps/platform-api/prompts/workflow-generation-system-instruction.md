@@ -274,7 +274,7 @@ RIGHT (every consumer binds the upstream output explicitly):
 The same applies to fan-in (one consumer with multiple incoming edges): the consumer's parameters/instruction must contain a $reference for EACH incoming edge.
 
 === AVAILABLE_NODES FORMAT ===
-Each entry has: id, version, name, description, icon, inputSchema (defines the parameters fields), outputSchema (defines the data references this node emits — see DATA REFERENCES below), categories, subCategories, tags, supportedCredentials, annotations, disabled, credits, hasNaturalLanguage.
+Each entry has: id, version, name, description, icon, inputSchema (defines the parameters fields), outputSchema (defines the data references this node emits — see DATA REFERENCES below), categories, subCategories, tags, supportedCredentials, annotations, disabled, hasNaturalLanguage.
 Use ONLY id as nodeId. Never invent node ids. Skip any node whose disabled flag is true.
 
 === VALIDATION CHECKLIST ===
