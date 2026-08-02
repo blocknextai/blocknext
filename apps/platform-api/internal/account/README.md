@@ -22,6 +22,27 @@ This context owns the `User` aggregate and everything that authenticates a perso
   - One primary linked account per user; `ProviderID` unique; emails normalized.
   - Refresh tokens rotate by family/generation to detect reuse.
 
+## Supported auth methods
+
+| Method | Flow |
+| --- | --- |
+| Email + password | Register → email verification → login; forgot/reset and change flows |
+| Magic link | One-time emailed link (`request` → `consume`), no password required |
+| OAuth 2.0 | Google, GitHub, X, Facebook — authorization-code flow with PKCE + server-side nonce |
+| Crypto wallet | MetaMask — server-issued nonce message, wallet signature verified server-side |
+
+Which methods are active is env-driven and exposed at `GET /auth/methods`; the UI renders only the enabled ones. A user can hold multiple linked identities (one primary) and add a password later on top of an OAuth/wallet account.
+
+## Security model
+
+- **Credential storage** — passwords are bcrypt-hashed (server-side policy check before hashing); verification tokens and magic links are stored **hash-only**, one-time, purpose-bound (`email_verify`, `password_reset`, `email_change`, `magic_link`), TTL-checked and soft-deleted on consume. No plaintext secret ever hits the database.
+- **Refresh-token rotation with reuse detection** — sessions carry a `TokenFamily` + `TokenGeneration`; every refresh rotates the generation with an optimistic-concurrency check (`UpdateRefreshToken(expectedGeneration)`). Presenting an already-rotated token (`ErrRefreshTokenReused`) revokes the **entire family** (`RevokeAllByTokenFamily`) — a stolen refresh token dies together with the thief's session.
+- **OAuth hardening** — authorization-code + **PKCE** with a short-TTL server-side nonce; the code exchange is validated against the stored verifier, blocking authorization-code interception and replay.
+- **Wallet-login replay protection** — each attempt signs a fresh server-issued nonce; signatures are verified against it server-side, so captured signatures cannot be replayed.
+- **Account-enumeration resistance** — registering with an existing email does not error; the existing owner is notified by email instead (`account.registration.existing_email_notified`).
+- **Session control** — users can list active sessions and revoke one or all; access tokens are short-lived JWTs (issuer/audience/leeway validated), so revocation converges within minutes.
+- **Rate limiting** — the public auth endpoints sit behind platform-api's Redis-backed IP rate limiter.
+
 ## Use cases (application)
 **Commands**
 - Auth (OAuth/crypto): `createusernonce` (start OAuth + PKCE), `createusertoken` (exchange code for session), `refreshtoken` (rotate access token).

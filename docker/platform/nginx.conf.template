@@ -24,4 +24,8 @@ server {
     location = /index.html {
         add_header Cache-Control "no-cache, no-store, must-revalidate";
     }
+
+    location = /env.js {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
 }

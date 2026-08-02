@@ -1,6 +1,6 @@
 ---
 name: node-update
-description: Use this skill when the user wants to modify an existing workflow node under `internal/nodeengine/nodes/<provider>/<action>/`. Triggers on phrases like "update the X node", "add a new input field to Y", "change Z's category / tags / credits / annotations", "add a credential to the node", "disable a node", "update the node's HTTP endpoint", "rename a node field". Edits node.go and/or executor.go in place, keeps the input struct + validator in sync with the schema, and propagates cross-references (credentials' `SupportedNodes`, MCP server's Tools slice).
+description: Use this skill when the user wants to modify an existing workflow node under `internal/nodeengine/nodes/<provider>/<action>/`. Triggers on phrases like "update the X node", "add a new input field to Y", "change Z's category / tags / annotations", "add a credential to the node", "disable a node", "update the node's HTTP endpoint", "rename a node field". Edits node.go and/or executor.go in place, keeps the input struct + validator in sync with the schema, and propagates cross-references (credentials' `SupportedNodes`, MCP server's Tools slice).
 ---
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
@@ -12,7 +12,7 @@ Edits an existing workflow node under `internal/nodeengine/nodes/<provider>/<act
 
 ## When to use
 
-- User says "update the `<provider>_<action>` node" / "add a `<field>` input to X" / "change Y's category" / "add `<credential>` to node's supported credentials" / "rename a field in Z node" / "disable the X node" / "change credit cost" / "change Y's annotations"
+- User says "update the `<provider>_<action>` node" / "add a `<field>` input to X" / "change Y's category" / "add `<credential>` to node's supported credentials" / "rename a field in Z node" / "disable the X node" / "change Y's annotations"
 - For brand-new nodes use `node-create` instead.
 
 ## Required information
@@ -26,7 +26,7 @@ Confirm with the user (ask only what's missing):
    - **Rename input field** (schema key + struct field + `schema:"..."` tag + executor reads)
    - **Add output field** (output schema's inner `Items` properties + executor's `results = append(results, map{...})` blocks)
    - **Change input default / enum** (no struct change required if type unchanged)
-   - **Change metadata** (Name, Description, Icon, Categories, SubCategories, Tags, Credits)
+   - **Change metadata** (Name, Description, Icon, Categories, SubCategories, Tags)
    - **Add / remove a supported credential** (`SupportedCredentials` slice)
    - **Change annotations** (re-classify the node into one of the 5 groups; see `node-create` skill)
    - **Disable** (`Disabled: true`) — node hidden everywhere (nodes registry, executors registry, MCP server tools list, function calling)
@@ -142,7 +142,7 @@ Verify the Go type still matches the new values (e.g., changing from `int` to `f
 
 #### Change metadata
 
-`Name`, `Description`, `Icon`, `Categories`, `SubCategories`, `Tags`, `Credits` are independent. Tags must remain lowercase; categories must use one of the existing top-level values (memory: `node-create` skill lists them). Changing `Credits` affects user billing for MCP tool calls — surface this prominently.
+`Name`, `Description`, `Icon`, `Categories`, `SubCategories`, `Tags` are independent. Tags must remain lowercase; categories must use one of the existing top-level values (memory: `node-create` skill lists them).
 
 #### Add / remove a supported credential
 
@@ -216,7 +216,6 @@ If the executor's HTTP flow needs to change (different endpoint, different auth 
 | Rename input field                    | Update struct field + `schema:"..."` tag + every executor read                    |
 | Add output field                      | Edit inside `OutputSchema.Items.Properties` (not top level); add to every `results = append(results, ...)` in executor.go |
 | Change annotations                    | Pick correct group from `node-create` skill; surface UX implication                |
-| Change credits                        | Affects MCP tool-call billing; surface to user                                    |
 | Add supported credential              | Verify credential file exists; consider adding node to credential's `SupportedNodes` |
 | Remove supported credential           | Verify executor no longer reads from that credential                              |
 | Disable node                          | Tell user the node will disappear from UI, function calling, AND MCP server tools list |
@@ -256,8 +255,7 @@ All three must be clean.
 8. **`httpclient` only in helpers, never `net/http` directly.**
 9. **`JSONContentType()` (initialism casing)** — never `JsonContentType()`.
 10. **`apperror.Internal(...)` for executor errors,** not `fmt.Errorf` or `errors.New`.
-11. **`Credits` change affects MCP billing.** Always surface to user; don't change silently.
-12. **Disabling a node makes it invisible to:** UI, function calling, AND MCP server tools list. Confirm intentional.
+11. **Disabling a node makes it invisible to:** UI, function calling, AND MCP server tools list. Confirm intentional.
 
 ## What NOT to do
 

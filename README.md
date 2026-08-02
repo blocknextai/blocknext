@@ -6,11 +6,15 @@ It is built for end users, not just developers: flows stay simple, readable and 
 
 ## Highlights
 
-- **Visual flow builder** — compose workflows on an intuitive drag-and-drop canvas.
-- **AI-powered nodes** — bring LLMs and generative AI into your flows as first-class building blocks.
-- **Integrations** — connect the tools and services you already use.
+- **Visual flow builder** — compose workflows on an intuitive drag-and-drop canvas. Flows are deliberately simple: no loops, no sub-workflows, no expression language to learn.
+- **Describe it, don't configure it** — give a node plain-language instructions and an LLM fills in its parameters at run time. Anything you set explicitly always wins over what the model infers.
+- **Built-in MCP server** — every integration node doubles as an [MCP](https://modelcontextprotocol.io) tool. Point Claude (or any MCP client) at your BlockNext server with an API key and use your connected services from chat.
+- **AI-powered nodes** — LLMs and generative AI (text, image, audio, video) as first-class building blocks, alongside integrations for the tools you already use.
 - **Triggers** — start flows manually, on a schedule, or from the outside via webhooks and API calls.
-- **Credentials management** — store and reuse service credentials securely across flows.
+- **Live execution view** — watch every task and node progress in real time over WebSocket.
+- **Credentials management** — encrypted at rest, OAuth tokens auto-refreshed, and only ever decrypted at execution time — flows never embed secrets.
+
+Curious how it works under the hood? See the [architecture overview](ARCHITECTURE.md).
 
 ## Getting started
 
@@ -27,6 +31,7 @@ To build and run everything from source instead, see
 
 ## Community
 
+- [Architecture overview](ARCHITECTURE.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Security policy](SECURITY.md) — please report vulnerabilities privately

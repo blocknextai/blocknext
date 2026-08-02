@@ -8,7 +8,7 @@ The node engine owns the **definitions** of everything a workflow can do: each n
 
 ## Core concepts
 
-- **Node** (`domain/nodes/node.go`): a declarative action descriptor — `ID`, `Version`, name/description, `InputSchema`/`OutputSchema` (`jsonschema-go`), `Categories`/`SubCategories`/`Tags`, `SupportedCredentials`, `Annotations`, `Credits`, `HasNaturalLanguage`, `Disabled`. Implements `NodeManager` (getter interface).
+- **Node** (`domain/nodes/node.go`): a declarative action descriptor — `ID`, `Version`, name/description, `InputSchema`/`OutputSchema` (`jsonschema-go`), `Categories`/`SubCategories`/`Tags`, `SupportedCredentials`, `Annotations`, `HasNaturalLanguage`, `Disabled`. Implements `NodeManager` (getter interface).
 - **Executor** (`domain/executors/executor.go`): the behavior for a node, keyed by the same ID. `ExecutorManager.ExecuteWithContext(ctx, credentials, data)` is the execution entry point.
 - **Credential** (`domain/credentials/credential.go`): a provider auth descriptor — schema, `IsOAuth1`/`IsOAuth2`/`IsSupportPlatform`, `SupportedNodes`. OAuth credentials may implement `RefreshableCredential`. `IsSupportPlatform` is auto-derived at load (host-provided OAuth apps).
 - **Adapter** (`domain/adapters/adapter.go`): a trigger adapter that maps a raw webhook payload into a `TriggerContext` (`source`/`sender`/`prompt`/`payload`, exposed as `$trigger.*` variables).
@@ -21,6 +21,42 @@ The node engine owns the **definitions** of everything a workflow can do: each n
 Nodes are organized as `nodes/<provider>/<action>/{node.go,executor.go}` with a per-provider `register.go` and shared `helpers/`. There are ~26 providers (`nodes/nodes.go`) spanning LLMs/AI (anthropic, chatgpt, gemini, deepseek, deepl), media generation (elevenlabs, veo, piapi, sunomusic, soundcloud), social/messaging (discord, slack, telegram, whatsapp, x, instagram, facebook, tiktok, linkedin), Google (docs, drive, gmail, sheets, keep, youtube), productivity/data (airtable, notion, coingecko, sendgrid), plus a `system` provider for engine primitives (`condition`, `sleep`, `starter`). Roughly ~80 node actions in total.
 
 A provider's `register.go` wires each action consistently: build the node, build a JSON-schema validator (`jsonschema.New[Input]`), build the executor, then `nodes.RegisterNode` + `executors.RegisterExecutor`, optionally `functioncalling.RegisterFunctionCalling(functioncalling.Generate(node))`, and a single `mcp.RegisterServer` grouping the provider's nodes as MCP tools. A node links to a credential by ID through `Node.SupportedCredentials`, and the credential mirrors the link via `Credential.SupportedNodes`. ~31 credentials live in `credentials/` as `<provider>_(api|oauth2).go`, registered in `credentials/credentials.go` (OAuth2 ones receive the OAuth redirect URL at registration).
+
+## Node anatomy
+
+**One descriptor drives every surface.** A node is a single declarative struct — `nodes.Node` in `domain/nodes/node.go` — with no behavior of its own. Every downstream surface is derived from it; there is no second definition to keep in sync:
+
+| Field | Powers |
+| - | - |
+| `ID`, `Version` | Registry key; pairs the node with its executor, and names both its MCP tool and its LLM function declaration |
+| `InputSchema` (`jsonschema-go`) | The flow editor's node form (served via `GET /node-engine/nodes`), runtime input validation, the function-declaration `parameters`, and the MCP tool `inputSchema` |
+| `OutputSchema` | Declares the array-of-records output shape for downstream `$references`; wrapped under `items` for the MCP `outputSchema` |
+| `Categories` / `SubCategories` / `Tags` | Catalog browsing and search in the editor |
+| `SupportedCredentials` | The credential picker in the UI; on MCP, expanded into a required `credentials` parameter object |
+| `Annotations` | MCP `ToolAnnotations` behavior hints (see below) |
+| `HasNaturalLanguage` | Whether an LLM function declaration is generated, i.e. whether the node's inputs can be filled from natural language |
+| `Disabled` | Registration gate — a disabled node is skipped by every registry and disappears from all surfaces at once |
+
+**The file-pair convention.** Each action lives in `nodes/<provider>/<action>/` as a `node.go` + `executor.go` pair sharing one node ID. `node.go` embeds `nodes.Node` and is pure data (e.g. `slack/sendmessage/node.go` declares the `channel`/`text` input schema, the `slack_oauth2` credential link, and `HasNaturalLanguage: true`); `executor.go` embeds `executors.Executor` with the same ID and implements the behavior. The provider `register.go` ties them together: `jsonschema.New[Input](node.GetInputSchema())` builds a typed validator from the node's own schema, which is injected into the executor — so the executor validates against exactly the schema the UI renders.
+
+**Executors see lists, not single records.** The executor contract is `ExecuteWithContext(ctx, credentials map[string]any, data []map[string]any) ([]map[string]any, error)` (`domain/executors/executor.go`). `data` is the list of input records (one per upstream output item); the executor loops, `validator.Parse`s each record into its typed input struct, calls the provider API, and appends one output record per input — the array-of-records shape declared by `OutputSchema`. `credentials` is keyed by credential ID (`credentials.GetCredentials(credentials, "slack_oauth2")` returns a typed accessor over the decrypted material); executors never fetch or refresh credentials themselves.
+
+**Validation is schema-first.** `application/jsonschema.Validator[T].Parse` copies schema `default`s into missing/empty fields, validates the record against the compiled JSON schema (`santhosh-tekuri/jsonschema`), then binds it onto the input struct via `schema:"..."` field tags with tolerant coercion (string/number/bool/slice). Executors therefore start from an already-validated, defaulted, typed input.
+
+**Registration gates.** `nodes.RegisterNode` silently skips `Disabled` nodes. `functioncalling.Generate(node)` sets `Disabled: !node.GetHasNaturalLanguage()`, and `RegisterFunctionCalling` skips disabled entries — so only natural-language nodes ever reach the LLM as functions (declaration name = node ID, dots mapped to underscores; `parameters` = the marshalled `InputSchema`). `mcp.RegisterServer` filters disabled tools out of a server's `Tools`. The `system` provider shows the gates are independent: `condition`/`sleep`/`starter` register node + executor + an MCP server but no function calling.
+
+## Annotations
+
+**MCP behavior hints, declared at the node.** `NodeAnnotations` (`domain/nodes/annotations.go`) carries the four standard MCP tool hints, forwarded verbatim to `ToolAnnotations` by the MCP adapter:
+
+| Field | Type | Declares | Example |
+| - | - | - | - |
+| `ReadOnly` | `bool` | No environment mutation | `gemini_chat`, `google_keep_get_note` |
+| `Destructive` | `*bool` | Updates may be destructive | `google_keep_delete_note` (`new(true)`); message senders opt out (`new(false)`) |
+| `Idempotent` | `bool` | Repeat calls with same args add no effect | `google_keep_get_note`, `google_keep_list_notes` |
+| `OpenWorld` | `*bool` | Interacts with an open domain of entities | — |
+
+`Destructive` and `OpenWorld` are pointers on purpose: MCP defaults these hints to `true` when absent, so an explicit `false` (a send-message node asserting it is non-destructive) must be distinguishable from "unset".
 
 ## Use cases (application)
 

@@ -35,7 +35,7 @@ Confirm with the user (ask only what's missing):
 2. **Aggregate name** — the first aggregate root inside the module. Often matches the module name (e.g., `apikeys` module owns the `apikeys` aggregate). For modules with multiple aggregates (e.g., `organizations` owns `organizations`, `organizationusers`, `organizationsocials`), pick the primary one.
 3. **Entity name** — singular Go type for the aggregate root (e.g., `APIKey`, `Credential`, `Organization`). PascalCase, acronyms uppercase.
 4. **Entity fields** — domain attributes (besides the standard `BaseEntity` triplet of ID + timestamps). For each: name, Go type, whether it's nullable.
-5. **Cross-module dependencies** — does this module need data or services from other modules? Repositories from other modules are NEVER injected (memory: `feedback_no_repository_injection_across_contexts`); only the other module's **service interface** can come in via `Dependencies`. Common examples: `account.UserService`, `subscriptions.SubscriptionService`.
+5. **Cross-module dependencies** — does this module need data or services from other modules? Repositories from other modules are NEVER injected (memory: `feedback_no_repository_injection_across_contexts`); only the other module's **service interface** can come in via `Dependencies`. Common examples: `account.UserService`, `organizations.OrganizationService`.
 6. **Public surface** — does this module expose a service to other modules? If yes, the `Module` struct gets a public `<X>Service` field; if no, all fields stay private. (Memory: `feedback_module_field_pattern`.)
 7. **HTTP routes** — does the module expose endpoints? (Almost always yes.) If so, what's the URL prefix (e.g., `/users/me/<entity>`, `/organizations/:organizationId/<entity>`, or both)?
 
@@ -659,7 +659,7 @@ Wiring is split across **two files**:
 })
 ```
 
-If `NewModule` returns an error (some modules do — e.g., `payments`, `account`, `web3`), use the early-return pattern (`NewPlatformAPI` returns `(*PlatformAPI, error)`):
+If `NewModule` returns an error (some modules do — e.g., `account`, `web3`, `llm`, `workflows`), use the early-return pattern (`NewPlatformAPI` returns `(*PlatformAPI, error)`):
 
 ```go
 <module>Module, err := <module>.NewModule(<module>.Dependencies{...})
