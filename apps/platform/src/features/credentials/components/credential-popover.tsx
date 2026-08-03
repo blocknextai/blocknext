@@ -17,6 +17,12 @@ const CredentialPopover = ({
 }) => {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (!next) setQuery('')
+  }
 
   const filteredSecrets = useMemo(() => {
     if (!secrets) return []
@@ -38,6 +44,7 @@ const CredentialPopover = ({
           variant={'ghost'}
           className="text-xs w-full justify-start gap-2"
           onClick={() => {
+            handleOpenChange(false)
             const secretCopy = { ...secret, isNew: true }
             onSelect(secretCopy)
           }}
@@ -51,7 +58,7 @@ const CredentialPopover = ({
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="p-0" asChild>
         <div className={`flex flex-col w-80 ${isUserMode ? 'pb-1' : ''}`}>
