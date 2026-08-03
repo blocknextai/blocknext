@@ -24,20 +24,20 @@ make docker-up  # pulls the published images and starts the full stack
 ```
 
 Docker and `make` are all you need — Go and Bun are only required for
-[development](CONTRIBUTING.md).
+[development](.github/CONTRIBUTING.md).
 
 The UI is served on http://localhost:4000. Run `make help` for every target.
 
 To build and run everything from source instead, see
-[CONTRIBUTING.md](CONTRIBUTING.md) — the development workflow uses
+[CONTRIBUTING.md](.github/CONTRIBUTING.md) — the development workflow uses
 `make local-docker-up`.
 
 ## Community
 
 - [Architecture overview](ARCHITECTURE.md)
-- [Contributing guide](CONTRIBUTING.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Security policy](SECURITY.md) — please report vulnerabilities privately
+- [Contributing guide](.github/CONTRIBUTING.md)
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Security policy](.github/SECURITY.md) — please report vulnerabilities privately
 
 ## License
 
