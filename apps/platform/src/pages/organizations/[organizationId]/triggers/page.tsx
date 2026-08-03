@@ -3,7 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Loading } from '@/components/shared/loading'
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Zap, Play, Pause, Trash2, RefreshCcw } from 'lucide-react'
+import {
+  Plus,
+  Zap,
+  Play,
+  Pause,
+  Trash2,
+  RefreshCcw,
+  ShieldCheck,
+} from 'lucide-react'
 import { useTriggers, useTriggerActions } from '@/features/workflows'
 import { useNodeEngineWebhookSources } from '@/features/flow-editor'
 import { Input } from '@/components/ui/input'
@@ -31,6 +39,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import ConfirmationDialog from '@/components/shared/confirmation-dialog'
 import { AppPagination } from '@/components/shared/app-pagination'
 import { SearchInput } from '@/components/shared/search-input'
@@ -76,6 +89,8 @@ function OrganizationTriggersPage() {
   const [isSavingSchedule, setIsSavingSchedule] = useState(false)
   const [isRegenerating, setIsRegenerating] = useState(false)
   const [regeneratedToken, setRegeneratedToken] = useState<string | null>(null)
+  const [editWebhookSecret, setEditWebhookSecret] = useState('')
+  const [isSavingSecret, setIsSavingSecret] = useState(false)
   const showWebhookDetails = detailsTrigger?.type === 'webhook'
   const isSchedule = detailsTrigger?.type === 'schedule'
   const { sources: webhookSources } = useNodeEngineWebhookSources()
@@ -84,6 +99,7 @@ function OrganizationTriggersPage() {
     if (!detailsTrigger) return
     setEditCron(detailsTrigger.cronPattern ?? '')
     setEditTimezone(detailsTrigger.timezone ?? '')
+    setEditWebhookSecret('')
   }, [detailsTrigger?.id])
 
   const initialCron = detailsTrigger?.cronPattern ?? ''
@@ -107,6 +123,30 @@ function OrganizationTriggersPage() {
     } finally {
       setIsSavingSchedule(false)
     }
+  }
+
+  const saveWebhookSecret = async () => {
+    const secret = editWebhookSecret.trim()
+    if (!detailsTrigger || !secret) return
+    setIsSavingSecret(true)
+    try {
+      await update(detailsTrigger.id, { webhookSecret: secret })
+      setDetailsTrigger(null)
+    } finally {
+      setIsSavingSecret(false)
+    }
+  }
+
+  const confirmRemoveWebhookSecret = (triggerId: string) => {
+    setConfirmData({
+      description: t('ui.text.removeWebhookSecretConfirmation'),
+      label: t('ui.text.remove'),
+      action: async () => {
+        await update(triggerId, { webhookSecret: '' })
+        setDetailsTrigger(null)
+      },
+    })
+    setOpen(true)
   }
 
   const lang = localStorage.getItem('i18nextLng') || 'en'
@@ -324,32 +364,92 @@ function OrganizationTriggersPage() {
                       <TimeAgoI18n date={detailsTrigger.createdAt} />
                     </span>
                   </div>
-                  {showWebhookDetails && webhookSources.length > 0 && (
-                    <div className="grid gap-2">
-                      <Label className="text-muted-foreground">
-                        {t('ui.text.webhookUrls')}
-                      </Label>
-                      <div className="grid gap-2">
-                        {webhookSources.map((item: any) => (
-                          <div
-                            key={item.source}
-                            className="flex items-center gap-2"
-                          >
-                            <span className="text-xs font-medium capitalize w-20 shrink-0">
-                              {item.source}
-                            </span>
-                            <CopyField
-                              value={item.webhookUrl}
-                              className="flex-1"
-                              inputClassName="h-8"
-                            />
+                  {showWebhookDetails && (
+                    <>
+                      {webhookSources.length > 0 && (
+                        <div className="grid gap-2">
+                          <Label className="text-muted-foreground">
+                            {t('ui.text.webhookUrls')}
+                          </Label>
+                          <div className="grid gap-3">
+                            {webhookSources.map((item: any) => (
+                              <div key={item.source} className="grid gap-1">
+                                <span className="text-xs font-medium flex items-center gap-1">
+                                  {item.supportsVerification && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <ShieldCheck className="size-3.5 text-muted-foreground shrink-0" />
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top">
+                                        {t('ui.text.webhookSourceVerified')}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                  {t(item.name)}
+                                </span>
+                                <CopyField
+                                  value={item.webhookUrl}
+                                  inputClassName="h-8"
+                                />
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                          <p className="text-xs text-muted-foreground">
+                            {t('ui.text.webhookUrlReplaceToken')}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="grid gap-2">
+                        <Label
+                          htmlFor="webhook-secret"
+                          className="text-muted-foreground"
+                        >
+                          {t('ui.text.webhookSecret')}
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="webhook-secret"
+                            type="password"
+                            autoComplete="new-password"
+                            className="h-8"
+                            placeholder={t('ui.text.webhookSecretPlaceholder')}
+                            value={editWebhookSecret}
+                            onChange={(e) =>
+                              setEditWebhookSecret(e.target.value)
+                            }
+                          />
+                          <Button
+                            size="sm"
+                            disabled={
+                              !editWebhookSecret.trim() || isSavingSecret
+                            }
+                            onClick={saveWebhookSecret}
+                          >
+                            {isSavingSecret
+                              ? t('ui.text.saving')
+                              : t('ui.text.save')}
+                          </Button>
+                          {detailsTrigger.hasWebhookSecret && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() =>
+                                confirmRemoveWebhookSecret(detailsTrigger.id)
+                              }
+                            >
+                              {t('ui.text.remove')}
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {detailsTrigger.hasWebhookSecret
+                            ? t('ui.text.webhookSecretConfigured')
+                            : t('ui.text.webhookSecretNotConfigured')}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {t('ui.text.webhookUrlReplaceToken')}
-                      </p>
-                    </div>
+                    </>
                   )}
 
                   <div className="flex flex-col gap-2 pt-4 border-t">

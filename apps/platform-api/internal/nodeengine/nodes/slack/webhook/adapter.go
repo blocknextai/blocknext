@@ -22,12 +22,11 @@ type SlackAdapter struct {
 }
 
 func NewSlackAdapter(nodeID string) *SlackAdapter {
-	adapter := nodeEngineDomainAdapters.NewAdapterBuilder().
-		ID(nodeID).
-		Build()
-
 	return &SlackAdapter{
-		Adapter: adapter,
+		Adapter: nodeEngineDomainAdapters.Adapter{
+			ID:   nodeID,
+			Name: "Slack",
+		},
 	}
 }
 
