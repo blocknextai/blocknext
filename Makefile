@@ -9,8 +9,12 @@ help: ## show this help
 		/^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) }' $(MAKEFILE_LIST)
 
 .PHONY: setup
-setup: ## create .env with generated secrets and install dependencies
+setup: ## create .env with generated secrets (all you need to run the stack)
 	@./scripts/setup.sh
+
+.PHONY: setup-dev
+setup-dev: ## setup + install Go and Bun dependencies for local development
+	@./scripts/setup-dev.sh
 
 ##@ go
 
