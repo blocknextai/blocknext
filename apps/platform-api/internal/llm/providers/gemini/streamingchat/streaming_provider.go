@@ -22,6 +22,7 @@ var (
 
 type geminiStreamingProvider struct {
 	client          *httpclient.Client
+	model           string
 	temperature     float32
 	topK            int32
 	topP            float32
@@ -54,6 +55,7 @@ func New(
 
 	return &geminiStreamingProvider{
 		client:          client,
+		model:           model,
 		temperature:     temperature,
 		topK:            topK,
 		topP:            topP,
@@ -116,8 +118,26 @@ func (p *geminiStreamingProvider) StreamChat(ctx context.Context, systemInstruct
 	}
 
 	ch := make(chan streamingchatPkg.Chunk, 64)
+	cachedContentUsed := payload.CachedContent != ""
 
 	go func() {
+		var usage *UsageMetadata
+		defer func() {
+			if usage == nil {
+				return
+			}
+			slog.Info("Gemini streaming token usage",
+				"component", "Generation",
+				"model", p.model,
+				"cached_content_used", cachedContentUsed,
+				"prompt_tokens", usage.PromptTokenCount,
+				"cached_tokens", usage.CachedContentTokenCount,
+				"candidates_tokens", usage.CandidatesTokenCount,
+				"thoughts_tokens", usage.ThoughtsTokenCount,
+				"total_tokens", usage.TotalTokenCount,
+			)
+		}()
+
 		defer close(ch)
 		defer func() {
 			if err := response.BodyReader.Close(); err != nil {
@@ -150,6 +170,10 @@ func (p *geminiStreamingProvider) StreamChat(ctx context.Context, systemInstruct
 					"data", data,
 				)
 				continue
+			}
+
+			if sseResp.UsageMetadata != nil {
+				usage = sseResp.UsageMetadata
 			}
 
 			for _, candidate := range sseResp.Candidates {

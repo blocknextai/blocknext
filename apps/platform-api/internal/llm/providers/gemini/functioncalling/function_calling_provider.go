@@ -8,10 +8,8 @@ import (
 
 	"github.com/blocknextai/go-packages/httpclient"
 	"github.com/blocknextai/go-packages/json"
-	llmCache "github.com/blocknextai/platform-api/internal/llm/cache"
 	"github.com/blocknextai/platform-api/internal/llm/functioncalling"
 	"github.com/blocknextai/platform-api/internal/llm/providers/gemini"
-	geminiCache "github.com/blocknextai/platform-api/internal/llm/providers/gemini/cache"
 )
 
 type geminiProvider struct {
@@ -24,7 +22,6 @@ type geminiProvider struct {
 	timeout           time.Duration
 	maxTimeout        time.Duration
 	client            *httpclient.Client
-	cache             llmCache.Cache
 }
 
 func New(
@@ -60,7 +57,6 @@ func New(
 		timeout:           timeout,
 		maxTimeout:        maxTimeout,
 		client:            client,
-		cache:             geminiCache.New(apiKey, model, "FunctionCalling", maxTimeout),
 	}, nil
 }
 
@@ -139,6 +135,11 @@ func (f *geminiProvider) ExecuteWithContext(ctx context.Context, data []map[stri
 
 	requestBody := map[string]any{
 		"contents": contents,
+		"systemInstruction": map[string]any{
+			"parts": []map[string]any{
+				{"text": f.systemInstruction},
+			},
+		},
 		"generationConfig": map[string]any{
 			"temperature":      temperature,
 			"topK":             f.topK,
@@ -158,16 +159,6 @@ func (f *geminiProvider) ExecuteWithContext(ctx context.Context, data []map[stri
 				"allowedFunctionNames": extractFunctionNames(functionDeclarations),
 			},
 		},
-	}
-
-	if cacheName := f.cache.Ensure(ctx, f.systemInstruction); cacheName != "" {
-		requestBody["cachedContent"] = cacheName
-	} else {
-		requestBody["systemInstruction"] = map[string]any{
-			"parts": []map[string]any{
-				{"text": f.systemInstruction},
-			},
-		}
 	}
 
 	var successResponse SuccessResponse
@@ -195,6 +186,17 @@ func (f *geminiProvider) ExecuteWithContext(ctx context.Context, data []map[stri
 		)
 		return nil, functioncalling.ErrProviderRequestFailed
 	}
+
+	usage := successResponse.UsageMetadata
+	slog.Info("Gemini function calling token usage",
+		"component", "FunctionCalling",
+		"model", f.model,
+		"prompt_tokens", usage.PromptTokenCount,
+		"cached_tokens", usage.CachedContentTokenCount,
+		"candidates_tokens", usage.CandidatesTokenCount,
+		"thoughts_tokens", usage.ThoughtsTokenCount,
+		"total_tokens", usage.TotalTokenCount,
+	)
 
 	if len(successResponse.Candidates) == 0 {
 		return nil, functioncalling.ErrNoCandidates

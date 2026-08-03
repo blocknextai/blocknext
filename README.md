@@ -10,6 +10,8 @@ It is built for end users, not just developers: flows stay simple, readable and 
 - **Describe it, don't configure it** — give a node plain-language instructions and an LLM fills in its parameters at run time. Anything you set explicitly always wins over what the model infers.
 - **Built-in MCP server** — every integration node doubles as an [MCP](https://modelcontextprotocol.io) tool. Point Claude (or any MCP client) at your BlockNext server with an API key and use your connected services from chat.
 - **AI-powered nodes** — LLMs and generative AI (text, image, audio, video) as first-class building blocks, alongside integrations for the tools you already use.
+- **Async done right** — long-running AI jobs (video, music generation) are a single node. The node starts the job, polls the provider, and returns the finished result — no wait/check/loop scaffolding on your canvas.
+- **Featherweight self-hosting** — Go services on distroless images (15–32 MB each). The full stack idles around ~150 MB RAM (even less with `TASK_RUNNER_MODE=embedded`), each API sitting in single-digit megabytes. Runs comfortably on the smallest VPS.
 - **Triggers** — start flows manually, on a schedule, or from the outside via webhooks and API calls.
 - **Live execution view** — watch every task and node progress in real time over WebSocket.
 - **Credentials management** — encrypted at rest, OAuth tokens auto-refreshed, and only ever decrypted at execution time — flows never embed secrets.
