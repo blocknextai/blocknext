@@ -14,14 +14,15 @@ func MapGetAllTriggersQueryToGetAllTriggersResponse(
 		workflow := workflowsByID[trigger.ID]
 
 		response = append(response, &TriggerResponse{
-			ID:          trigger.ID,
-			Type:        trigger.Type,
-			CronPattern: trigger.CronPattern,
-			Timezone:    trigger.Timezone,
-			IsActive:    trigger.IsActive,
-			Workflow:    workflow,
-			CreatedAt:   trigger.CreatedAt,
-			UpdatedAt:   trigger.UpdatedAt,
+			ID:               trigger.ID,
+			Type:             trigger.Type,
+			CronPattern:      trigger.CronPattern,
+			Timezone:         trigger.Timezone,
+			HasWebhookSecret: trigger.WebhookSecret != nil,
+			IsActive:         trigger.IsActive,
+			Workflow:         workflow,
+			CreatedAt:        trigger.CreatedAt,
+			UpdatedAt:        trigger.UpdatedAt,
 		})
 	}
 	return response

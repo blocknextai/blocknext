@@ -10,12 +10,11 @@ type DiscordAdapter struct {
 }
 
 func NewDiscordAdapter(nodeID string) *DiscordAdapter {
-	adapter := nodeEngineDomainAdapters.NewAdapterBuilder().
-		ID(nodeID).
-		Build()
-
 	return &DiscordAdapter{
-		Adapter: adapter,
+		Adapter: nodeEngineDomainAdapters.Adapter{
+			ID:   nodeID,
+			Name: "Discord",
+		},
 	}
 }
 
