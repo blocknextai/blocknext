@@ -22,16 +22,24 @@ workspaces + Turborepo. All configuration lives in the single root `.env`
 
 ## Getting started
 
-Requirements: Docker + Docker Compose, Go 1.26+, [Bun](https://bun.sh), Make.
+Requirements: Docker + Docker Compose, Make. (Go 1.26+ and [Bun](https://bun.sh)
+are only needed for host-side development — see below.)
 
 ```bash
-make setup            # creates .env with generated secrets, installs dependencies
+make setup            # creates .env with generated secrets
 make local-docker-up  # builds and starts the full stack from source
 ```
 
 The UI is served on http://localhost:4000; APIs on 3000 (platform),
 3100 (mcp), 3200 (webhook), 3300 (file gateway). Run `make help` for every
 available target.
+
+To work on the code directly on the host — linters, formatters, the UI dev
+server — install the Go and Bun dependencies too:
+
+```bash
+make setup-dev        # setup + go mod download + bun install
+```
 
 For a faster UI feedback loop, stop the `platform` container and run the dev
 server on the host:

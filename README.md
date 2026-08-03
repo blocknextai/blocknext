@@ -19,9 +19,12 @@ Curious how it works under the hood? See the [architecture overview](ARCHITECTUR
 ## Getting started
 
 ```bash
-make setup      # creates .env with generated secrets, installs dependencies
+make setup      # creates .env with generated secrets
 make docker-up  # pulls the published images and starts the full stack
 ```
+
+Docker and `make` are all you need — Go and Bun are only required for
+[development](CONTRIBUTING.md).
 
 The UI is served on http://localhost:4000. Run `make help` for every target.
 
