@@ -28,7 +28,16 @@ type GenerationConfig struct {
 }
 
 type SSEResponse struct {
-	Candidates []Candidate `json:"candidates"`
+	Candidates    []Candidate    `json:"candidates"`
+	UsageMetadata *UsageMetadata `json:"usageMetadata"`
+}
+
+type UsageMetadata struct {
+	PromptTokenCount        int32 `json:"promptTokenCount"`
+	CachedContentTokenCount int32 `json:"cachedContentTokenCount"`
+	CandidatesTokenCount    int32 `json:"candidatesTokenCount"`
+	ThoughtsTokenCount      int32 `json:"thoughtsTokenCount"`
+	TotalTokenCount         int32 `json:"totalTokenCount"`
 }
 
 type Candidate struct {
