@@ -115,6 +115,9 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 	platformModule := platform.NewModule(platform.Dependencies{
 		CredentialConfigs: shared.Platform.Credentials.ToCredentialConfigs(),
 
+		FunctionCallingEnabled:     shared.FunctionCalling.Enabled,
+		WorkflowsGenerationEnabled: shared.Workflows.Generation.Enabled,
+
 		NodeEngineCredentialService: nodeEngineModule.CredentialService,
 	})
 

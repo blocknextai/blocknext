@@ -14,6 +14,9 @@ import (
 type Dependencies struct {
 	CredentialConfigs map[string]string
 
+	FunctionCallingEnabled     bool
+	WorkflowsGenerationEnabled bool
+
 	NodeEngineCredentialService nodeEngineApplicationCredentials.CredentialService
 }
 
@@ -30,6 +33,9 @@ func NewModule(deps Dependencies) *Module {
 	)
 	service := platformApplicationPlatformCredentials.NewPlatformCredentialService(loader)
 	handlers := platformInfrastructure.RegisterInfrastructure(platformInfrastructure.RegisterInfrastructureDeps{
+		FunctionCallingEnabled:     deps.FunctionCallingEnabled,
+		WorkflowsGenerationEnabled: deps.WorkflowsGenerationEnabled,
+
 		PlatformCredentialService: service,
 		CredentialService:         deps.NodeEngineCredentialService,
 	})

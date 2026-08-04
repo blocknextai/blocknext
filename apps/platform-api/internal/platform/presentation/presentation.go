@@ -7,6 +7,7 @@ import (
 	"github.com/blocknextai/go-packages/rbac"
 	commonPresentationAuth "github.com/blocknextai/platform-api/internal/common/presentation/auth"
 	platformInfrastructure "github.com/blocknextai/platform-api/internal/platform/infrastructure"
+	"github.com/blocknextai/platform-api/internal/platform/presentation/features"
 	"github.com/blocknextai/platform-api/internal/platform/presentation/platformcredentials"
 	"github.com/gofiber/fiber/v3"
 )
@@ -17,7 +18,15 @@ func RegisterPresentation(
 	cacheMiddleware *cachemiddleware.Middleware,
 	handlers *platformInfrastructure.Handlers,
 ) {
-	platformCredentialsRouterGroup := router.Group("/platform/credentials")
+	platformRouterGroup := router.Group("/platform")
+
+	platformRouterGroup.Get(
+		"/features",
+		cacheMiddleware.Cache(5*time.Minute),
+		features.NewGetFeaturesHandler(handlers.GetFeatures),
+	)
+
+	platformCredentialsRouterGroup := platformRouterGroup.Group("/credentials")
 
 	platformCredentialsRouterGroup.Get(
 		"/",

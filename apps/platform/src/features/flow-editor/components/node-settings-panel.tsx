@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { usePlatformFeatures } from '@/features/platform'
 import { AdvancedDebouncedTextarea } from '@/components/shared/advanced-debounced-textarea'
 import { SchemaFieldRenderer } from '@/features/flow-editor/components/schema-field-renderer'
 import { DataSourcePopover } from '@/features/flow-editor/components/data-source-popover'
@@ -106,7 +107,8 @@ export function NodeSettingsPanel({
     [schema],
   )
 
-  const showBasicTab = hasNaturalLanguage !== false
+  const { functionCallingEnabled } = usePlatformFeatures()
+  const showBasicTab = hasNaturalLanguage !== false && functionCallingEnabled
   const showAdvancedTab = visibleSchema.length > 0
   const defaultTab = showBasicTab
     ? 'basic'
