@@ -105,7 +105,7 @@ export function FlowApiSheet({ open, onOpenChange, flowId, nodes, apiNodes }) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-xl">
+      <SheetContent className="sm:max-w-3xl">
         <SheetHeader>
           <SheetTitle>{t('ui.text.apiTrigger', 'API Trigger')}</SheetTitle>
           <SheetDescription>
