@@ -14,6 +14,7 @@ import {
   useOrganizations,
   useOrganizationActions,
 } from '@/features/organizations'
+import { usePlatformFeatures } from '@/features/platform'
 import { useOrganizationStore } from '@/stores/organization'
 import { useAuthLinkedAccounts } from '@/features/auth'
 import wsManager from '@/lib/ws-manager'
@@ -25,6 +26,7 @@ const OrganizationLayout = () => {
   const { organizations } = useOrganizations()
   const { linkedAccounts } = useAuthLinkedAccounts()
   const { create: createOrganization } = useOrganizationActions()
+  usePlatformFeatures()
 
   useEffect(() => {
     if (!organizations) return

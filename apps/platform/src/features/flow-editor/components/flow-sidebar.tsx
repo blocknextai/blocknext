@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GhostInput } from '@/components/shared/ghost-input'
 import { getCategoryPrefs } from '@/lib/flow-categories'
+import { usePlatformFeatures } from '@/features/platform'
 import { useTranslation } from 'react-i18next'
 
 const FlowSidebar = ({
@@ -25,6 +26,7 @@ const FlowSidebar = ({
   setChatOpen,
 }) => {
   const { t } = useTranslation()
+  const { workflowsGenerationEnabled } = usePlatformFeatures()
 
   const renderNodeCard = (item, key) => {
     const name = item.label || item.name
@@ -204,7 +206,7 @@ const FlowSidebar = ({
             </div>
           </label>
 
-          {!previewMode && (
+          {!previewMode && workflowsGenerationEnabled && (
             <Button
               onClick={() => setChatOpen((prev) => !prev)}
               data-tour="ai-flow-builder"
