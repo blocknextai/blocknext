@@ -3,7 +3,7 @@ module github.com/blocknextai/platform-api
 go 1.26.5
 
 require (
-	github.com/blocknextai/go-packages v0.0.118
+	github.com/blocknextai/go-packages v0.0.0
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/ethereum/go-ethereum v1.17.5
 	github.com/gofiber/contrib/v3/websocket v1.2.2
@@ -13,7 +13,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.12.3
 	github.com/modelcontextprotocol/go-sdk v1.7.0
-	github.com/redis/go-redis/v9 v9.21.0
+	github.com/redis/go-redis/v9 v9.22.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/valyala/fasthttp v1.73.0
