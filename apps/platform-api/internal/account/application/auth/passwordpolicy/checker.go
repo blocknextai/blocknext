@@ -72,7 +72,7 @@ func (c *checker) checkHIBP(ctx context.Context, password string) (bool, error) 
 		return false, errHIBPUnavailable
 	}
 
-	for _, rawLine := range strings.Split(string(response.Body), "\n") {
+	for rawLine := range strings.SplitSeq(string(response.Body), "\n") {
 		line := strings.TrimSpace(rawLine)
 		if line == "" {
 			continue
