@@ -28,6 +28,8 @@ services:
     container_name: task-queue-redis
     command: ["redis-server", "--requirepass", "${TASK_RUNNER_QUEUE_REDIS_PASSWORD:?TASK_RUNNER_QUEUE_REDIS_PASSWORD is required}", "--appendonly", "yes", "--save", "60 1"]
     restart: unless-stopped
+    profiles:
+      - queue
     volumes:
       - task_queue_redis_data:/data
 
@@ -102,6 +104,8 @@ services:
 
   task-worker:
     restart: on-failure:10
+    profiles:
+      - queue
     env_file:
       - .env
     depends_on:

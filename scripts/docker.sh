@@ -4,6 +4,7 @@ set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.prod.yml"
+ALL_PROFILES='COMPOSE_PROFILES=*' 
 COMPOSE_LOCAL="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.local.yml"
 
 usage() {
@@ -36,7 +37,7 @@ case $1 in
         $COMPOSE up -d
         ;;
     down)
-        $COMPOSE down
+        env "$ALL_PROFILES" $COMPOSE down
         ;;
     logs)
         $COMPOSE logs -f
@@ -45,7 +46,7 @@ case $1 in
         $COMPOSE ps
         ;;
     clean)
-        $COMPOSE down -v --remove-orphans
+        env "$ALL_PROFILES" $COMPOSE down -v --remove-orphans
         ;;
     local-build)
         DOCKER_BUILDKIT=1 $COMPOSE_LOCAL build
@@ -54,7 +55,7 @@ case $1 in
         DOCKER_BUILDKIT=1 $COMPOSE_LOCAL up -d --build
         ;;
     local-down)
-        $COMPOSE_LOCAL down
+        env "$ALL_PROFILES" $COMPOSE_LOCAL down
         ;;
     local-logs)
         $COMPOSE_LOCAL logs -f
@@ -63,7 +64,7 @@ case $1 in
         $COMPOSE_LOCAL ps
         ;;
     local-clean)
-        $COMPOSE_LOCAL down -v --remove-orphans
+        env "$ALL_PROFILES" $COMPOSE_LOCAL down -v --remove-orphans
         ;;
     *)
         usage
