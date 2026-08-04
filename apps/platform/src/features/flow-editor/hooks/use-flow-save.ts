@@ -133,7 +133,8 @@ export function useFlowSave({
   }
 
   const runFlow = async () => {
-    const flow = await createOrUpdateFlow()
+    const needsSave = !initialFlow?.id || hasUnsavedChanges
+    const flow = needsSave ? await createOrUpdateFlow() : initialFlow
     const flowId = initialFlow?.id || flow?.id
     if (flowId) {
       navigate(`/organizations/${organizationId}/run/${flowId}`)
