@@ -227,7 +227,9 @@ function OrganizationRunPage() {
 
   const renderTriggerBadge = () => {
     const config = triggerTypeConfig[triggerType]
-    if (!config) return null
+    if (!config) {
+      return null
+    }
     const Icon = config.icon
     return (
       <Badge variant="outline" className="gap-1.5 font-normal">

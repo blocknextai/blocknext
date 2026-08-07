@@ -62,7 +62,9 @@ export function useExecutionActions(organizationId: string | null | undefined) {
 
   const remove = useCallback(
     async (executionId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       await executionsService.delete(organizationId, executionId)
       await invalidateList()
     },
@@ -71,7 +73,9 @@ export function useExecutionActions(organizationId: string | null | undefined) {
 
   const bulkRemove = useCallback(
     async (payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       await executionsService.bulkDelete(organizationId, payload as never)
       await invalidateList()
     },

@@ -85,7 +85,9 @@ export function useOrganizationNotifications(
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      return
+    }
     await notificationsService.markAllOrganizationNotificationsSeen(
       organizationId,
     )
@@ -94,7 +96,9 @@ export function useOrganizationNotifications(
 
   const handleMarkAsRead = useCallback(
     async (recipientId: string) => {
-      if (!organizationId) return
+      if (!organizationId) {
+        return
+      }
       await notificationsService.markOrganizationNotificationRead(
         organizationId,
         recipientId,
@@ -105,7 +109,9 @@ export function useOrganizationNotifications(
   )
 
   const handleMarkAllAsRead = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      return
+    }
     await notificationsService.markAllOrganizationNotificationsRead(
       organizationId,
     )
@@ -114,7 +120,9 @@ export function useOrganizationNotifications(
 
   const handleDelete = useCallback(
     async (recipientId: string) => {
-      if (!organizationId) return
+      if (!organizationId) {
+        return
+      }
       await notificationsService.deleteOrganizationNotification(
         organizationId,
         recipientId,
@@ -194,7 +202,9 @@ export function useOrganizationNotificationsBell(
   )
 
   const handleMarkAllAsSeen = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      return
+    }
     await notificationsService.markAllOrganizationNotificationsSeen(
       organizationId,
     )
@@ -203,7 +213,9 @@ export function useOrganizationNotificationsBell(
 
   const handleMarkAsRead = useCallback(
     async (recipientId: string) => {
-      if (!organizationId) return
+      if (!organizationId) {
+        return
+      }
       await notificationsService.markOrganizationNotificationRead(
         organizationId,
         recipientId,
@@ -214,7 +226,9 @@ export function useOrganizationNotificationsBell(
   )
 
   const handleMarkAllAsRead = useCallback(async () => {
-    if (!organizationId) return
+    if (!organizationId) {
+      return
+    }
     await notificationsService.markAllOrganizationNotificationsRead(
       organizationId,
     )

@@ -24,7 +24,9 @@ function AuthVerifyEmailPage() {
     authService
       .verifyEmail({ token })
       .then((response) => {
-        if (cancelled) return
+        if (cancelled) {
+          return
+        }
         const tokens = response.data
         if (!response.isSuccess || !tokens?.accessToken) {
           setStatus('error')
@@ -36,7 +38,9 @@ function AuthVerifyEmailPage() {
         window.location.href = returnUrl || '/preferences/profile'
       })
       .catch(() => {
-        if (!cancelled) setStatus('error')
+        if (!cancelled) {
+          setStatus('error')
+        }
       })
     return () => {
       cancelled = true

@@ -58,7 +58,9 @@ const AIChatSheet = ({ organizationId, isOpen, onClose, onApplyWorkflow }) => {
 
   const handleScroll = useCallback(() => {
     const el = scrollContainerRef.current
-    if (!el) return
+    if (!el) {
+      return
+    }
     const threshold = 50
     isUserScrolledUp.current =
       el.scrollHeight - el.scrollTop - el.clientHeight > threshold
@@ -92,7 +94,9 @@ const AIChatSheet = ({ organizationId, isOpen, onClose, onApplyWorkflow }) => {
     onClose()
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    return null
+  }
 
   return (
     <>

@@ -126,7 +126,9 @@ const ProfileSection = ({
                       } else if (!isPlaceholder) {
                         subtitle = identifier
                       }
-                      if (!subtitle) return null
+                      if (!subtitle) {
+                        return null
+                      }
                       return (
                         <div className="text-xs text-muted-foreground">
                           {subtitle}
@@ -157,7 +159,9 @@ const ProfileSection = ({
                     const canResend =
                       account.authProvider === 'email' && !account.isVerified
                     const canRemove = !account.isPrimary
-                    if (!canResend && !canRemove) return null
+                    if (!canResend && !canRemove) {
+                      return null
+                    }
                     const isBusy =
                       resendingEmail === account.identifier ||
                       deletingAccountId === account.id
@@ -221,7 +225,9 @@ const ProfileSection = ({
                       const target = linkedAccounts.find(
                         (a) => a.id === confirmRemoveId,
                       )
-                      if (!target) return null
+                      if (!target) {
+                        return null
+                      }
                       return t('ui.text.removeLinkedAccountConfirmation', {
                         name: target.displayName ?? target.identifier,
                         provider: target.authProvider,
@@ -233,7 +239,9 @@ const ProfileSection = ({
                   <AlertDialogCancel>{t('ui.text.cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => {
-                      if (confirmRemoveId) deleteLinkedAccount(confirmRemoveId)
+                      if (confirmRemoveId) {
+                        deleteLinkedAccount(confirmRemoveId)
+                      }
                       setConfirmRemoveId(null)
                     }}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -255,8 +263,9 @@ const ProfileSection = ({
           const unlinked = getUnlinkedProviders()
           const showEmailRow = !hasEmail
           const showPasswordRow = passwordEnabled && hasEmail && !hasPassword
-          if (unlinked.length === 0 && !showEmailRow && !showPasswordRow)
+          if (unlinked.length === 0 && !showEmailRow && !showPasswordRow) {
             return null
+          }
           return (
             <>
               <Separator className="my-4" />

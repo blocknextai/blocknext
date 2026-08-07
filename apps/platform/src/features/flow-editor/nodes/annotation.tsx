@@ -1,15 +1,18 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   AnnotationNode,
   AnnotationNodeContent,
 } from '@/features/flow-editor/nodes/annotation-node'
+import { useFlowSetNodes } from '@/features/flow-editor/contexts/flow-nodes-context'
 
-const Annotation = () => {
+const Annotation = ({ id, data }) => {
   const { t } = useTranslation()
-  const [content, setContent] = useState(t('ui.text.annotationPlaceholder'))
+  const setNodes = useFlowSetNodes()
   const [isEditing, setIsEditing] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const note = data?.note ?? ''
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -17,20 +20,19 @@ const Annotation = () => {
     }
   }, [isEditing])
 
-  const handleContentClick = () => {
-    setIsEditing(true)
-  }
+  const updateNote = useCallback(
+    (value: string) => {
+      setNodes((nodes) =>
+        nodes.map((n) =>
+          n.id === id ? { ...n, data: { ...n.data, note: value } } : n,
+        ),
+      )
+    },
+    [id, setNodes],
+  )
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setContent(e.target.value)
-  }
-
-  const handleInputBlur = () => {
-    setIsEditing(false)
-  }
-
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Escape') {
       setIsEditing(false)
     }
   }
@@ -38,29 +40,22 @@ const Annotation = () => {
   return (
     <AnnotationNode>
       <AnnotationNodeContent
-        onClick={handleContentClick}
-        style={{ cursor: 'text' }}
+        onClick={() => setIsEditing(true)}
+        className="w-full cursor-text"
       >
         {isEditing ? (
           <textarea
             ref={inputRef}
-            value={content}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
+            value={note}
+            onChange={(e) => updateNote(e.target.value)}
+            onBlur={() => setIsEditing(false)}
             onKeyDown={handleInputKeyDown}
-            style={{
-              fontSize: 'inherit',
-              fontFamily: 'inherit',
-              border: '1px solid #ccc',
-              borderRadius: 4,
-              padding: '6px 8px',
-              width: '100%',
-              minHeight: '80px',
-              boxSizing: 'border-box',
-            }}
+            className="bg-card border-border text-secondary-foreground min-h-20 w-full resize-none rounded-md border px-2 py-1.5 text-sm outline-none"
           />
         ) : (
-          content
+          <span className={note ? undefined : 'text-muted-foreground'}>
+            {note || t('ui.text.annotationPlaceholder')}
+          </span>
         )}
       </AnnotationNodeContent>
     </AnnotationNode>

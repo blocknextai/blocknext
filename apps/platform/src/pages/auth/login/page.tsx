@@ -63,13 +63,17 @@ function AuthLoginPage() {
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim()) {
+      return
+    }
     setStep('methods')
   }
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
+    if (!email || !password) {
+      return
+    }
     setSigningIn(true)
     try {
       const response = await authService.loginWithPassword({ email, password })
@@ -87,7 +91,9 @@ function AuthLoginPage() {
   }
 
   const handleSendMagicLink = async () => {
-    if (!email.trim()) return
+    if (!email.trim()) {
+      return
+    }
     setSendingMagicLink(true)
     try {
       const response = await authService.requestMagicLink({ email })
@@ -144,7 +150,7 @@ function AuthLoginPage() {
               <form onSubmit={handleContinue} className="space-y-3">
                 <div className="grid gap-2">
                   <Label htmlFor="login-email">
-                    {t('ui.text.emailAddress', { ns: 'ui' })}
+                    {t('ui.text.emailAddress')}
                   </Label>
                   <Input
                     id="login-email"
@@ -175,7 +181,7 @@ function AuthLoginPage() {
             <div className="flex flex-col space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="login-email-locked">
-                  {t('ui.text.emailAddress', { ns: 'ui' })}
+                  {t('ui.text.emailAddress')}
                 </Label>
                 <Input
                   id="login-email-locked"
@@ -191,7 +197,7 @@ function AuthLoginPage() {
                   <div className="grid gap-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="login-password">
-                        {t('ui.text.password', { ns: 'ui' })}
+                        {t('ui.text.password')}
                       </Label>
                       <Link
                         to="/auth/forgot-password"
@@ -217,9 +223,7 @@ function AuthLoginPage() {
                         size="sm"
                         tabIndex={-1}
                         aria-label={
-                          showPassword
-                            ? t('ui.text.hide', { ns: 'ui' })
-                            : t('ui.text.show', { ns: 'ui' })
+                          showPassword ? t('ui.text.hide') : t('ui.text.show')
                         }
                         className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                         onClick={() => setShowPassword((s) => !s)}

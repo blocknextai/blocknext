@@ -85,7 +85,9 @@ export function useChatSession(organizationId: string) {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setSearchQuery(value)
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
     searchTimeoutRef.current = setTimeout(() => {
       fetchSessions(value, 0)
     }, 300)
@@ -97,7 +99,9 @@ export function useChatSession(organizationId: string) {
   }
 
   const selectSession = async (session: Session) => {
-    if (editingSessionId) return // Don't select while editing
+    if (editingSessionId) {
+      return
+    } // Don't select while editing
     setSessionId(session.id)
     setMessages([])
     setView('chat')
@@ -124,7 +128,9 @@ export function useChatSession(organizationId: string) {
   }
 
   const confirmRename = async () => {
-    if (!editingTitle.trim() || !editingSessionId) return
+    if (!editingTitle.trim() || !editingSessionId) {
+      return
+    }
     setActionLoading(true)
     try {
       await generation.updateSession(
@@ -156,7 +162,9 @@ export function useChatSession(organizationId: string) {
   }
 
   const confirmDelete = async () => {
-    if (!deleteConfirmSession) return
+    if (!deleteConfirmSession) {
+      return
+    }
     setActionLoading(true)
     try {
       await generation.deleteSession(organizationId, deleteConfirmSession.id)
@@ -183,7 +191,9 @@ export function useChatSession(organizationId: string) {
 
   const handleSend = async () => {
     const text = input.trim()
-    if (!text || streaming) return
+    if (!text || streaming) {
+      return
+    }
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -232,7 +242,9 @@ export function useChatSession(organizationId: string) {
 
     await generation.sendMessageStream(organizationId, currentSessionId, text, {
       onChunk: (chunk: string) => {
-        if (abortRef.current) return
+        if (abortRef.current) {
+          return
+        }
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId ? { ...m, content: m.content + chunk } : m,

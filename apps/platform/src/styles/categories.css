@@ -1,0 +1,39 @@
+:root {
+  --category-mailing: oklch(0.55 0.156 149.1);
+  --category-genai: oklch(0.55 0.114 82.1);
+  --category-ai: oklch(0.55 0.114 82.1);
+  --category-image: oklch(0.55 0.094 195.7);
+  --category-googleworkspace: oklch(0.55 0.116 234);
+  --category-publishing: oklch(0.55 0.243 306.9);
+  --category-system: oklch(0.55 0.068 241.3);
+  --category-audio: oklch(0.55 0.208 258.3);
+  --category-video: oklch(0.55 0.204 12.8);
+  --category-blockchain: oklch(0.55 0.119 71.6);
+  --category-database: oklch(0.55 0.099 182.5);
+  --category-marketing: oklch(0.55 0.208 25.3);
+  --category-ecommerce: oklch(0.55 0.218 0.6);
+  --category-crm: oklch(0.55 0.23 277);
+  --category-productivity: oklch(0.55 0.151 130.8);
+  --category-analytics: oklch(0.55 0.132 58.3);
+  --category-utility: oklch(0.55 0.041 257.4);
+}
+
+.dark {
+  --category-mailing: oklch(0.78 0.214 149.1);
+  --category-genai: oklch(0.78 0.161 82.1);
+  --category-ai: oklch(0.78 0.161 82.1);
+  --category-image: oklch(0.78 0.124 195.7);
+  --category-googleworkspace: oklch(0.78 0.133 234);
+  --category-publishing: oklch(0.78 0.144 306.9);
+  --category-system: oklch(0.78 0.068 241.3);
+  --category-audio: oklch(0.78 0.113 258.3);
+  --category-video: oklch(0.78 0.131 12.8);
+  --category-blockchain: oklch(0.78 0.168 71.6);
+  --category-database: oklch(0.78 0.123 182.5);
+  --category-marketing: oklch(0.78 0.129 25.3);
+  --category-ecommerce: oklch(0.78 0.14 0.6);
+  --category-crm: oklch(0.78 0.113 277);
+  --category-productivity: oklch(0.78 0.204 130.8);
+  --category-analytics: oklch(0.78 0.154 58.3);
+  --category-utility: oklch(0.78 0.041 257.4);
+}

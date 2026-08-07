@@ -1,21 +1,22 @@
 import { getCategoryPrefs } from '@/lib/flow-categories'
 
 const FlowDragPreview = ({ dragging, previewData, previewPos }) => {
-  if (!dragging || !previewData) return null
+  if (!dragging || !previewData) {
+    return null
+  }
 
   const pref = getCategoryPrefs(previewData.category)
   const Icon = pref.icon
 
   return (
     <div
-      className="size-10 rounded-lg bg-background fixed pointer-events-none z-100"
+      className="bg-card border-border pointer-events-none fixed z-100 size-10 rounded-lg border"
       style={{
         left: previewPos.x,
         top: previewPos.y,
-        color: pref.color,
       }}
     >
-      <div className="bg-current/10 w-full h-full flex items-center justify-center rounded-lg p-1">
+      <div className="flex h-full w-full items-center justify-center rounded-lg p-1">
         <Icon className="size-4" />
       </div>
     </div>

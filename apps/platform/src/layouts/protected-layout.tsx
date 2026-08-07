@@ -30,7 +30,9 @@ const ProtectedLayout = () => {
   }, [navigate, location])
 
   useEffect(() => {
-    if (!preferences) return
+    if (!preferences) {
+      return
+    }
     syncFromBackend(preferences.theme ?? {})
     if (preferences.language && preferences.language !== i18n.language) {
       i18n.changeLanguage(preferences.language)

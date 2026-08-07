@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { KeyRound } from 'lucide-react'
+import { KeyRound, Wrench } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
@@ -9,14 +9,30 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { CopyField } from '@/components/shared/copy-field'
-import { FlowIcon } from '@/components/shared/custom-icons'
+import { useIconResolver } from '@/features/flow-editor/icons'
 import { McpToolSchemaSection } from '@/features/mcp/components/mcp-tool-schema'
+import type { IconSource } from '@/features/flow-editor/types'
 import type { McpServer } from '@/features/mcp/services/mcp'
 
 type McpServerDetailDialogProps = {
   server: McpServer | null
   open: boolean
   onOpenChange: (open: boolean) => void
+}
+
+const McpToolIcon = ({ icon }: { icon?: IconSource }) => {
+  const resolveIcon = useIconResolver()
+  const Icon = resolveIcon(icon)
+
+  return (
+    <div className="bg-muted ring-foreground/10 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-lg ring-1">
+      {Icon ? (
+        <Icon className="size-9" />
+      ) : (
+        <Wrench className="text-muted-foreground size-5" />
+      )}
+    </div>
+  )
 }
 
 const McpServerDetailDialog = ({
@@ -66,14 +82,7 @@ const McpServerDetailDialog = ({
                       key={tool.id}
                       className="flex items-start gap-2.5 rounded-lg border bg-card p-3 ring-1 ring-foreground/5 transition-colors hover:border-foreground/20"
                     >
-                      <div
-                        className="size-8 shrink-0 overflow-hidden rounded-md ring-1 ring-foreground/10"
-                        style={{
-                          backgroundImage: FlowIcon(tool.id),
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
-                        }}
-                      />
+                      <McpToolIcon icon={tool.icon} />
                       <div className="flex min-w-0 flex-1 flex-col gap-1">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span className="truncate font-mono text-sm font-medium">

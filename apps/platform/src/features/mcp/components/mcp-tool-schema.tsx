@@ -32,7 +32,9 @@ type SchemaShape = {
 const resolveShape = (
   node: McpToolSchema | McpToolSchemaProperty | undefined,
 ): SchemaShape | null => {
-  if (!node || typeof node !== 'object') return null
+  if (!node || typeof node !== 'object') {
+    return null
+  }
   if (node.type === 'array' && node.items && typeof node.items === 'object') {
     return resolveShape(node.items as McpToolSchemaProperty)
   }
@@ -101,7 +103,9 @@ const McpToolSchemaSection = ({ label, schema }: McpToolSchemaSectionProps) => {
   const shape = resolveShape(schema)
   const count = shape ? Object.keys(shape.properties ?? {}).length : 0
 
-  if (count === 0) return null
+  if (count === 0) {
+    return null
+  }
 
   return (
     <Collapsible className="rounded-md border bg-muted/30">

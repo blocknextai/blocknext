@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 const getTooltipPosition = (steps, currentStep, highlightPosition) => {
-  if (!steps[currentStep])
+  if (!steps[currentStep]) {
     return { position: 'fixed' as const, top: 0, left: 0 }
+  }
 
   const { position = 'bottom' } = steps[currentStep]
   const { top, left, width, height } = highlightPosition
@@ -47,7 +48,7 @@ const TourOverlay = ({
   onPrev,
   onClose,
 }) => {
-  const { t } = useTranslation('ui')
+  const { t } = useTranslation()
   const currentStepData = steps[currentStep]
 
   return (

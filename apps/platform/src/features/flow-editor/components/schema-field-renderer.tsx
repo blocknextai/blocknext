@@ -49,15 +49,25 @@ const isMultilineFormat = (format?: string) =>
   format === 'multiline' || format === 'textarea' || format === 'multi-line'
 
 const inputTypeFor = (field: SchemaField) => {
-  if (field.writeOnly) return 'password'
-  if (field.format === 'email') return 'email'
-  if (field.format === 'uri' || field.format === 'url') return 'url'
+  if (field.writeOnly) {
+    return 'password'
+  }
+  if (field.format === 'email') {
+    return 'email'
+  }
+  if (field.format === 'uri' || field.format === 'url') {
+    return 'url'
+  }
   return 'text'
 }
 
 const stringifyComplex = (val: any) => {
-  if (val === undefined || val === null) return ''
-  if (typeof val === 'string') return val
+  if (val === undefined || val === null) {
+    return ''
+  }
+  if (typeof val === 'string') {
+    return val
+  }
   try {
     return JSON.stringify(val, null, 2)
   } catch {
@@ -68,15 +78,23 @@ const stringifyComplex = (val: any) => {
 const PRIMITIVE_ITEM_TYPES = new Set(['string', 'number', 'integer', 'boolean'])
 
 const isPrimitiveItemSchema = (items: any) => {
-  if (!items || typeof items !== 'object') return true
+  if (!items || typeof items !== 'object') {
+    return true
+  }
   const type = items.type
-  if (type === undefined) return true
+  if (type === undefined) {
+    return true
+  }
   return PRIMITIVE_ITEM_TYPES.has(type)
 }
 
 const defaultForItemType = (type?: string) => {
-  if (type === 'boolean') return false
-  if (type === 'number' || type === 'integer') return 0
+  if (type === 'boolean') {
+    return false
+  }
+  if (type === 'number' || type === 'integer') {
+    return 0
+  }
   return ''
 }
 
@@ -222,7 +240,9 @@ export function SchemaFieldRenderer({
 }: SchemaFieldRendererProps) {
   const { t } = useTranslation()
 
-  if (field.hidden) return null
+  if (field.hidden) {
+    return null
+  }
 
   const labelText = t(field.title || field.key, field.title || field.key)
   const isReadOnly = !!field.readOnly

@@ -23,6 +23,6 @@ export function useOAuthLogin(provider: string, mode: string) {
         url.searchParams.set('state', encodedState)
         window.location.href = url.toString()
       }
-    } catch (error) {}
+    } catch {}
   }, [provider, mode])
 }

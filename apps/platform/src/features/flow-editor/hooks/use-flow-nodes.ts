@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import useSWR from 'swr'
 import nodeEngineService from '@/features/flow-editor/services/node-engine'
 import { useTranslation } from 'react-i18next'
-import { useThemeStore } from '@/stores/theme-store'
 import type {
   ContextMenuItem,
   FlowEdge,
   FlowNode,
+  IconSource,
   NodeEngineNode,
   NodeOutputType,
   RendererNode,
@@ -15,18 +15,13 @@ import type {
   SchemaField,
 } from '@/features/flow-editor/types'
 
-export const resolveIconKey = (icon: any, mode: 'light' | 'dark'): string => {
-  if (!icon) return ''
-  if (typeof icon === 'string') return icon
-  if (mode === 'dark' && icon.dark) return icon.dark
-  return icon.light ?? icon.dark ?? ''
-}
-
 const normalizeKey = (value?: string) =>
   (value ?? '').toLowerCase().replace(/\s+/g, '')
 
 const inputSchemaToFields = (schema: any): SchemaField[] => {
-  if (!schema?.properties) return []
+  if (!schema?.properties) {
+    return []
+  }
   const required = new Set<string>(schema.required ?? [])
   return Object.entries(schema.properties).map(
     ([key, value]: [string, any]) => ({
@@ -53,7 +48,9 @@ const collectOutputPaths = (
   prefix: string,
   acc: NodeOutputType[],
 ) => {
-  if (!node || typeof node !== 'object') return
+  if (!node || typeof node !== 'object') {
+    return
+  }
 
   if (node.type === 'object' && node.properties) {
     for (const [key, value] of Object.entries<any>(node.properties)) {
@@ -85,7 +82,9 @@ const collectOutputPaths = (
 }
 
 const outputSchemaToTypes = (schema: any): NodeOutputType[] => {
-  if (!schema || typeof schema !== 'object') return []
+  if (!schema || typeof schema !== 'object') {
+    return []
+  }
   const acc: NodeOutputType[] = []
   collectOutputPaths(schema, '', acc)
   return acc
@@ -95,13 +94,19 @@ const buildNodeList = (nodes: ResolvedNode[]): RendererNodeMap => {
   const r: RendererNodeMap = {}
   for (const item of nodes) {
     const subCategory = item.subCategory ?? ''
-    if (!r[item.category]) r[item.category] = {}
-    if (!r[item.category][subCategory]) r[item.category][subCategory] = []
+    if (!r[item.category]) {
+      r[item.category] = {}
+    }
+    if (!r[item.category][subCategory]) {
+      r[item.category][subCategory] = []
+    }
     const labels: string[] = []
     if (item.schema && item.schema.length > 0) {
       for (const field of item.schema) {
         if (Array.isArray(field.enum)) {
-          for (const opt of field.enum) labels.push(String(opt))
+          for (const opt of field.enum) {
+            labels.push(String(opt))
+          }
         }
       }
     }
@@ -110,6 +115,9 @@ const buildNodeList = (nodes: ResolvedNode[]): RendererNodeMap => {
       label: item.name,
       description: item.description,
       type: item.category,
+      icon: item.icon,
+      inputs: item.inputs,
+      outputs: item.outputs,
       subCategory: item.subCategory,
       actions: labels,
       tags: item.tags,
@@ -120,11 +128,45 @@ const buildNodeList = (nodes: ResolvedNode[]): RendererNodeMap => {
   return r
 }
 
+const buildProviderList = (nodes: ResolvedNode[]) => {
+  const groups = new Map<
+    string,
+    { key: string; label: string; icon: IconSource; nodes: RendererNode[] }
+  >()
+
+  for (const item of nodes) {
+    const label = item.provider || item.subCategory || ''
+    const key = item.subCategory || normalizeKey(label)
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        label,
+        icon: { brand: item.icon?.brand },
+        nodes: [],
+      })
+    }
+    groups.get(key)!.nodes.push({
+      id: item.id,
+      label: item.name,
+      description: item.description,
+      type: item.category,
+      icon: item.icon,
+      inputs: item.inputs,
+      outputs: item.outputs,
+      subCategory: item.subCategory,
+      actions: [],
+      tags: item.tags,
+      isComingSoon: item.isComingSoon ?? false,
+    })
+  }
+
+  return [...groups.values()].sort((a, b) => a.label.localeCompare(b.label))
+}
+
 const NODES_KEY = 'node-engine-nodes'
 const TRIGGER_VARIABLES_KEY = 'node-engine-trigger-variables'
 
 export function useNodeEngineNodes() {
-  const mode = useThemeStore((s) => s.getMode())
   const { data, isLoading } = useSWR<NodeEngineNode[]>(NODES_KEY, async () => {
     const response = await nodeEngineService.getNodes()
     return (response.data as NodeEngineNode[]) || []
@@ -136,9 +178,12 @@ export function useNodeEngineNodes() {
         id: item.id ?? '',
         name: item.name ?? '',
         description: item.description ?? '',
-        icon: resolveIconKey(item.icon, mode),
+        icon: item.icon,
+        inputs: item.inputs,
+        outputs: item.outputs,
         category: normalizeKey(item.categories?.[0]),
         subCategory: normalizeKey(item.subCategories?.[0]),
+        provider: item.subCategories?.[0] ?? '',
         tags: item.tags ?? [],
         supportedCredentials: item.supportedCredentials,
         schema: inputSchemaToFields(item.inputSchema),
@@ -147,11 +192,12 @@ export function useNodeEngineNodes() {
         isComingSoon: item.isComingSoon,
         hasNaturalLanguage: item.hasNaturalLanguage,
       })),
-    [data, mode],
+    [data],
   )
   const nodeList = useMemo(() => buildNodeList(apiNodes), [apiNodes])
+  const providerList = useMemo(() => buildProviderList(apiNodes), [apiNodes])
 
-  return { apiNodes, nodeList, isLoading }
+  return { apiNodes, nodeList, providerList, isLoading }
 }
 
 export function useTriggerVariables() {
@@ -159,7 +205,9 @@ export function useTriggerVariables() {
     TRIGGER_VARIABLES_KEY,
     async () => {
       const response = await nodeEngineService.getTriggerVariables()
-      if (response.isSuccess && response.data) return response.data
+      if (response.isSuccess && response.data) {
+        return response.data
+      }
       return []
     },
   )
@@ -195,7 +243,9 @@ export function useFlowNodes(apiNodes: ResolvedNode[] = []) {
       from?: SourceRef,
       apiNodesArg?: ResolvedNode[],
     ): ContextMenuItem[] | undefined => {
-      if (node.id === '0') return undefined
+      if (node.id === '0') {
+        return undefined
+      }
       let contextMenu: ContextMenuItem[] = []
       const ref = node.id
 
@@ -204,7 +254,9 @@ export function useFlowNodes(apiNodes: ResolvedNode[] = []) {
         const apiNode = apiOriginRef.current.find(
           (n) => n.id === sourceNode.nodeId,
         )
-        if (apiNode === undefined) return contextMenu
+        if (apiNode === undefined) {
+          return contextMenu
+        }
 
         const outputs = apiNode.outputTypes ?? []
         for (let j = 0; j < outputs.length; j++) {
@@ -237,15 +289,21 @@ export function useFlowNodes(apiNodes: ResolvedNode[] = []) {
         const edges = source.edges.filter((e) => e.target === ref)
         for (let i = 0; i < edges.length; i++) {
           const edge = edges[i]
-          if (edge.source === '0') continue
+          if (edge.source === '0') {
+            continue
+          }
           const sourceNode = source.nodes.find((n) => n.id === edge.source)
-          if (!sourceNode) continue
+          if (!sourceNode) {
+            continue
+          }
           const currentApiNodes = apiNodesArg || apiOriginRef.current
           const apiNode = currentApiNodes?.find(
             (n) => n.id === sourceNode.nodeId,
           )
 
-          if (apiNode === undefined) continue
+          if (apiNode === undefined) {
+            continue
+          }
           const sourceContextMenu = sourceNode.data?.contextMenu
           if (sourceContextMenu && sourceContextMenu.length > 0) {
             contextMenu = contextMenu.concat(sourceContextMenu)

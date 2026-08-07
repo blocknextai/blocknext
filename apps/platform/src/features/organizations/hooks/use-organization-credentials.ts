@@ -54,7 +54,9 @@ export function useOrganizationCredentialActions(
 
   const create = useCallback(
     async (payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.createOrganizationCredential(
           organizationId,
@@ -69,7 +71,9 @@ export function useOrganizationCredentialActions(
 
   const update = useCallback(
     async (credentialId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.updateOrganizationCredential(
           organizationId,
@@ -88,7 +92,9 @@ export function useOrganizationCredentialActions(
 
   const remove = useCallback(
     async (credentialId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.deleteOrganizationCredential(
           organizationId,

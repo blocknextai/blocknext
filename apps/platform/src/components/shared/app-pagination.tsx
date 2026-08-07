@@ -31,11 +31,17 @@ function computePages(current: number, total: number): Array<number | string> {
     return Array.from({ length: total }, (_, i) => i + 1)
   }
   const pages: Array<number | string> = [1]
-  if (current > 3) pages.push('ellipsis-start')
+  if (current > 3) {
+    pages.push('ellipsis-start')
+  }
   const start = Math.max(2, current - 1)
   const end = Math.min(total - 1, current + 1)
-  for (let i = start; i <= end; i++) pages.push(i)
-  if (current < total - 2) pages.push('ellipsis-end')
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  if (current < total - 2) {
+    pages.push('ellipsis-end')
+  }
   pages.push(total)
   return pages
 }
@@ -58,7 +64,9 @@ export function AppPagination({
     [currentPage, totalPages],
   )
 
-  if (total <= 0) return null
+  if (total <= 0) {
+    return null
+  }
 
   return (
     <div className={`mt-4 flex flex-col items-center gap-3 ${className}`}>

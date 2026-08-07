@@ -35,8 +35,12 @@ export function useNavigationGuard({
 
   // Link click and popstate interception
   useEffect(() => {
-    if (previewMode) return
-    if (!hasUnsavedChanges) return
+    if (previewMode) {
+      return
+    }
+    if (!hasUnsavedChanges) {
+      return
+    }
 
     const handleClick = (e: MouseEvent) => {
       const link = (e.target as HTMLElement).closest('a[href]')
@@ -74,7 +78,9 @@ export function useNavigationGuard({
 
   // beforeunload
   useEffect(() => {
-    if (previewMode) return
+    if (previewMode) {
+      return
+    }
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
         e.preventDefault()

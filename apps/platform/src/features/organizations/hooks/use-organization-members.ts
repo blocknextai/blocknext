@@ -59,7 +59,9 @@ export function useOrganizationMemberActions(
 
   const invite = useCallback(
     async (payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.inviteMember(organizationId, payload as never),
       )
@@ -71,7 +73,9 @@ export function useOrganizationMemberActions(
 
   const updateRole = useCallback(
     async (memberId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.updateMemberRole(
           organizationId,
@@ -87,7 +91,9 @@ export function useOrganizationMemberActions(
 
   const updateInfo = useCallback(
     async (memberId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.updateMemberInfo(
           organizationId,
@@ -103,7 +109,9 @@ export function useOrganizationMemberActions(
 
   const remove = useCallback(
     async (memberId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         organizationsService.deleteMember(organizationId, memberId),
       )

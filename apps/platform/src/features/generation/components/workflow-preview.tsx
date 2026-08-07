@@ -19,7 +19,7 @@ const WorkflowPreview = ({ json, onApplyWorkflow }) => {
   // Try parsing with sanitization if direct parse fails
   try {
     parsed = JSON.parse(json)
-  } catch (e) {
+  } catch {
     try {
       parsed = JSON.parse(sanitizeJson(json))
     } catch (e2) {

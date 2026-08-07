@@ -24,7 +24,9 @@ function AuthMagicLinkCallbackPage() {
     authService
       .consumeMagicLink({ token })
       .then((response) => {
-        if (cancelled) return
+        if (cancelled) {
+          return
+        }
         const tokens = response.data
         if (!response.isSuccess || !tokens?.accessToken) {
           setStatus('error')
@@ -36,7 +38,9 @@ function AuthMagicLinkCallbackPage() {
         window.location.href = returnUrl || '/'
       })
       .catch(() => {
-        if (!cancelled) setStatus('error')
+        if (!cancelled) {
+          setStatus('error')
+        }
       })
     return () => {
       cancelled = true

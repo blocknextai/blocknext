@@ -29,7 +29,9 @@ const OrganizationLayout = () => {
   usePlatformFeatures()
 
   useEffect(() => {
-    if (!organizations) return
+    if (!organizations) {
+      return
+    }
     setOrganizations(organizations)
     if (organizationId === null && organizations.length > 0) {
       setOrganizationId(organizations[0].id)

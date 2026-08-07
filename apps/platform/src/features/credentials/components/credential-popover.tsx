@@ -21,13 +21,19 @@ const CredentialPopover = ({
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next)
-    if (!next) setQuery('')
+    if (!next) {
+      setQuery('')
+    }
   }
 
   const filteredSecrets = useMemo(() => {
-    if (!secrets) return []
+    if (!secrets) {
+      return []
+    }
     const q = query.trim().toLowerCase()
-    if (!q) return secrets
+    if (!q) {
+      return secrets
+    }
     return secrets.filter((secret: any) =>
       t(secret.name).toLowerCase().includes(q),
     )
@@ -49,7 +55,7 @@ const CredentialPopover = ({
             onSelect(secretCopy)
           }}
         >
-          <IconComponent className="text-icon" />
+          <IconComponent className="text-icon size-4 shrink-0" />
           <span>{t(secret.name)}</span>
         </Button>,
       )

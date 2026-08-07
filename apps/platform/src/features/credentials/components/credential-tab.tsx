@@ -91,12 +91,18 @@ const CredentialTab = ({
 
       if (secretDetails) {
         setSelectedSecret((prev: any) => {
-          if (!prev) return prev
+          if (!prev) {
+            return prev
+          }
           const next = { ...prev }
           next.secretDetails = secretDetails
           next.sourceType = secretDetails.sourceType
-          if (secretDetails.data) next.data = { ...secretDetails.data }
-          if (secretDetails.title) next.label = secretDetails.title
+          if (secretDetails.data) {
+            next.data = { ...secretDetails.data }
+          }
+          if (secretDetails.title) {
+            next.label = secretDetails.title
+          }
           return next
         })
         if (secretDetails.sourceType === 'platform') {
@@ -111,8 +117,11 @@ const CredentialTab = ({
     ns.label = t(ns.name)
     const c = JSON.parse(JSON.stringify(ns))
     setSelectedSecret(c)
-    if (w) w(true)
-    else setOpen(true)
+    if (w) {
+      w(true)
+    } else {
+      setOpen(true)
+    }
   }
 
   const saveCredentials = async () => {

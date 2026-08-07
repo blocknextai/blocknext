@@ -42,7 +42,9 @@ const CredentialFormDialog = ({
 
   const clearError = (key: string) => {
     setErrors((prev) => {
-      if (!prev[key]) return prev
+      if (!prev[key]) {
+        return prev
+      }
       const next = { ...prev }
       delete next[key]
       return next
@@ -50,7 +52,9 @@ const CredentialFormDialog = ({
   }
 
   useEffect(() => {
-    if (!open) setErrors({})
+    if (!open) {
+      setErrors({})
+    }
   }, [open])
 
   useEffect(() => {
@@ -67,20 +71,28 @@ const CredentialFormDialog = ({
     ) {
       return selectedSecret.secretDetails.data[schema.key]
     }
-    if (schema?.default) return schema.default
+    if (schema?.default) {
+      return schema.default
+    }
     return ''
   }
 
   const validate = () => {
     const errs: Record<string, boolean> = {}
     const titleValue = (selectedSecret?.label || '').toString().trim()
-    if (!titleValue) errs['s-t'] = true
+    if (!titleValue) {
+      errs['s-t'] = true
+    }
 
     if (!usePlatformCredential && selectedSecret?.provider) {
       for (const schema of selectedSecret.provider) {
-        if (schema.hidden || schema.readOnly || !schema.required) continue
+        if (schema.hidden || schema.readOnly || !schema.required) {
+          continue
+        }
         const value = (getFieldValue(schema) || '').toString().trim()
-        if (!value) errs[schema.key] = true
+        if (!value) {
+          errs[schema.key] = true
+        }
       }
     }
 
@@ -89,13 +101,17 @@ const CredentialFormDialog = ({
   }
 
   const handleSave = () => {
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     saveCredentials()
     onOpenChange(false)
   }
 
   const handleAuthorize = () => {
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     authorizeOAuth2()
   }
 
@@ -205,7 +221,9 @@ const CredentialFormDialog = ({
     if (!usePlatformCredential && selectedSecret?.provider) {
       for (let i = 0; i < selectedSecret.provider.length; i++) {
         const schema = selectedSecret.provider[i]
-        if (schema.hidden) continue
+        if (schema.hidden) {
+          continue
+        }
 
         let currentValue = ''
         if (selectedSecret.data && selectedSecret.data[schema.key]) {

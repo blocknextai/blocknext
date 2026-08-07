@@ -12,8 +12,12 @@ export function useOrganizationEvents(
 ) {
   useEffect(() => {
     const unsubscribe = wsManager.subscribe((event) => {
-      if (filter?.type && event.type !== filter.type) return
-      if (filter?.executionId && event.id !== filter.executionId) return
+      if (filter?.type && event.type !== filter.type) {
+        return
+      }
+      if (filter?.executionId && event.id !== filter.executionId) {
+        return
+      }
       callback(event)
     })
 

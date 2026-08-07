@@ -68,7 +68,9 @@ function OrganizationHistoryPage() {
 
   const confirmDelete = (id: string) => {
     const h = history.find((h) => h.id === id)
-    if (!h) return
+    if (!h) {
+      return
+    }
     setConfirmData({
       description: t('ui.text.deleteHistoryConfirmation'),
       action: () => remove(h.id),
@@ -79,7 +81,9 @@ function OrganizationHistoryPage() {
 
   const confirmCancel = (id: string) => {
     const h = history.find((h) => h.id === id)
-    if (!h) return
+    if (!h) {
+      return
+    }
     setConfirmData({
       description: t('ui.text.cancelExecutionConfirmation'),
       action: () => cancel({ organizationId, id: h.id }).then(() => mutate()),
@@ -106,7 +110,9 @@ function OrganizationHistoryPage() {
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const handleEvent = useCallback(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
     debounceRef.current = setTimeout(() => {
       mutate()
     }, 300)

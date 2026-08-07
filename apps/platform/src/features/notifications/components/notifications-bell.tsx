@@ -109,16 +109,22 @@ export function NotificationsBell() {
     handleMarkAllAsRead,
   } = useOrganizationNotificationsBell(organizationId, open)
 
-  if (!organizationId) return null
+  if (!organizationId) {
+    return null
+  }
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next)
     // Opening the panel clears the bell badge (marks everything seen).
-    if (next && unseenCount > 0) handleMarkAllAsSeen()
+    if (next && unseenCount > 0) {
+      handleMarkAllAsSeen()
+    }
   }
 
   const handleActivate = (notification: any) => {
-    if (!notification.readAt) handleMarkAsRead(notification.id)
+    if (!notification.readAt) {
+      handleMarkAsRead(notification.id)
+    }
     setOpen(false)
   }
 

@@ -61,9 +61,13 @@ const OrganizationSwitcher = ({ teams, onCreateOrganization }) => {
     const prefersDark = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches
-    if (mode === 'dark') setAvatarColor('2a2627')
-    else if (mode === 'light') setAvatarColor('fafafa')
-    else setAvatarColor(prefersDark ? '2a2627' : 'fafafa')
+    if (mode === 'dark') {
+      setAvatarColor('2a2627')
+    } else if (mode === 'light') {
+      setAvatarColor('fafafa')
+    } else {
+      setAvatarColor(prefersDark ? '2a2627' : 'fafafa')
+    }
   }, [mode])
 
   if (!activeTeam || !teams || teams.length === 0) {

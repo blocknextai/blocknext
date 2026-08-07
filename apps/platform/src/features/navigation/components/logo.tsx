@@ -15,9 +15,13 @@ const PlatformLogo = ({ width = 200, height = 40, className = '' }) => {
 
   useEffect(() => {
     const theme = getMode()
-    if (theme === 'dark') setLogoName('logo-b.png')
-    else if (theme === 'light') setLogoName('logo-w.png')
-    else setLogoName(prefersDark ? 'logo-b.png' : 'logo-w.png')
+    if (theme === 'dark') {
+      setLogoName('logo-b.png')
+    } else if (theme === 'light') {
+      setLogoName('logo-w.png')
+    } else {
+      setLogoName(prefersDark ? 'logo-b.png' : 'logo-w.png')
+    }
   }, [mode, getMode])
 
   return (

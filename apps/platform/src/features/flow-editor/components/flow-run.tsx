@@ -18,7 +18,9 @@ const FlowRun = ({ flow, setFlow }) => {
     const steps = []
     for (let i = 0; i < flow.nodes.length; i++) {
       const node = flow.nodes[i]
-      if (node.type === 'starter') continue
+      if (node.type === 'starter') {
+        continue
+      }
       const runnerKey = node.nodeId?.replaceAll('.', '_')
       if (runnerKey && Runner[runnerKey]) {
         node.runner = Runner[runnerKey]

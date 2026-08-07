@@ -35,7 +35,9 @@ const CreateOrganizationForm = ({
       const fieldErrors: Record<string, string> = {}
       for (const issue of result.error.issues) {
         const field = String(issue.path[0])
-        if (fieldErrors[field]) continue
+        if (fieldErrors[field]) {
+          continue
+        }
         fieldErrors[field] = issue.message.startsWith('ui.')
           ? t(issue.message)
           : issue.message
@@ -72,7 +74,9 @@ const CreateOrganizationForm = ({
           value={values.title}
           onChange={(e) => {
             setValues({ ...values, title: e.target.value })
-            if (errors.title) setErrors({ ...errors, title: '' })
+            if (errors.title) {
+              setErrors({ ...errors, title: '' })
+            }
           }}
         />
         {errors.title && (
@@ -91,7 +95,9 @@ const CreateOrganizationForm = ({
           value={values.description}
           onChange={(e) => {
             setValues({ ...values, description: e.target.value })
-            if (errors.description) setErrors({ ...errors, description: '' })
+            if (errors.description) {
+              setErrors({ ...errors, description: '' })
+            }
           }}
         />
         {errors.description && (

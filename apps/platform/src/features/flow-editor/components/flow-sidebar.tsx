@@ -1,14 +1,17 @@
 import {
+  ChevronLeft,
   PanelLeft,
   PanelLeftClose,
   Search,
-  ChevronLeft,
+  SearchX,
   Sparkles,
+  StickyNote,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { GhostInput } from '@/components/shared/ghost-input'
 import { getCategoryPrefs } from '@/lib/flow-categories'
+import { useIconResolver } from '@/features/flow-editor/icons'
 import { usePlatformFeatures } from '@/features/platform'
 import { useTranslation } from 'react-i18next'
 
@@ -18,7 +21,7 @@ const FlowSidebar = ({
   setSidebarOpen,
   selectedCategory,
   setSelectedCategory,
-  nodeList,
+  providerList,
   dragging,
   startDrag,
   annotationDrag,
@@ -27,11 +30,12 @@ const FlowSidebar = ({
 }) => {
   const { t } = useTranslation()
   const { workflowsGenerationEnabled } = usePlatformFeatures()
+  const resolveIcon = useIconResolver()
 
   const renderNodeCard = (item, key) => {
     const name = item.label || item.name
     const prefs = getCategoryPrefs(item.type || item.category)
-    const Icon = prefs.icon
+    const Icon = resolveIcon(item.icon) ?? prefs.icon
     const isDisabled = item.isComingSoon
     const cursorClass = isDisabled
       ? 'cursor-not-allowed'
@@ -47,59 +51,51 @@ const FlowSidebar = ({
       <div
         key={key}
         data-tour="node-item"
-        style={{ color: prefs.color }}
-        className={`border rounded-md p-4 flex flex-1 w-full flex-col transition-colors dark:bg-current/20 bg-current/10 dark:hover:bg-current/10 hover:bg-current/20 items-start justify-start gap-2 ${cursorClass} ${isDisabled ? 'opacity-50' : ''}`}
+        style={{ borderColor: prefs.color }}
+        className={`bg-card hover:bg-accent flex w-full items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${cursorClass} ${isDisabled ? 'opacity-50' : ''}`}
         onMouseDown={(e) => !isDisabled && startDrag(e, item.id)}
         role="button"
         tabIndex={isDisabled ? -1 : 0}
         aria-label={ariaLabel}
         aria-disabled={isDisabled}
       >
-        <div className="flex items-start justify-start gap-3 w-full">
-          <div style={{ color: prefs.color }} aria-hidden="true">
-            <Icon className="size-6" />
-          </div>
-          <div className="flex flex-col gap-1 flex-1 min-w-0">
+        <Icon className="size-5 shrink-0" aria-hidden="true" />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{t(name)}</span>
             {item.isComingSoon && (
-              <div className="flex gap-2">
-                <Badge
-                  variant="secondary"
-                  className="text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-                >
-                  {t('ui.text.comingSoon')}
-                </Badge>
-              </div>
+              <Badge
+                variant="secondary"
+                className="shrink-0 text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+              >
+                {t('ui.text.comingSoon')}
+              </Badge>
             )}
-            <div>{t(name)}</div>
           </div>
+          <span className="text-xs text-muted-foreground">
+            {t(item.description)}
+          </span>
         </div>
-        <div className="text-foreground">{t(item.description)}</div>
       </div>
     )
   }
 
   const renderAnnotationCard = () => {
-    const annotationPrefs = getCategoryPrefs('system')
-    const AnnotationIcon = annotationPrefs?.icon
-
     return (
       <div
         key="annotation-node"
-        style={{ color: annotationPrefs?.color }}
-        className={`border rounded-md p-4 flex flex-1 w-full flex-col transition-colors dark:bg-current/20 bg-current/10  dark:hover:bg-current/10  hover:bg-current/20 items-start justify-start gap-2 ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        className={`bg-card border-border hover:bg-accent flex w-full items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
         onMouseDown={annotationDrag}
         role="button"
         tabIndex={0}
         aria-label={t('ui.text.annotationNode')}
       >
-        <div className="flex items-center justify-start gap-3 w-full">
-          <div style={{ color: annotationPrefs.color }} aria-hidden="true">
-            <AnnotationIcon className="size-6" />
-          </div>
-          <div>{t('ui.text.annotationNode')}</div>
-        </div>
-        <div className="text-foreground">
-          {t('ui.text.addAnnotationToFlow')}
+        <StickyNote className="size-5 shrink-0" aria-hidden="true" />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span className="text-sm">{t('ui.text.annotationNode')}</span>
+          <span className="text-xs text-muted-foreground">
+            {t('ui.text.addAnnotationToFlow')}
+          </span>
         </div>
       </div>
     )
@@ -107,82 +103,76 @@ const FlowSidebar = ({
 
   const renderNodeList = () => {
     if (selectedCategory) {
-      const isFlat = Array.isArray(selectedCategory)
-      const flatItems = isFlat
-        ? selectedCategory
-        : Object.values(selectedCategory).flat()
-      const hasSystem = flatItems.some((cat: any) => cat.type === 'system')
+      const items = selectedCategory.nodes ?? []
+      const hasSystem = items.some((node: any) => node.type === 'system')
 
-      let body: React.ReactNode
-
-      if (isFlat) {
-        body = (
-          <>
-            {selectedCategory.map((item, j) => renderNodeCard(item, j))}
-            {hasSystem && renderAnnotationCard()}
-          </>
-        )
-      } else {
-        const subEntries = Object.entries(
-          selectedCategory as Record<string, any[]>,
-        )
-        body = (
-          <>
-            {subEntries.map(([sub, items]) => (
-              <div key={sub || '__default'} className="flex flex-col gap-3">
-                {sub && (
-                  <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">
-                    {t(sub)}
-                  </div>
-                )}
-                {items.map((item, j) => renderNodeCard(item, `${sub}-${j}`))}
-              </div>
-            ))}
-            {hasSystem && renderAnnotationCard()}
-          </>
+      if (items.length === 0) {
+        return (
+          <li
+            className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center"
+            data-tour="node-list"
+          >
+            <SearchX
+              className="size-8 text-muted-foreground/70"
+              aria-hidden="true"
+            />
+            <div className="text-sm font-medium">
+              {t('ui.text.noNodesFound')}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {t('ui.text.noNodesFoundDescription')}
+            </div>
+          </li>
         )
       }
 
       return (
-        <li className={`flex flex-col gap-4 p-4`} data-tour="node-list">
-          {body}
+        <li className="flex flex-1 flex-col gap-2 p-4" data-tour="node-list">
+          {items.map((item: any, j: number) => renderNodeCard(item, j))}
+          {hasSystem && renderAnnotationCard()}
         </li>
       )
     }
 
-    const categories = Object.keys(nodeList).map((category, i) => {
-      const prefs = getCategoryPrefs(category)
-      const Icon = prefs.icon
-      const categoryLabel = prefs.labelKey ? t(prefs.labelKey) : category
+    const providers = providerList.map((provider: any) => {
+      const prefs = getCategoryPrefs(provider.nodes[0]?.type ?? '')
+      const Icon = resolveIcon(provider.icon) ?? prefs.icon
 
       return (
         <div
-          key={i}
-          onClick={() => setSelectedCategory(nodeList[category])}
-          className={`flex flex-col items-center justify-center rounded-lg transition-colors w-full min-h-33 cursor-pointer bg-current/10 dark:hover:bg-current/50 hover:bg-current/20 gap-3`}
-          style={{ color: prefs.color }}
-          data-tour={category === 'system' ? 'system-category' : undefined}
+          key={provider.key}
+          onClick={() =>
+            setSelectedCategory({
+              label: provider.label,
+              nodes: provider.nodes,
+            })
+          }
+          style={{ borderColor: prefs.color }}
+          className="bg-card hover:bg-accent flex w-full cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors"
+          data-tour={provider.key === 'system' ? 'system-category' : undefined}
           role="button"
           tabIndex={0}
-          aria-label={categoryLabel}
+          aria-label={provider.label}
         >
-          <Icon className="size-8" aria-hidden="true" />
-          <div className="capitalize">{categoryLabel}</div>
+          <Icon className="size-5 shrink-0" aria-hidden="true" />
+          <span className="flex-1 truncate text-sm">{provider.label}</span>
+          <span className="shrink-0 text-xs text-muted-foreground">
+            {t('ui.text.toolCount', { count: provider.nodes.length })}
+          </span>
         </div>
       )
     })
 
     return (
-      <li
-        className={`grid grid-cols-2 gap-4 p-4 flex-1`}
-        data-tour="category-grid"
-      >
-        {categories}
+      <li className="flex flex-1 flex-col gap-2 p-4" data-tour="category-grid">
+        {providers}
       </li>
     )
   }
 
-  if (previewMode) return null
+  if (previewMode) {
+    return null
+  }
 
   return (
     <div className="drawer w-full h-full">
@@ -219,7 +209,7 @@ const FlowSidebar = ({
         </div>
       </div>
       <div className="drawer-side w-sm! p-0! rounded-xl bg-background! relative z-50 top-4 left-4 h-[calc(100%-2rem)] shadow-lg">
-        <ul className="min-h-full w-full p-0 rounded-s flex flex-col justify-between">
+        <ul className="min-h-full w-full p-0 rounded-s flex flex-col">
           <li
             className="flex cursor-default! w-full flex-row!
                         justify-between items-center sticky
@@ -238,16 +228,7 @@ const FlowSidebar = ({
                     {' '}
                     <ChevronLeft className="size-4" aria-hidden="true" />
                   </div>
-                  <div className="capitalize font-semibold">
-                    {(() => {
-                      const flat = Array.isArray(selectedCategory)
-                        ? selectedCategory
-                        : Object.values(
-                            selectedCategory as Record<string, any[]>,
-                          ).flat()
-                      return flat[0]?.type ?? 'Results'
-                    })()}
-                  </div>
+                  <div className="font-semibold">{selectedCategory.label}</div>
                 </div>
               ) : (
                 <></>

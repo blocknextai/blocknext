@@ -100,4 +100,5 @@ html {
 }
 
 @import './themes/index.css';
+@import './categories.css';
 @import './react-flow.css';

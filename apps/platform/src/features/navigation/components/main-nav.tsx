@@ -30,7 +30,9 @@ const NavMain = ({ items, title }) => {
   }
 
   const isLinkActive = (url: string) => {
-    if (!url || url === '#') return false
+    if (!url || url === '#') {
+      return false
+    }
     const resolved = getUrl(url).split('?')[0]
     return location.pathname === resolved
   }

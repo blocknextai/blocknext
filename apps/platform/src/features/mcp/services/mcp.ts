@@ -1,3 +1,4 @@
+import type { IconSource } from '@/features/flow-editor/types'
 import mcpApi from '@/lib/mcp-api'
 
 export type McpToolSchemaProperty = {
@@ -23,6 +24,7 @@ export type McpTool = {
   version: string
   name: string
   description?: string
+  icon?: IconSource
   inputSchema?: McpToolSchema
   outputSchema?: McpToolSchema
   supportedCredentials?: string[]
@@ -32,6 +34,7 @@ export type McpServer = {
   id: string
   name: string
   description?: string
+  icon?: IconSource
   version: string
   url?: string
   tools: McpTool[]

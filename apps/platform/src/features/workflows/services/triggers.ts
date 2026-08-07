@@ -5,7 +5,9 @@ const getAll = async (
   { query = '', offset = 0, limit = 10 } = {},
 ) => {
   const params = new URLSearchParams()
-  if (query) params.set('query', query)
+  if (query) {
+    params.set('query', query)
+  }
   params.set('offset', String(offset))
   params.set('limit', String(limit))
   return await platformApi.get(

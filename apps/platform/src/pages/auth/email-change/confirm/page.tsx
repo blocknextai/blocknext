@@ -23,11 +23,15 @@ function AuthEmailChangeConfirmPage() {
     authService
       .confirmEmailChange({ token })
       .then((response) => {
-        if (cancelled) return
+        if (cancelled) {
+          return
+        }
         setStatus(response.isSuccess ? 'success' : 'error')
       })
       .catch(() => {
-        if (!cancelled) setStatus('error')
+        if (!cancelled) {
+          setStatus('error')
+        }
       })
     return () => {
       cancelled = true

@@ -26,7 +26,9 @@ const isUrl = (value: string) => {
 }
 
 const isImageUrl = (value: string) => {
-  if (!isUrl(value)) return false
+  if (!isUrl(value)) {
+    return false
+  }
   const ext = value.split('?')[0].toLowerCase()
   return (
     ext.endsWith('.png') ||
@@ -39,7 +41,9 @@ const isImageUrl = (value: string) => {
 }
 
 const isVideoUrl = (value: string) => {
-  if (!isUrl(value)) return false
+  if (!isUrl(value)) {
+    return false
+  }
   const ext = value.split('?')[0].toLowerCase()
   return (
     ext.endsWith('.mp4') ||
@@ -50,7 +54,9 @@ const isVideoUrl = (value: string) => {
 }
 
 const isAudioUrl = (value: string) => {
-  if (!isUrl(value)) return false
+  if (!isUrl(value)) {
+    return false
+  }
   const ext = value.split('?')[0].toLowerCase()
   return (
     ext.endsWith('.mp3') ||
@@ -199,23 +205,35 @@ const ObjectOutput = ({ value }: { value: any }) => (
 )
 
 const renderValue = (key: string, value: any) => {
-  if (value === null || value === undefined) return null
+  if (value === null || value === undefined) {
+    return null
+  }
 
   const strValue = typeof value === 'string' ? value : String(value)
 
   // Detect by key name hints
   if (key === 'image' || key.includes('image') || key.includes('thumbnail')) {
-    if (isUrl(strValue)) return <ImageOutput value={strValue} />
+    if (isUrl(strValue)) {
+      return <ImageOutput value={strValue} />
+    }
   }
 
   if (key === 'video' || key.includes('video')) {
-    if (isVideoUrl(strValue)) return <VideoOutput value={strValue} />
-    if (isUrl(strValue)) return <LinkOutput value={strValue} />
+    if (isVideoUrl(strValue)) {
+      return <VideoOutput value={strValue} />
+    }
+    if (isUrl(strValue)) {
+      return <LinkOutput value={strValue} />
+    }
   }
 
   if (key === 'audio' || key.includes('audio')) {
-    if (isAudioUrl(strValue)) return <AudioOutput value={strValue} />
-    if (isUrl(strValue)) return <LinkOutput value={strValue} />
+    if (isAudioUrl(strValue)) {
+      return <AudioOutput value={strValue} />
+    }
+    if (isUrl(strValue)) {
+      return <LinkOutput value={strValue} />
+    }
   }
 
   if (key === 'file') {
@@ -227,16 +245,26 @@ const renderValue = (key: string, value: any) => {
   }
 
   if (key === 'videoUrl' || key === 'videoId') {
-    if (isUrl(strValue)) return <LinkOutput value={strValue} />
+    if (isUrl(strValue)) {
+      return <LinkOutput value={strValue} />
+    }
     return <TextOutput value={strValue} />
   }
 
   // Detect by content
   if (typeof value === 'string') {
-    if (isImageUrl(value)) return <ImageOutput value={value} />
-    if (isVideoUrl(value)) return <VideoOutput value={value} />
-    if (isAudioUrl(value)) return <AudioOutput value={value} />
-    if (isUrl(value)) return <LinkOutput value={value} />
+    if (isImageUrl(value)) {
+      return <ImageOutput value={value} />
+    }
+    if (isVideoUrl(value)) {
+      return <VideoOutput value={value} />
+    }
+    if (isAudioUrl(value)) {
+      return <AudioOutput value={value} />
+    }
+    if (isUrl(value)) {
+      return <LinkOutput value={value} />
+    }
     return <TextOutput value={value} />
   }
 
@@ -250,7 +278,9 @@ const renderValue = (key: string, value: any) => {
 const OutputRenderer = ({ outputs }: { outputs: any }) => {
   const { t } = useTranslation()
 
-  if (!outputs) return null
+  if (!outputs) {
+    return null
+  }
 
   // outputs can be an array of objects or a single object
   const items = Array.isArray(outputs) ? outputs : [outputs]
@@ -263,12 +293,16 @@ const OutputRenderer = ({ outputs }: { outputs: any }) => {
       </h4>
       <div className="space-y-3">
         {items.map((item, itemIndex) => {
-          if (!item || typeof item !== 'object') return null
+          if (!item || typeof item !== 'object') {
+            return null
+          }
 
           return (
             <div key={itemIndex} className="space-y-2">
               {Object.entries(item).map(([key, value]) => {
-                if (value === null || value === undefined) return null
+                if (value === null || value === undefined) {
+                  return null
+                }
 
                 return (
                   <div key={key}>

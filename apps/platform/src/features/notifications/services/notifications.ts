@@ -4,7 +4,9 @@ const buildQuery = ({ offset = 0, limit = 10, query = '' } = {}) => {
   const params = new URLSearchParams()
   params.set('offset', String(offset))
   params.set('limit', String(limit))
-  if (query) params.set('query', query)
+  if (query) {
+    params.set('query', query)
+  }
   return params.toString()
 }
 

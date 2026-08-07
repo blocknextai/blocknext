@@ -3,13 +3,13 @@ import useSWR, { useSWRConfig } from 'swr'
 import credentialsService from '@/features/credentials/services/credentials'
 import { organizationsService } from '@/features/organizations'
 import { nodeEngineService } from '@/features/flow-editor'
-import { secretIcons } from '@/features/flow-editor/icons'
-import { resolveIconKey } from '@/features/flow-editor/hooks/use-flow-nodes'
-import { useThemeStore } from '@/stores/theme-store'
+import { useIconResolver } from '@/features/flow-editor/icons'
 import { unwrap } from '@/lib/swr'
 
 const schemaToFields = (schema: any) => {
-  if (!schema || !schema.properties) return []
+  if (!schema || !schema.properties) {
+    return []
+  }
   const required = new Set<string>(schema.required ?? [])
   return Object.entries(schema.properties).map(
     ([key, value]: [string, any]) => ({
@@ -45,7 +45,7 @@ export function useCredentials(
   isUserMode: boolean,
 ) {
   const hasAccess = isUserMode || !!organizationId
-  const mode = useThemeStore((s) => s.getMode())
+  const resolveIcon = useIconResolver()
 
   const [pagination, setPagination] = useState<Pagination>({
     offset: 0,
@@ -101,19 +101,17 @@ export function useCredentials(
     })
     return sa.map((secret: any) => {
       const credential = credentialMap[secret.key]
-      const iconKey = credential ? resolveIconKey(credential.icon, mode) : ''
       return {
         ...secret,
-        icon: iconKey ? secretIcons[iconKey] : null,
+        icon: (credential && resolveIcon(credential.icon)) ?? null,
         isSupportPlatform: credential?.isSupportPlatform || false,
         sourceType: secret.sourceType || 'owner',
       }
     })
-  }, [ca, sa, mode])
+  }, [ca, sa, resolveIcon])
 
   const secrets = useMemo(() => {
     return ca.map((c) => {
-      const iconKey = resolveIconKey(c.icon, mode)
       return {
         id: c.id,
         name: c.name,
@@ -121,10 +119,10 @@ export function useCredentials(
         isOAuth2: c.isOAuth2,
         isSupportPlatform: c.isSupportPlatform,
         provider: schemaToFields(c.schema),
-        icon: iconKey ? secretIcons[iconKey] : undefined,
+        icon: resolveIcon(c.icon),
       }
     })
-  }, [ca, mode])
+  }, [ca, resolveIcon])
 
   const fetchCredentials = useCallback((offset = 0, limit = 10, query = '') => {
     setPagination({ offset, limit, query })
@@ -136,7 +134,9 @@ export function useCredentials(
 
   const getSecretDetails = useCallback(
     async (secretId: string) => {
-      if (!hasAccess || !secretId) return null
+      if (!hasAccess || !secretId) {
+        return null
+      }
       try {
         const response = isUserMode
           ? await credentialsService.getUserCredentialById(secretId)
