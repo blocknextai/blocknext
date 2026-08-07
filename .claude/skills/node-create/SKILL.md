@@ -53,6 +53,50 @@ When **adding a new action to an existing provider**, only create `<action>/node
 
 When **adding a new provider from scratch**, create the entire tree above, then add the provider's `Register()` call to `internal/nodeengine/nodes/nodes.go`.
 
+## Icon and handles
+
+A node states what it looks like and how it connects; nothing is derived from
+its name or category.
+
+**Icon** is a brand plus a glyph. `Brand` names the artwork under
+`apps/platform/public/assets/icons/brands/<brand>/{light,dark}.svg` — reuse the
+provider's existing brand (`gmail`, `slack`, `x`). A provider that has no mark
+yet needs one dropped in that folder; no code registers it. `Glyph` names the
+action badge under `.../glyphs/<glyph>.svg` — reuse an existing one where it
+fits (`send`, `search`, `create`, `list`, `eye`, `trash`, `pencil`, `image`,
+`film`, `speaker`, `music`, `chat`, `folder`, `file`, `table`, `record`,
+`branch`, `clock`, `play`, `note`, `story`, `upload`, `organize`, `translate`,
+`trending`, `target`). Two nodes of the same provider must not share a glyph —
+that is the only thing telling them apart in a list.
+
+A system primitive with no brand behind it declares only `Glyph`.
+
+**Handles** are the connection points, and every node lists its own; there is no
+default. Almost every node is one in, one out:
+
+```go
+Inputs: []nodes.NodeHandle{
+	{Key: "in"},
+},
+Outputs: []nodes.NodeHandle{
+	{Key: "out"},
+},
+```
+
+A node with no way in declares `Inputs: []nodes.NodeHandle{}` (an empty, non-nil
+slice — `nil` would mean "not declared"). A node that branches declares one
+output per branch with a `Label`, which the canvas prints next to the dot:
+
+```go
+Outputs: []nodes.NodeHandle{
+	{Key: "true", Label: "True"},
+	{Key: "false", Label: "False"},
+},
+```
+
+Edges record which output they leave from, so a key is part of the saved
+workflow — renaming one breaks every flow that uses it.
+
 ## Annotations classification
 
 Every node carries `Annotations: nodes.NodeAnnotations{...}` describing how the tool affects its environment. MCP clients (Claude Desktop, Cursor, etc.) use these hints to decide when to ask the user for confirmation. Pick one of these groups:
@@ -145,8 +189,14 @@ func New<Provider><Action>Node(nodeID string) *<Provider><Action>Node {
 			Name:        "<DisplayName>",
 			Description: "<one-line description>",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "<brand>",
+				Glyph: "<glyph>",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"<Category>"},
 			SubCategories: []string{"<SubCategory>"},

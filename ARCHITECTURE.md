@@ -131,7 +131,7 @@ The mechanics behind the headline features are documented next to the code:
 | --- | --- |
 | The canvas model — `$references`, credential references, deliberate simplicity | [`workflows`](apps/platform-api/internal/workflows/README.md) |
 | AI workflow generation from chat (SSE streaming) | [`workflows`](apps/platform-api/internal/workflows/README.md) |
-| One node descriptor → UI form, validation, function calling, MCP tool | [`nodeengine`](apps/platform-api/internal/nodeengine/README.md) |
+| One node descriptor → UI form, icon, connection points, validation, function calling, MCP tool | [`nodeengine`](apps/platform-api/internal/nodeengine/README.md) |
 | How a node becomes an MCP tool | [`mcp`](apps/platform-api/internal/mcp/README.md) |
 | Task scheduling, DAG execution order, prompt layering | [`taskrunner`](apps/platform-api/internal/taskrunner/README.md) |
 | Trigger types, webhook adapters, runtime config overlay | [`triggers`](apps/platform-api/internal/triggers/README.md) |

@@ -144,6 +144,10 @@ Verify the Go type still matches the new values (e.g., changing from `int` to `f
 
 `Name`, `Description`, `Icon`, `Categories`, `SubCategories`, `Tags` are independent. Tags must remain lowercase; categories must use one of the existing top-level values (memory: `node-create` skill lists them).
 
+`Icon` is a `Brand` (the provider's mark) plus a `Glyph` (the action badge), both naming files under the platform UI's `public/assets/icons/`; see the `node-create` skill for the glyph vocabulary and the rule that two nodes of one provider must not share a glyph.
+
+`Inputs`/`Outputs` are a different matter — they are not metadata. A handle `Key` is written into every edge of every saved workflow, so renaming or removing one breaks each flow that uses it. Adding an output is safe; changing an existing key is a migration, not an update.
+
 #### Add / remove a supported credential
 
 ```go

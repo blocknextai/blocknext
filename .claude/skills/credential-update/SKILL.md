@@ -135,7 +135,7 @@ grep -rn 'SupportedCredentials.*"<credential_id>"' internal/nodeengine/nodes/
 
 #### Update display metadata
 
-`Name`, `Description`, `Icon` are independent and non-breaking.
+`Name`, `Description`, `Icon` are independent and non-breaking. `CredentialIcon` carries only a `Brand` — the provider's plain mark, named after a folder under the platform UI's `public/assets/icons/brands/`; the glyph badge belongs to individual nodes.
 
 #### Disable / enable
 

@@ -45,6 +45,14 @@ Naming rules:
 - Function: `New<Provider><AuthType>Credential` (PascalCase). For OAuth2/OAuth1 the suffix is `OAuth2` / `OAuth1`, not `Oauth2`.
 - Credential `ID`: `<provider>_<authtype>` (e.g., `mistral_api`, `notion_oauth2`)
 
+## Icon
+
+A credential wears its provider's plain brand mark; the glyph badge belongs to
+individual nodes, so `CredentialIcon` carries only `Brand`. The value names the
+artwork under `apps/platform/public/assets/icons/brands/<brand>/{light,dark}.svg`
+— reuse the provider's existing brand, or drop the two files in for a provider
+that has none. Nothing registers a brand in code.
+
 ## Templates
 
 ### API key credential
@@ -64,8 +72,7 @@ func New<Provider>ApiCredential() *domain.Credential {
 		Name:        "<DisplayName>",
 		Description: "<one-line description>",
 		Icon: domain.CredentialIcon{
-			Light: "<provider>",
-			Dark:  "<provider>",
+			Brand: "<brand>",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",
@@ -117,8 +124,7 @@ func New<Provider>OAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "<DisplayName>",
 		Description: "<one-line description>",
 		Icon: domain.CredentialIcon{
-			Light: "<provider>",
-			Dark:  "<provider>",
+			Brand: "<brand>",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",
