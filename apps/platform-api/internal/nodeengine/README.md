@@ -8,7 +8,9 @@ The node engine owns the **definitions** of everything a workflow can do: each n
 
 ## Core concepts
 
-- **Node** (`domain/nodes/node.go`): a declarative action descriptor — `ID`, `Version`, name/description, `InputSchema`/`OutputSchema` (`jsonschema-go`), `Categories`/`SubCategories`/`Tags`, `SupportedCredentials`, `Annotations`, `HasNaturalLanguage`, `Disabled`. Implements `NodeManager` (getter interface).
+- **Node** (`domain/nodes/node.go`): a declarative action descriptor — `ID`, `Version`, name/description, `Icon` (a `Brand` naming the provider's mark plus a `Glyph` naming the action badge), `Inputs`/`Outputs` (the connection points, each a `Key` and an optional `Label`; every node states its own, there is no default), `InputSchema`/`OutputSchema` (`jsonschema-go`), `Categories`/`SubCategories`/`Tags`, `SupportedCredentials`, `Annotations`, `HasNaturalLanguage`, `Disabled`. Implements `NodeManager` (getter interface).
+
+  A node describes how it looks and how it connects, so the UI derives nothing: the artwork lives under `apps/platform/public/assets/icons/{brands,glyphs}/` and is composed at render time. `system_starter` declares an empty `Inputs` slice (no way in), `system_condition` declares two outputs labelled True and False. Credentials (`CredentialIcon`) and MCP servers (`ServerIcon`) name a `Brand` only — the glyph badge belongs to individual nodes.
 - **Executor** (`domain/executors/executor.go`): the behavior for a node, keyed by the same ID. `ExecutorManager.ExecuteWithContext(ctx, credentials, data)` is the execution entry point.
 - **Credential** (`domain/credentials/credential.go`): a provider auth descriptor — schema, `IsOAuth1`/`IsOAuth2`/`IsSupportPlatform`, `SupportedNodes`. OAuth credentials may implement `RefreshableCredential`. `IsSupportPlatform` is auto-derived at load (host-provided OAuth apps).
 - **Adapter** (`domain/adapters/adapter.go`): a trigger adapter that maps a raw webhook payload into a `TriggerContext` (`source`/`sender`/`prompt`/`payload`, exposed as `$trigger.*` variables).
