@@ -3,6 +3,7 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import eslintConfigPrettier from 'eslint-config-prettier'
+import tseslint from 'typescript-eslint'
 
 export default [
   { ignores: ['dist'] },
@@ -32,4 +33,24 @@ export default [
     },
   },
   eslintConfigPrettier,
+  {
+    // After the prettier config, which switches `curly` off — every branch
+    // states its scope, however short the body.
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    plugins: { '@typescript-eslint': tseslint.plugin },
+    rules: {
+      curly: ['error', 'all'],
+      'no-unused-vars': 'off',
+      // Unused imports and locals are dead weight; only underscore-prefixed
+      // arguments are allowed to stay.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
+    },
+  },
 ]
