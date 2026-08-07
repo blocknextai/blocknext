@@ -7,7 +7,8 @@ import (
 type BrokerType string
 
 const (
-	BrokerTypeRedis BrokerType = "redis"
+	BrokerTypeMemory BrokerType = "memory"
+	BrokerTypeRedis  BrokerType = "redis"
 )
 
 type BrokerOptions struct {

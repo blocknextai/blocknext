@@ -2,13 +2,16 @@ package infrastructure
 
 import (
 	"github.com/blocknextai/go-packages/apperror"
+	"github.com/blocknextai/go-packages/redisclient"
 	"github.com/blocknextai/platform-api/internal/config"
 	executionsApplicationTaskClaims "github.com/blocknextai/platform-api/internal/executions/application/taskclaims"
 	taskRunnerApplicationDispatchers "github.com/blocknextai/platform-api/internal/taskrunner/application/dispatchers"
 	taskRunnerApplicationTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/application/taskrunner"
 	"github.com/blocknextai/platform-api/internal/taskrunner/domain/taskqueue"
 	taskRunnerDomainTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/domain/taskrunner"
+	taskRunnerInfrastructureLeaderMemory "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/leader/memory"
 	taskRunnerInfrastructureLeaderRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/leader/redis"
+	taskRunnerInfrastructureSemaphoreMemory "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore/memory"
 	taskRunnerInfrastructureSemaphoreRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore/redis"
 	taskRunnerInfrastructureTaskQueueRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/taskqueue/redis"
 )
@@ -26,7 +29,7 @@ func NewTaskQueue(queueOptions config.TaskRunnerQueueOptions, consumerName strin
 			queueOptions.Redis.Address,
 			queueOptions.Redis.Password,
 			queueOptions.Redis.DB,
-			taskRunnerInfrastructureTaskQueueRedis.PoolOptions{
+			redisclient.PoolOptions{
 				PoolSize:        queueOptions.Redis.PoolSize,
 				MinIdleConns:    queueOptions.Redis.MinIdleConns,
 				MaxIdleConns:    queueOptions.Redis.MaxIdleConns,
@@ -48,12 +51,16 @@ func NewTaskQueue(queueOptions config.TaskRunnerQueueOptions, consumerName strin
 }
 
 func NewSemaphore(semaphoreOptions config.TaskRunnerSemaphoreOptions) (taskRunnerDomainTaskRunner.SemaphoreManager, error) {
+	if semaphoreOptions.Provider == config.TaskSemaphoreProviderMemory {
+		return taskRunnerInfrastructureSemaphoreMemory.New(semaphoreOptions.TTL), nil
+	}
+
 	if semaphoreOptions.Provider == config.TaskSemaphoreProviderRedis {
 		return taskRunnerInfrastructureSemaphoreRedis.NewRedisSemaphore(
 			semaphoreOptions.Redis.Address,
 			semaphoreOptions.Redis.Password,
 			semaphoreOptions.Redis.DB,
-			taskRunnerInfrastructureSemaphoreRedis.PoolOptions{
+			redisclient.PoolOptions{
 				PoolSize:        semaphoreOptions.Redis.PoolSize,
 				MinIdleConns:    semaphoreOptions.Redis.MinIdleConns,
 				MaxIdleConns:    semaphoreOptions.Redis.MaxIdleConns,
@@ -98,12 +105,16 @@ func NewDispatcher(
 }
 
 func NewLeaderRunner(leaderOptions config.TaskRunnerLeaderOptions, instanceID string) (taskRunnerDomainTaskRunner.LeaderRunner, error) {
+	if leaderOptions.Provider == config.TaskLockProviderMemory {
+		return taskRunnerInfrastructureLeaderMemory.New(), nil
+	}
+
 	if leaderOptions.Provider == config.TaskLockProviderRedis {
 		return taskRunnerInfrastructureLeaderRedis.NewRedisLeader(
 			leaderOptions.Redis.Address,
 			leaderOptions.Redis.Password,
 			leaderOptions.Redis.DB,
-			taskRunnerInfrastructureLeaderRedis.PoolOptions{
+			redisclient.PoolOptions{
 				PoolSize:        leaderOptions.Redis.PoolSize,
 				MinIdleConns:    leaderOptions.Redis.MinIdleConns,
 				MaxIdleConns:    leaderOptions.Redis.MaxIdleConns,

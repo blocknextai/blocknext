@@ -25,8 +25,8 @@ graph LR
 
     subgraph Data
         PG[(PostgreSQL 18)]
-        R[(redis<br/>cache · broker · locks)]
-        TQ[(task-queue-redis<br/>AOF-persisted)]
+        R[(redis<br/>cache · broker · locks<br/>opt-in, for scale-out)]
+        TQ[(task-queue-redis<br/>AOF-persisted<br/>queue mode only)]
     end
 
     B --> UI
@@ -84,9 +84,11 @@ Two boundary rules keep the monolith modular:
 - Modules never share repositories — cross-module access goes through **service interfaces** injected in `bootstrap`.
 - A module's routes, handlers, and persistence live entirely inside its own directory; `module.go` is the only wiring surface.
 
-**Two-layer eventing.** Server→server events use the `eventbus` module: a transactional outbox in Postgres, drained with `SKIP LOCKED` by the relay (embedded in `platform-api` or standalone as `event-relay-worker`). Server→client updates use `realtime`: ephemeral Redis pub/sub broadcast into the `ws` hub. Durability and fan-out are deliberately separate concerns.
+**Two-layer eventing.** Server→server events use the `eventbus` module: a transactional outbox in Postgres, drained with `SKIP LOCKED` by the relay (embedded in `platform-api` or standalone as `event-relay-worker`). Server→client updates use `realtime`: ephemeral pub/sub broadcast into the `ws` hub. Durability and fan-out are deliberately separate concerns.
 
-**Task runner.** Workflow executions run through `taskrunner` in one of two modes (`TASK_RUNNER_MODE`): `embedded` (inside platform-api) or `queue` (Redis Streams + consumer group, consumed by `task-worker`). Leader election and concurrency semaphores live in Redis DB 1.
+**Task runner.** Workflow executions run through `taskrunner` in one of two modes (`TASK_RUNNER_MODE`): `embedded` (inside platform-api) or `queue` (Redis Streams + consumer group, consumed by `task-worker`).
+
+**Redis is opt-in.** The cache, realtime broker, leader election and concurrency semaphore each pick a provider (`CACHE_TYPE`, `BROKER_TYPE`, `TASK_RUNNER_LEADER_PROVIDER`, `TASK_RUNNER_SEMAPHORE_PROVIDER`). All of them default to `memory`, which keeps the state in-process — correct for the single instance a fresh install runs, and it removes the dependency entirely. Switch a subsystem to `redis` when you run several instances and they need to share that state. Compose gates every backing service behind a profile named after its consumer (`cache-redis`, `broker-redis`, `lock-redis`, `semaphore-redis`, `task-runner-queue`), all derived from those same settings — so a subsystem left on `memory` never starts a container. A default install is 7 containers idling around 100 MB; turning everything on brings it to 10 containers and roughly 160 MB.
 
 **Persistence.** `database/sql` + `lib/pq` — no ORM. Shared helpers (`TransactionManager`, `BaseRepository`, generic scanners) come from `go-packages/database`. Migrations are **centralized in platform-api**: each module owns its `infrastructure/database/migrations/` directory and a dedicated `<module>_migrations` tracking table; the one-shot migration container runs before the stack starts.
 
@@ -118,6 +120,7 @@ Service ports are fixed (`3000/3100/3200/3300/4000`); container-to-container URL
 - **Opinionated workflow model** — no loops, no sub-workflows, no expression language. Flows stay simple, readable, and predictable for non-developer users; that constraint is a feature.
 - **stdlib-first Go** — `log/slog`, `database/sql`, small focused packages in `go-packages` instead of frameworks.
 - **Runtime env for the UI** — one image per release, environment decided at container start.
+- **Scale-out infrastructure is opt-in** — Redis buys cross-instance coordination, which a fresh single-instance install does not need. Every Redis-backed subsystem ships an in-process provider and defaults to it; Compose only starts what is configured.
 - **Distroless + unprivileged runtimes** — minimal attack surface; health is probed via `/livez` and `/readyz` on every API.
 
 ## Deep dives

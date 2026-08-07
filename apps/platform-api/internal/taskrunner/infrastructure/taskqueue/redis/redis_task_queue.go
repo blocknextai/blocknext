@@ -9,6 +9,7 @@ import (
 
 	"github.com/blocknextai/go-packages/apperror"
 	"github.com/blocknextai/go-packages/json"
+	"github.com/blocknextai/go-packages/redisclient"
 	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
 	"github.com/blocknextai/platform-api/internal/taskrunner/domain/taskqueue"
 	"github.com/redis/go-redis/v9"
@@ -35,32 +36,16 @@ type Options struct {
 	PrefetchCount int
 }
 
-type PoolOptions struct {
-	PoolSize        int
-	MinIdleConns    int
-	MaxIdleConns    int
-	PoolTimeout     time.Duration
-	ConnMaxIdleTime time.Duration
-	ConnMaxLifetime time.Duration
-}
-
 type RedisTaskQueue struct {
 	client  *redis.Client
 	options Options
 }
 
-func NewRedisTaskQueue(addr string, password string, db int, poolOptions PoolOptions, options Options) (taskqueue.TaskQueue, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:            addr,
-		Password:        password,
-		DB:              db,
-		PoolSize:        poolOptions.PoolSize,
-		MinIdleConns:    poolOptions.MinIdleConns,
-		MaxIdleConns:    poolOptions.MaxIdleConns,
-		PoolTimeout:     poolOptions.PoolTimeout,
-		ConnMaxIdleTime: poolOptions.ConnMaxIdleTime,
-		ConnMaxLifetime: poolOptions.ConnMaxLifetime,
-	})
+func NewRedisTaskQueue(addr string, password string, db int, poolOptions redisclient.PoolOptions, options Options) (taskqueue.TaskQueue, error) {
+	client, err := redisclient.New(addr, password, db, poolOptions)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx := context.Background()
 	if err := client.Ping(ctx).Err(); err != nil {

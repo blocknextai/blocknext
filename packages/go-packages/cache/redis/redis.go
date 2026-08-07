@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/blocknextai/go-packages/cache"
+	"github.com/blocknextai/go-packages/redisclient"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -19,23 +20,9 @@ type provider struct {
 // index and pool options, and returns a cache.Service. It pings the server to
 // verify connectivity and returns an error if the connection cannot be
 // established.
-func New(addr string, password string, db int, poolOptions PoolOptions) (cache.Service, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:            addr,
-		Password:        password,
-		DB:              db,
-		PoolSize:        poolOptions.PoolSize,
-		MinIdleConns:    poolOptions.MinIdleConns,
-		MaxIdleConns:    poolOptions.MaxIdleConns,
-		PoolTimeout:     poolOptions.PoolTimeout,
-		ConnMaxIdleTime: poolOptions.ConnMaxIdleTime,
-		ConnMaxLifetime: poolOptions.ConnMaxLifetime,
-	})
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := client.Ping(ctx).Err(); err != nil {
+func New(addr string, password string, db int, poolOptions redisclient.PoolOptions) (cache.Service, error) {
+	client, err := redisclient.New(addr, password, db, poolOptions)
+	if err != nil {
 		return nil, err
 	}
 

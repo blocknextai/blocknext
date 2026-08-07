@@ -4,47 +4,32 @@ import (
 	"context"
 	"log/slog"
 	"strings"
-	"time"
 
 	"github.com/blocknextai/go-packages/apperror"
-	"github.com/blocknextai/go-packages/json"
+	"github.com/blocknextai/go-packages/redisclient"
+	"github.com/blocknextai/platform-api/internal/realtime/events"
 	taskRunnerDomainNode "github.com/blocknextai/platform-api/internal/taskrunner/domain/node"
 	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
+const organizationKeyPrefix = "organization:"
+
 var (
-	ErrFailedToMarshalTaskEvent = apperror.Internal("failed to marshal task event")
 	ErrFailedToPublishTaskEvent = apperror.Internal("failed to publish task event")
-	ErrFailedToMarshalNodeEvent = apperror.Internal("failed to marshal node event")
 	ErrFailedToPublishNodeEvent = apperror.Internal("failed to publish node event")
 )
 
-type PoolOptions struct {
-	PoolSize        int
-	MinIdleConns    int
-	MaxIdleConns    int
-	PoolTimeout     time.Duration
-	ConnMaxIdleTime time.Duration
-	ConnMaxLifetime time.Duration
-}
 type redisBroadcaster struct {
 	client *redis.Client
 }
 
-func New(addr string, password string, db int, poolOptions PoolOptions) (*redisBroadcaster, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:            addr,
-		Password:        password,
-		DB:              db,
-		PoolSize:        poolOptions.PoolSize,
-		MinIdleConns:    poolOptions.MinIdleConns,
-		MaxIdleConns:    poolOptions.MaxIdleConns,
-		PoolTimeout:     poolOptions.PoolTimeout,
-		ConnMaxIdleTime: poolOptions.ConnMaxIdleTime,
-		ConnMaxLifetime: poolOptions.ConnMaxLifetime,
-	})
+func New(addr string, password string, db int, poolOptions redisclient.PoolOptions) (*redisBroadcaster, error) {
+	client, err := redisclient.New(addr, password, db, poolOptions)
+	if err != nil {
+		return nil, err
+	}
 
 	ctx := context.Background()
 	if err := client.Ping(ctx).Err(); err != nil {
@@ -61,17 +46,12 @@ func (b *redisBroadcaster) Ping(ctx context.Context) error {
 }
 
 func (b *redisBroadcaster) PublishTaskEvent(ctx context.Context, event *taskRunnerDomainTask.TaskEvent) error {
-	eventJSON, err := json.Marshal(event)
+	payload, err := events.MarshalTask(event)
 	if err != nil {
-		return ErrFailedToMarshalTaskEvent
+		return err
 	}
 
-	var builder strings.Builder
-	builder.WriteString("organization:")
-	builder.WriteString(event.OrganizationID.String())
-	organizationKey := builder.String()
-
-	err = b.client.Publish(ctx, organizationKey, string(eventJSON)).Err()
+	err = b.client.Publish(ctx, buildOrganizationKey(event.OrganizationID), payload).Err()
 	if err != nil {
 		return ErrFailedToPublishTaskEvent
 	}
@@ -80,17 +60,12 @@ func (b *redisBroadcaster) PublishTaskEvent(ctx context.Context, event *taskRunn
 }
 
 func (b *redisBroadcaster) PublishNodeEvent(ctx context.Context, event *taskRunnerDomainNode.NodeEvent) error {
-	eventJSON, err := json.Marshal(event)
+	payload, err := events.MarshalNode(event)
 	if err != nil {
-		return ErrFailedToMarshalNodeEvent
+		return err
 	}
 
-	var builder strings.Builder
-	builder.WriteString("organization:")
-	builder.WriteString(event.OrganizationID.String())
-	organizationKey := builder.String()
-
-	err = b.client.Publish(ctx, organizationKey, string(eventJSON)).Err()
+	err = b.client.Publish(ctx, buildOrganizationKey(event.OrganizationID), payload).Err()
 	if err != nil {
 		return ErrFailedToPublishNodeEvent
 	}
@@ -103,13 +78,8 @@ func (b *redisBroadcaster) Close() error {
 }
 
 func (b *redisBroadcaster) Subscribe(ctx context.Context, organizationID uuid.UUID) (<-chan string, error) {
-	var builder strings.Builder
-	builder.WriteString("organization:")
-	builder.WriteString(organizationID.String())
-	organizationKey := builder.String()
-
-	pubsub := b.client.Subscribe(ctx, organizationKey)
-	ch := make(chan string, 64)
+	pubsub := b.client.Subscribe(ctx, buildOrganizationKey(organizationID))
+	ch := make(chan string, events.SubscriberBuffer)
 
 	go func() {
 		defer func() {
@@ -132,4 +102,15 @@ func (b *redisBroadcaster) Subscribe(ctx context.Context, organizationID uuid.UU
 	}()
 
 	return ch, nil
+}
+
+func buildOrganizationKey(organizationID uuid.UUID) string {
+	id := organizationID.String()
+
+	var builder strings.Builder
+	builder.Grow(len(organizationKeyPrefix) + len(id))
+	builder.WriteString(organizationKeyPrefix)
+	builder.WriteString(id)
+
+	return builder.String()
 }

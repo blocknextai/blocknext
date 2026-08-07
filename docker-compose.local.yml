@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD is required}
       POSTGRES_DB: ${DATABASE_NAME:-postgres}
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - db_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres} -d ${DATABASE_NAME:-postgres}"]
       interval: 5s
@@ -22,6 +22,11 @@ services:
     container_name: redis
     command: ["redis-server", "--requirepass", "${CACHE_REDIS_PASSWORD:?CACHE_REDIS_PASSWORD is required}", "--appendonly", "no", "--save", ""]
     restart: unless-stopped
+    profiles:
+      - cache-redis
+      - broker-redis
+      - lock-redis
+      - semaphore-redis
 
   task-queue-redis:
     image: redis:8-alpine
@@ -29,7 +34,7 @@ services:
     command: ["redis-server", "--requirepass", "${TASK_RUNNER_QUEUE_REDIS_PASSWORD:?TASK_RUNNER_QUEUE_REDIS_PASSWORD is required}", "--appendonly", "yes", "--save", "60 1"]
     restart: unless-stopped
     profiles:
-      - queue
+      - task-runner-queue
     volumes:
       - task_queue_redis_data:/data
 
@@ -105,7 +110,7 @@ services:
   task-worker:
     restart: on-failure:10
     profiles:
-      - queue
+      - task-runner-queue
     env_file:
       - .env
     depends_on:
@@ -146,8 +151,6 @@ services:
       - .env
     ports:
       - "${FILE_GATEWAY_API_PORT:-3300}:${FILE_GATEWAY_API_PORT:-3300}"
-    depends_on:
-      - redis
 
   platform:
     container_name: platform
@@ -159,7 +162,10 @@ services:
       - .env
     ports:
       - "${PLATFORM_UI_PORT:-4000}:4000"
+    depends_on:
+      - platform-api
+      - file-gateway-api
 
 volumes:
-  postgres_data:
+  db_data:
   task_queue_redis_data:

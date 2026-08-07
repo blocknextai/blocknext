@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/blocknextai/go-packages/apperror"
+	"github.com/blocknextai/go-packages/redisclient"
 	taskRunnerDomainTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/domain/taskrunner"
 	"github.com/redis/go-redis/v9"
 )
@@ -23,15 +24,6 @@ type Options struct {
 	RenewInterval time.Duration
 }
 
-type PoolOptions struct {
-	PoolSize        int
-	MinIdleConns    int
-	MaxIdleConns    int
-	PoolTimeout     time.Duration
-	ConnMaxIdleTime time.Duration
-	ConnMaxLifetime time.Duration
-}
-
 type RedisLeader struct {
 	client                 *redis.Client
 	compareAndRenewScript  *redis.Script
@@ -39,18 +31,11 @@ type RedisLeader struct {
 	options                Options
 }
 
-func NewRedisLeader(addr string, password string, db int, poolOptions PoolOptions, options Options) (taskRunnerDomainTaskRunner.LeaderRunner, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:            addr,
-		Password:        password,
-		DB:              db,
-		PoolSize:        poolOptions.PoolSize,
-		MinIdleConns:    poolOptions.MinIdleConns,
-		MaxIdleConns:    poolOptions.MaxIdleConns,
-		PoolTimeout:     poolOptions.PoolTimeout,
-		ConnMaxIdleTime: poolOptions.ConnMaxIdleTime,
-		ConnMaxLifetime: poolOptions.ConnMaxLifetime,
-	})
+func NewRedisLeader(addr string, password string, db int, poolOptions redisclient.PoolOptions, options Options) (taskRunnerDomainTaskRunner.LeaderRunner, error) {
+	client, err := redisclient.New(addr, password, db, poolOptions)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := client.Ping(context.Background()).Err(); err != nil {
 		return nil, err
