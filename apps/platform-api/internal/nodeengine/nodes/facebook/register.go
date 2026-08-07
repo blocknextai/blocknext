@@ -45,7 +45,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Facebook",
 		Description: "Tools for publishing posts, media, and stories to Facebook pages.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "facebook",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			publishPostNode,
 			publishMediaPostNode,

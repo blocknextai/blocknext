@@ -18,8 +18,14 @@ func NewCoingeckoAirdropTrackerNode(nodeID string) *CoingeckoAirdropTrackerNode 
 			Name:        "Coingecko Airdrop Tracker",
 			Description: "Track cryptocurrency airdrops via CoinGecko.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "coingecko",
+				Glyph: "target",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Blockchain"},
 			SubCategories: []string{"CoinGecko"},

@@ -12,8 +12,7 @@ func NewGeminiAPICredential() *domain.Credential {
 		Name:        "Gemini",
 		Description: "Google Gemini API domain.",
 		Icon: domain.CredentialIcon{
-			Light: "gemini",
-			Dark:  "gemini",
+			Brand: "gemini",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

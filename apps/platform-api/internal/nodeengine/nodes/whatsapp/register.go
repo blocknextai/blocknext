@@ -49,7 +49,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "WhatsApp",
 		Description: "Tools for sending text messages, templates, and media via WhatsApp.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "whatsapp",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			sendMessageNode,
 			sendTemplateNode,

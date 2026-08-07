@@ -12,8 +12,7 @@ func NewAnthropicAPICredential() *domain.Credential {
 		Name:        "Anthropic",
 		Description: "Anthropic API credentials for accessing Claude models.",
 		Icon: domain.CredentialIcon{
-			Light: "anthropic",
-			Dark:  "anthropic",
+			Brand: "anthropic",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

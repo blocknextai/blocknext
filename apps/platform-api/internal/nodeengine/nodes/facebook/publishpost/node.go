@@ -17,8 +17,14 @@ func NewFacebookPublishPostNode(nodeID string) *FacebookPublishPostNode {
 			Name:        "Facebook Publish Post",
 			Description: "Publish a text post to a Facebook page.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "facebook",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Facebook"},

@@ -18,8 +18,14 @@ func NewGoogleSheetsReadSpreadsheetNode(nodeID string) *GoogleSheetsReadSpreadsh
 			Name:        "Google Sheets Read Spreadsheet",
 			Description: "Read rows from a Google Sheets spreadsheet, optionally filtering and limiting results.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_sheets",
+				Glyph: "eye",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Sheets"},

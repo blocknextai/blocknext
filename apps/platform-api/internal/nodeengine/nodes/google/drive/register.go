@@ -56,7 +56,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "Google Drive",
 		Description: "Tools for managing files and folders in Google Drive.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "google_drive",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createFolderNode,
 			createTextFileNode,

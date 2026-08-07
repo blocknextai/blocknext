@@ -17,6 +17,7 @@ func MapGetAllServersQueryToGetAllServersResponse(
 			ID:           server.GetID(),
 			Name:         server.GetName(),
 			Description:  server.GetDescription(),
+			Icon:         server.GetIcon(),
 			Version:      server.GetVersion(),
 			Instructions: server.GetInstructions(),
 			URL:          url,

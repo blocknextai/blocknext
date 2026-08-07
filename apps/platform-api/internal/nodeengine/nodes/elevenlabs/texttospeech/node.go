@@ -18,8 +18,14 @@ func NewElevenlabsTextToSpeechNode(nodeID string) *ElevenlabsTextToSpeechNode {
 			Name:        "ElevenLabs Text To Speech",
 			Description: "Convert text to speech using ElevenLabs.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "elevenlabs",
+				Glyph: "speaker",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Audio"},
 			SubCategories: []string{"ElevenLabs"},

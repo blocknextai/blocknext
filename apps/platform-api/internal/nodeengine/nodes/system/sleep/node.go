@@ -18,8 +18,13 @@ func NewSleepNode(nodeID string) *SleepNode {
 			Name:        "Sleep",
 			Description: "Pause the workflow for a specified duration.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Glyph: "clock",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"System"},
 			SubCategories: []string{"System"},

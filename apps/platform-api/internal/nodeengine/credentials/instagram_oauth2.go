@@ -19,8 +19,7 @@ func NewInstagramOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Instagram",
 		Description: "Instagram OAuth2 credentials for publishing posts and stories.",
 		Icon: domain.CredentialIcon{
-			Light: "instagram",
-			Dark:  "instagram",
+			Brand: "instagram",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

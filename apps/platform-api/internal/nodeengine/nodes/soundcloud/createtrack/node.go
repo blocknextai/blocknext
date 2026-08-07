@@ -17,8 +17,14 @@ func NewSoundCloudCreateTrackNode(nodeID string) *SoundCloudCreateTrackNode {
 			Name:        "SoundCloud Create Track",
 			Description: "Upload a new track to SoundCloud.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "soundcloud",
+				Glyph: "music",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"SoundCloud"},

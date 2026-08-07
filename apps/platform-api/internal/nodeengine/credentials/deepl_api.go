@@ -12,8 +12,7 @@ func NewDeeplAPICredential() *domain.Credential {
 		Name:        "DeepL",
 		Description: "DeepL API credentials for translation services.",
 		Icon: domain.CredentialIcon{
-			Light: "deepl",
-			Dark:  "deepl",
+			Brand: "deepl",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

@@ -17,8 +17,14 @@ func NewDiscordSendMediaNode(nodeID string) *DiscordSendMediaNode {
 			Name:        "Discord Send Media",
 			Description: "Send a media file to a Discord channel.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "discord",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Discord"},

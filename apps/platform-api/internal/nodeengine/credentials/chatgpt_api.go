@@ -12,8 +12,7 @@ func NewChatgptAPICredential() *domain.Credential {
 		Name:        "ChatGPT",
 		Description: "OpenAI API credentials for ChatGPT models.",
 		Icon: domain.CredentialIcon{
-			Light: "chatgpt",
-			Dark:  "chatgpt",
+			Brand: "chatgpt",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

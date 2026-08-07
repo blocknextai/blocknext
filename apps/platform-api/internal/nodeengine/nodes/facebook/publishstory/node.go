@@ -17,8 +17,14 @@ func NewFacebookPublishStoryNode(nodeID string) *FacebookPublishStoryNode {
 			Name:        "Facebook Publish Story",
 			Description: "Publish a story to a Facebook page.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "facebook",
+				Glyph: "story",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Facebook"},

@@ -45,7 +45,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Gmail",
 		Description: "Tools for organizing, searching, and sending Gmail emails.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "gmail",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			organizeEmailsNode,
 			searchEmailsNode,

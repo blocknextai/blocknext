@@ -12,8 +12,7 @@ func NewCoingeckoAPICredential() *domain.Credential {
 		Name:        "CoinGecko",
 		Description: "CoinGecko API credentials for cryptocurrency market data.",
 		Icon: domain.CredentialIcon{
-			Light: "coingecko",
-			Dark:  "coingecko",
+			Brand: "coingecko",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

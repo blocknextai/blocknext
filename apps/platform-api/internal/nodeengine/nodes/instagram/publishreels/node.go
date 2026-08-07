@@ -18,8 +18,14 @@ func NewInstagramPublishReelsNode(nodeID string) *InstagramPublishReelsNode {
 			Name:        "Instagram Publish Reels",
 			Description: "Publish a Reel to an Instagram account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "instagram",
+				Glyph: "film",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Instagram"},

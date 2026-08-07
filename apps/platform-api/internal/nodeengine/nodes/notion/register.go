@@ -55,7 +55,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Notion",
 		Description: "Tools for managing Notion pages.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "notion",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createPageNode,
 			updatePageNode,

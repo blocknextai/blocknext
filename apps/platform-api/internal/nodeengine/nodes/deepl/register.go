@@ -25,7 +25,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "DeepL",
 		Description: "Tools for translation via DeepL.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "deepl",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			translateNode,
 		},

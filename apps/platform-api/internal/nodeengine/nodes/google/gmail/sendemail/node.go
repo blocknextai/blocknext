@@ -17,8 +17,14 @@ func NewGmailSendEmailNode(nodeID string) *GmailSendEmailNode {
 			Name:        "Gmail Send Email",
 			Description: "Send an email through Gmail.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "gmail",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Mailing"},
 			SubCategories: []string{"Gmail"},

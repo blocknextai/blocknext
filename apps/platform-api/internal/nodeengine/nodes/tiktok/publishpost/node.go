@@ -17,8 +17,14 @@ func NewTiktokPublishPostNode(nodeID string) *TiktokPublishPostNode {
 			Name:        "TikTok Publish Post",
 			Description: "Publish a video post to a TikTok account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "tiktok",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"TikTok"},

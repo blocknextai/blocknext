@@ -12,8 +12,7 @@ func NewSunomusicAPICredential() *domain.Credential {
 		Name:        "Suno Music",
 		Description: "Suno Music API credentials for music and lyrics generation.",
 		Icon: domain.CredentialIcon{
-			Light: "sunomusic",
-			Dark:  "sunomusic",
+			Brand: "sunomusic",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

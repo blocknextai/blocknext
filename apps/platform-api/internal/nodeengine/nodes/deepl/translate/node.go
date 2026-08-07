@@ -18,8 +18,14 @@ func NewDeeplTranslateNode(nodeID string) *DeeplTranslateNode {
 			Name:        "DeepL Translate",
 			Description: "Translate text using DeepL.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "deepl",
+				Glyph: "translate",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"AI"},
 			SubCategories: []string{"DeepL"},

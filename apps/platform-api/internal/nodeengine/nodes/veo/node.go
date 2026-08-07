@@ -18,8 +18,14 @@ func NewVeoNode(nodeID string) *VeoNode {
 			Name:        "Veo",
 			Description: "Generate a video from a text prompt using Veo.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "veo",
+				Glyph: "film",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Video"},
 			SubCategories: []string{"Veo"},

@@ -18,8 +18,14 @@ func NewDeepseekChatNode(nodeID string) *DeepseekChatNode {
 			Name:        "DeepSeek Chat",
 			Description: "Generate a chat completion using DeepSeek.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "deepseek",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"AI"},
 			SubCategories: []string{"DeepSeek"},

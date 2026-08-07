@@ -19,8 +19,7 @@ func NewLinkedinOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "LinkedIn",
 		Description: "LinkedIn OAuth2 credentials for publishing posts.",
 		Icon: domain.CredentialIcon{
-			Light: "linkedin",
-			Dark:  "linkedin",
+			Brand: "linkedin",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

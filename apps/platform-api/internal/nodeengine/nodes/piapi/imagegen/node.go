@@ -18,8 +18,14 @@ func NewPiAPIImageGenNode(nodeID string) *PiAPIImageGenNode {
 			Name:        "PiAPI Image Generation",
 			Description: "Generate an image using PiAPI.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "piapi",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Image"},
 			SubCategories: []string{"PiApi"},

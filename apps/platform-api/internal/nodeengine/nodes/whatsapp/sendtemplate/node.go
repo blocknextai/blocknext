@@ -18,8 +18,14 @@ func NewWhatsAppSendTemplateNode(nodeID string) *WhatsAppSendTemplateNode {
 			Name:        "WhatsApp Send Template",
 			Description: "Send a template message via WhatsApp.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "whatsapp",
+				Glyph: "file",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"WhatsApp"},

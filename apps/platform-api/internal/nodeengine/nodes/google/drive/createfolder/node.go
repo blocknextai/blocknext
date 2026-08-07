@@ -18,8 +18,14 @@ func NewGoogleDriveCreateFolderNode(nodeID string) *GoogleDriveCreateFolderNode 
 			Name:        "Google Drive Create Folder",
 			Description: "Create a new folder in Google Drive.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_drive",
+				Glyph: "folder",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Drive"},

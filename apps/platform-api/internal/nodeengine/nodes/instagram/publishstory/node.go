@@ -17,8 +17,14 @@ func NewInstagramPublishStoryNode(nodeID string) *InstagramPublishStoryNode {
 			Name:        "Instagram Publish Story",
 			Description: "Publish a story to an Instagram account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "instagram",
+				Glyph: "story",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Instagram"},

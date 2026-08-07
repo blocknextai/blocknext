@@ -45,7 +45,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "PiAPI",
 		Description: "Tools for AI image, video, and audio generation via PiAPI.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "piapi",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			imageGenNode,
 			videoGenNode,

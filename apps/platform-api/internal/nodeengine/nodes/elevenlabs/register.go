@@ -26,7 +26,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "ElevenLabs",
 		Description: "Tools for text-to-speech and audio synthesis via ElevenLabs.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "elevenlabs",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			textToSpeechNode,
 		},

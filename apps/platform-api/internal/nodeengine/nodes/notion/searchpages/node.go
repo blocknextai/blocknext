@@ -18,8 +18,14 @@ func NewNotionSearchPagesNode(nodeID string) *NotionSearchPagesNode {
 			Name:        "Notion Search Pages",
 			Description: "Search for pages in a Notion workspace.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "notion",
+				Glyph: "search",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Notion"},

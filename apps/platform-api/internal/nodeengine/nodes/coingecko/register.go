@@ -35,7 +35,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "CoinGecko",
 		Description: "Tools for tracking cryptocurrency markets via CoinGecko.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "coingecko",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			airdropTrackerNode,
 			priceMonitorNode,

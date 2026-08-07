@@ -18,8 +18,14 @@ func NewGoogleKeepGetNoteNode(nodeID string) *GoogleKeepGetNoteNode {
 			Name:        "Google Keep Get Note",
 			Description: "Get a single note from Google Keep by its resource name.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_keep",
+				Glyph: "eye",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Keep"},

@@ -20,8 +20,7 @@ func NewSlackOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Slack",
 		Description: "Slack OAuth2 credentials for sending messages and media.",
 		Icon: domain.CredentialIcon{
-			Light: "slack",
-			Dark:  "slack",
+			Brand: "slack",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

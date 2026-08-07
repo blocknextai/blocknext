@@ -8,6 +8,7 @@ type Server struct {
 	ID           string              `json:"id,omitempty"`
 	Name         string              `json:"name,omitempty"`
 	Description  string              `json:"description,omitempty"`
+	Icon         ServerIcon          `json:"icon,omitzero"`
 	Version      string              `json:"version,omitempty"`
 	Instructions string              `json:"instructions,omitempty"`
 	Tools        []nodes.NodeManager `json:"tools,omitempty"`
@@ -18,6 +19,7 @@ type ServerManager interface {
 	GetID() string
 	GetName() string
 	GetDescription() string
+	GetIcon() ServerIcon
 	GetVersion() string
 	GetInstructions() string
 	GetTools() []nodes.NodeManager
@@ -35,6 +37,10 @@ func (s *Server) GetName() string {
 
 func (s *Server) GetDescription() string {
 	return s.Description
+}
+
+func (s *Server) GetIcon() ServerIcon {
+	return s.Icon
 }
 
 func (s *Server) GetVersion() string {

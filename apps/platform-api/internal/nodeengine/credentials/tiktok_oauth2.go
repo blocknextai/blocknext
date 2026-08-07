@@ -19,8 +19,7 @@ func NewTiktokOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "TikTok",
 		Description: "TikTok OAuth2 credentials for publishing videos.",
 		Icon: domain.CredentialIcon{
-			Light: "tiktok",
-			Dark:  "tiktok",
+			Brand: "tiktok",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

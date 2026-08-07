@@ -18,8 +18,14 @@ func NewLinkedinPublishPostNode(nodeID string) *LinkedinPublishPostNode {
 			Name:        "LinkedIn Publish Post",
 			Description: "Publish a post to a LinkedIn account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "linkedin",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"LinkedIn"},

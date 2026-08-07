@@ -10,6 +10,8 @@ type Node struct {
 	Name                 string          `json:"name,omitempty"`
 	Description          string          `json:"description,omitempty"`
 	Icon                 NodeIcon        `json:"icon"`
+	Inputs               []NodeHandle    `json:"inputs"`
+	Outputs              []NodeHandle    `json:"outputs"`
 	InputSchema          *gjs.Schema     `json:"inputSchema,omitempty"`
 	OutputSchema         *gjs.Schema     `json:"outputSchema,omitempty"`
 	Categories           []string        `json:"categories,omitempty"`
@@ -27,6 +29,10 @@ type NodeManager interface {
 	GetName() string
 	GetDescription() string
 	GetIcon() NodeIcon
+	GetInputs() []NodeHandle
+	SetInputs(handles []NodeHandle)
+	GetOutputs() []NodeHandle
+	SetOutputs(handles []NodeHandle)
 	GetInputSchema() *gjs.Schema
 	GetOutputSchema() *gjs.Schema
 	GetCategories() []string
@@ -56,6 +62,22 @@ func (n *Node) GetDescription() string {
 
 func (n *Node) GetIcon() NodeIcon {
 	return n.Icon
+}
+
+func (n *Node) GetInputs() []NodeHandle {
+	return n.Inputs
+}
+
+func (n *Node) SetInputs(handles []NodeHandle) {
+	n.Inputs = handles
+}
+
+func (n *Node) GetOutputs() []NodeHandle {
+	return n.Outputs
+}
+
+func (n *Node) SetOutputs(handles []NodeHandle) {
+	n.Outputs = handles
 }
 
 func (n *Node) GetInputSchema() *gjs.Schema {

@@ -17,8 +17,14 @@ func NewGoogleSheetsUpdateNode(nodeID string) *GoogleSheetsUpdateNode {
 			Name:        "Google Sheets Update Cell",
 			Description: "Update a single cell in a Google Sheets spreadsheet by row number and column.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_sheets",
+				Glyph: "pencil",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Sheets"},

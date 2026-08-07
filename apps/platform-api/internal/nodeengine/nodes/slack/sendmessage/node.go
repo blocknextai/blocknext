@@ -17,8 +17,14 @@ func NewSlackSendMessageNode(nodeID string) *SlackSendMessageNode {
 			Name:        "Slack Send Message",
 			Description: "Send a text message to a Slack channel.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "slack",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Slack"},

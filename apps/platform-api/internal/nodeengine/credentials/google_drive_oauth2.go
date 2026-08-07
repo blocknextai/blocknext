@@ -19,8 +19,7 @@ func NewGoogleDriveOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Google Drive",
 		Description: "Google Drive OAuth2 credentials for managing files and folders.",
 		Icon: domain.CredentialIcon{
-			Light: "google_drive",
-			Dark:  "google_drive",
+			Brand: "google_drive",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

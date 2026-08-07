@@ -17,8 +17,14 @@ func NewGoogleDriveGetFileNode(nodeID string) *GoogleDriveGetFileNode {
 			Name:        "Google Drive Get File",
 			Description: "Retrieve a file from Google Drive along with its metadata.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_drive",
+				Glyph: "file",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Drive"},

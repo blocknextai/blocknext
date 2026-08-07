@@ -18,8 +18,14 @@ func NewGoogleDriveCreateTextFileNode(nodeID string) *GoogleDriveCreateTextFileN
 			Name:        "Google Drive Create Text File",
 			Description: "Create a plain text file in Google Drive.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_drive",
+				Glyph: "plus",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Drive"},

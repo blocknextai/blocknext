@@ -17,8 +17,14 @@ func NewTelegramSendMediaNode(nodeID string) *TelegramSendMediaNode {
 			Name:        "Telegram Send Media",
 			Description: "Send a media file to a Telegram chat.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "telegram",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Telegram"},

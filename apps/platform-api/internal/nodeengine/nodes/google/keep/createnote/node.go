@@ -18,8 +18,14 @@ func NewGoogleKeepCreateNoteNode(nodeID string) *GoogleKeepCreateNoteNode {
 			Name:        "Google Keep Create Note",
 			Description: "Create a new note in Google Keep.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_keep",
+				Glyph: "note",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Keep"},

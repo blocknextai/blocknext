@@ -18,8 +18,14 @@ func NewLinkedinPublishMediaPostNode(nodeID string) *LinkedinPublishMediaPostNod
 			Name:        "LinkedIn Publish Media Post",
 			Description: "Publish a post with media to a LinkedIn account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "linkedin",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"LinkedIn"},

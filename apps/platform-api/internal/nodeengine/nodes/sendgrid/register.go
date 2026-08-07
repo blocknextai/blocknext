@@ -23,7 +23,10 @@ func Register() {
 		ID:          "sendgrid",
 		Name:        "SendGrid",
 		Description: "Tools for sending emails via SendGrid.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "sendgrid",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			sendEmailNode,
 		},

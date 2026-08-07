@@ -17,8 +17,14 @@ func NewDiscordSendMessageNode(nodeID string) *DiscordSendMessageNode {
 			Name:        "Discord Send Message",
 			Description: "Send a text message to a Discord channel.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "discord",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Discord"},

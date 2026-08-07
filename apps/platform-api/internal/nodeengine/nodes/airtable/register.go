@@ -35,7 +35,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Airtable",
 		Description: "Tools for managing Airtable records.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "airtable",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createRecordNode,
 			listRecordsNode,

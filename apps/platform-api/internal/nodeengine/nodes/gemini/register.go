@@ -36,7 +36,10 @@ func Register(fileGatewayService filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "Gemini",
 		Description: "Tools for chat completions and image generation with Google Gemini.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "gemini",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			nanoBananaNode,
 			chatNode,

@@ -19,8 +19,7 @@ func NewGmailOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Gmail",
 		Description: "Gmail OAuth2 credentials for sending and reading email.",
 		Icon: domain.CredentialIcon{
-			Light: "gmail",
-			Dark:  "gmail",
+			Brand: "gmail",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

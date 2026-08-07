@@ -24,7 +24,10 @@ func Register(fileGatewayService filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "Veo",
 		Description: "Tools for video generation via Google Veo.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "veo",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			veoNode,
 		},

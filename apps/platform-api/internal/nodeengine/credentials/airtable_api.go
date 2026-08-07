@@ -12,8 +12,7 @@ func NewAirtableAPICredential() *domain.Credential {
 		Name:        "Airtable",
 		Description: "Airtable personal access token domain.",
 		Icon: domain.CredentialIcon{
-			Light: "airtable",
-			Dark:  "airtable",
+			Brand: "airtable",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

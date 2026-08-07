@@ -17,8 +17,14 @@ func NewSunoMusicCreateLyricsNode(nodeID string) *SunoMusicCreateLyricsNode {
 			Name:        "Suno Create Lyrics",
 			Description: "Generate song lyrics using Suno.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "sunomusic",
+				Glyph: "note",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Audio"},
 			SubCategories: []string{"Suno"},

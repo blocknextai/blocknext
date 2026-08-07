@@ -35,7 +35,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Google Docs",
 		Description: "Tools for creating, updating, and reading Google Docs.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "google_docs",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createOrUpdateNode,
 			readDocsNode,

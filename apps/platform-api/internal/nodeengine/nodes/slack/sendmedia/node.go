@@ -17,8 +17,14 @@ func NewSlackSendMediaNode(nodeID string) *SlackSendMediaNode {
 			Name:        "Slack Send Media",
 			Description: "Send a media file to a Slack channel.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "slack",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Slack"},

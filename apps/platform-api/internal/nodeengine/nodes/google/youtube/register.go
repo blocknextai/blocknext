@@ -26,7 +26,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "YouTube",
 		Description: "Tools for uploading videos to YouTube.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "youtube",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			uploadVideoNode,
 		},

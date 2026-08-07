@@ -18,8 +18,14 @@ func NewPiAPIVideoGenNode(nodeID string) *PiAPIVideoGenNode {
 			Name:        "PiAPI Video Generation",
 			Description: "Generate a video using PiAPI.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "piapi",
+				Glyph: "film",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Video"},
 			SubCategories: []string{"PiApi"},

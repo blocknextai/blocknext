@@ -25,7 +25,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "ChatGPT",
 		Description: "Tools for chat completions with OpenAI ChatGPT.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "chatgpt",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			chatNode,
 		},
