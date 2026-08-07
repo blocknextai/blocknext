@@ -19,8 +19,7 @@ func NewGoogleDocsOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Google Docs",
 		Description: "Google Docs OAuth2 credentials for managing documents.",
 		Icon: domain.CredentialIcon{
-			Light: "google_docs",
-			Dark:  "google_docs",
+			Brand: "google_docs",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

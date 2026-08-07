@@ -17,8 +17,14 @@ func NewWhatsAppSendMediaNode(nodeID string) *WhatsAppSendMediaNode {
 			Name:        "WhatsApp Send Media",
 			Description: "Send a media message via WhatsApp.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "whatsapp",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"WhatsApp"},

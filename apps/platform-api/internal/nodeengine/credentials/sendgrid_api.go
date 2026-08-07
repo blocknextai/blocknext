@@ -12,8 +12,7 @@ func NewSendgridAPICredential() *domain.Credential {
 		Name:        "SendGrid",
 		Description: "SendGrid API credentials for sending email.",
 		Icon: domain.CredentialIcon{
-			Light: "sendgrid",
-			Dark:  "sendgrid",
+			Brand: "sendgrid",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

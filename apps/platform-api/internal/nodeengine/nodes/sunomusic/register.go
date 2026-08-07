@@ -35,7 +35,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Suno Music",
 		Description: "Tools for generating music and lyrics via Suno.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "sunomusic",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createMusicNode,
 			createLyricsNode,

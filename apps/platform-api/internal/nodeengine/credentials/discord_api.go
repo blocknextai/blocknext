@@ -12,8 +12,7 @@ func NewDiscordAPICredential() *domain.Credential {
 		Name:        "Discord",
 		Description: "Discord bot credentials for messaging and media.",
 		Icon: domain.CredentialIcon{
-			Light: "discord",
-			Dark:  "discord",
+			Brand: "discord",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

@@ -73,7 +73,9 @@ const APIKeyTab = ({
   )
 
   const handleCreate = async () => {
-    if (!selectedScopes.length) return
+    if (!selectedScopes.length) {
+      return
+    }
     const created = await onCreate({
       name: newKeyName || t('ui.text.apiKey', 'API Key'),
       scopes: selectedScopes,
@@ -195,7 +197,9 @@ const APIKeyTab = ({
         open={createOpen}
         onOpenChange={(open) => {
           setCreateOpen(open)
-          if (!open) resetCreateForm()
+          if (!open) {
+            resetCreateForm()
+          }
         }}
       >
         <DialogContent className="sm:max-w-[425px]">

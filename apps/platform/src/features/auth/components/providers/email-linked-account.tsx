@@ -28,7 +28,7 @@ const EmailLinkedAccount = ({ onLinked }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) {
-      setError(t('ui.text.emailRequired', { ns: 'ui' }))
+      setError(t('ui.text.emailRequired'))
       return
     }
     setSubmitting(true)
@@ -55,7 +55,7 @@ const EmailLinkedAccount = ({ onLinked }: Props) => {
           </div>
           <div>
             <div className="font-medium text-sm">
-              {t('ui.text.emailAddress', { ns: 'ui' })}
+              {t('ui.text.emailAddress')}
             </div>
             <div className="text-xs text-muted-foreground">
               {t('ui.text.add_email_description')}
@@ -67,7 +67,7 @@ const EmailLinkedAccount = ({ onLinked }: Props) => {
             variant="ghost"
             size="sm"
             onClick={reset}
-            aria-label={t('ui.text.cancel', { ns: 'ui' })}
+            aria-label={t('ui.text.cancel')}
             disabled={submitting}
           >
             <X className="w-4 h-4" />
@@ -94,9 +94,7 @@ const EmailLinkedAccount = ({ onLinked }: Props) => {
       {expanded && !sent && (
         <form onSubmit={handleSubmit} className="space-y-3 mt-3">
           <div className="grid gap-2">
-            <Label htmlFor="add-email-input">
-              {t('ui.text.emailAddress', { ns: 'ui' })}
-            </Label>
+            <Label htmlFor="add-email-input">{t('ui.text.emailAddress')}</Label>
             <Input
               id="add-email-input"
               type="email"

@@ -42,6 +42,10 @@ func (e *ConditionExecutor) ExecuteWithContext(ctx context.Context, credentials 
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
+		// TODO: only the first item is evaluated, so a node fed 10 items decides
+		// the whole flow from item 0. Routing items per branch needs the runner
+		// to carry item identity and keep outputs per edge; see the branching
+		// notes before changing this.
 		input, err := e.validator.Parse(data[0])
 		if err != nil {
 			return nil, err

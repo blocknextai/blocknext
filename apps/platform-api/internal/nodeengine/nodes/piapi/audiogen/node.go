@@ -18,8 +18,14 @@ func NewPiAPIAudioGenNode(nodeID string) *PiAPIAudioGenNode {
 			Name:        "PiAPI Audio Generation",
 			Description: "Generate audio using PiAPI.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "piapi",
+				Glyph: "speaker",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Audio"},
 			SubCategories: []string{"PiApi"},

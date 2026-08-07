@@ -17,8 +17,14 @@ func NewGoogleDocsReadDocsNode(nodeID string) *GoogleDocsReadDocsNode {
 			Name:        "Google Docs Read",
 			Description: "Read the plain text content of a Google Docs document.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_docs",
+				Glyph: "eye",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Docs"},

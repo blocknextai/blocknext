@@ -17,8 +17,14 @@ func NewNotionGetPageNode(nodeID string) *NotionGetPageNode {
 			Name:        "Notion Get Page",
 			Description: "Retrieve a page from a Notion workspace.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "notion",
+				Glyph: "eye",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Notion"},

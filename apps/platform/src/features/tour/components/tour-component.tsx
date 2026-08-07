@@ -114,7 +114,9 @@ const TourComponent = ({
   }
 
   useEffect(() => {
-    if (!autoProgressOnClick || !isOpen || currentStep >= steps.length) return
+    if (!autoProgressOnClick || !isOpen || currentStep >= steps.length) {
+      return
+    }
 
     const currentStepData = steps[currentStep]
     let targetElement = document.querySelector(currentStepData.target)
@@ -204,7 +206,9 @@ const TourComponent = ({
     }
   }, [isOpen, currentStep])
 
-  if (!isOpen || steps.length === 0) return null
+  if (!isOpen || steps.length === 0) {
+    return null
+  }
 
   return (
     <TourOverlay
@@ -225,7 +229,7 @@ const TourComp = ({
   setSidebarOpen,
   onNextStep,
 }) => {
-  const { t } = useTranslation('ui')
+  const { t } = useTranslation()
   const [isTourOpen, setIsTourOpen] = useState(false)
 
   const tourSteps = [

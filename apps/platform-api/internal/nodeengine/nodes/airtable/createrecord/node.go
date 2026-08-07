@@ -17,8 +17,14 @@ func NewAirtableCreateRecordNode(nodeID string) *AirtableCreateRecordNode {
 			Name:        "Airtable Create Record",
 			Description: "Create a new record in an Airtable base.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "airtable",
+				Glyph: "record",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Database"},
 			SubCategories: []string{"Airtable"},

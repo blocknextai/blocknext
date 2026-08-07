@@ -45,13 +45,23 @@ export interface NodeEngineNode {
   hasNaturalLanguage?: boolean
 }
 
+export interface NodeHandle {
+  key: string
+  label?: string
+}
+
+export type IconSource = { brand?: string; glyph?: string } | null | undefined
+
 export interface ResolvedNode {
   id: string
   name: string
   description: string
-  icon: string
+  icon: IconSource
+  inputs: NodeHandle[]
+  outputs: NodeHandle[]
   category: string
   subCategory: string
+  provider: string
   tags: string[]
   supportedCredentials?: string[]
   schema: SchemaField[]
@@ -80,6 +90,7 @@ export interface FlowNodeData extends Record<string, unknown> {
   title?: string
   description?: string
   category?: string
+  subCategory?: string
   tags?: string[]
   contextMenu?: ContextMenuItem[]
   note?: string
@@ -109,6 +120,9 @@ export interface RendererNode {
   label: string
   description: string
   type: string
+  icon?: IconSource
+  inputs?: NodeHandle[]
+  outputs?: NodeHandle[]
   subCategory?: string
   actions: string[]
   tags?: string[]

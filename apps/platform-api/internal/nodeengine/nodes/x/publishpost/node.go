@@ -18,8 +18,14 @@ func NewXPublishPostNode(nodeID string) *XPublishPostNode {
 			Name:        "X Publish Post",
 			Description: "Publish a post to an X (Twitter) account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "x",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"X"},

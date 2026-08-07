@@ -12,8 +12,7 @@ func NewElevenlabsAPICredential() *domain.Credential {
 		Name:        "ElevenLabs",
 		Description: "ElevenLabs API credentials for text-to-speech generation.",
 		Icon: domain.CredentialIcon{
-			Light: "elevenlabs",
-			Dark:  "elevenlabs",
+			Brand: "elevenlabs",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

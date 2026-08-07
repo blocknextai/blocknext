@@ -25,7 +25,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "DeepSeek",
 		Description: "Tools for chat completions with DeepSeek models.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "deepseek",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			chatNode,
 		},

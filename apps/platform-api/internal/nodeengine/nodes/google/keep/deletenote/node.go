@@ -17,8 +17,14 @@ func NewGoogleKeepDeleteNoteNode(nodeID string) *GoogleKeepDeleteNoteNode {
 			Name:        "Google Keep Delete Note",
 			Description: "Delete a note from Google Keep. This removes the note immediately and cannot be undone.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_keep",
+				Glyph: "trash",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Keep"},

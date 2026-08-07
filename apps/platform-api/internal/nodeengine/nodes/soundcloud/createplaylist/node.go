@@ -17,8 +17,14 @@ func NewSoundCloudCreatePlaylistNode(nodeID string) *SoundCloudCreatePlaylistNod
 			Name:        "SoundCloud Create Playlist",
 			Description: "Create a new playlist on SoundCloud.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "soundcloud",
+				Glyph: "list",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"SoundCloud"},

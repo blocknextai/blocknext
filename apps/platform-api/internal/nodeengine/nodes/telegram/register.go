@@ -39,7 +39,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Telegram",
 		Description: "Tools for sending messages and media via Telegram.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "telegram",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			sendMessageNode,
 			sendMediaNode,

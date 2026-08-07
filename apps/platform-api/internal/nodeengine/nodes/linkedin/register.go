@@ -36,7 +36,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "LinkedIn",
 		Description: "Tools for publishing posts and media to LinkedIn.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "linkedin",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			publishPostNode,
 			publishMediaPostNode,

@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePlatformFeatures } from '@/features/platform'
+import { useIconResolver } from '@/features/flow-editor/icons'
 import { AdvancedDebouncedTextarea } from '@/components/shared/advanced-debounced-textarea'
 import { SchemaFieldRenderer } from '@/features/flow-editor/components/schema-field-renderer'
 import { DataSourcePopover } from '@/features/flow-editor/components/data-source-popover'
 import { flowCategoryPreferences } from '@/lib/flow-categories'
 import type {
   FlowNode,
+  IconSource,
   NodeSettings,
   SchemaField,
 } from '@/features/flow-editor/types'
@@ -53,7 +55,9 @@ export function NodeSettingsPanel({
     const initial: Record<string, any> = {}
     const existing = node.parameters || {}
     for (const field of schema || []) {
-      if (field.hidden) continue
+      if (field.hidden) {
+        continue
+      }
       initial[field.key] = existing[field.key] ?? field.default ?? ''
     }
     return initial
@@ -69,7 +73,9 @@ export function NodeSettingsPanel({
     const initial: Record<string, any> = {}
     const existing = node.parameters || {}
     for (const field of schema || []) {
-      if (field.hidden) continue
+      if (field.hidden) {
+        continue
+      }
       initial[field.key] = existing[field.key] ?? field.default ?? ''
     }
     setParameters(initial)
@@ -100,7 +106,8 @@ export function NodeSettingsPanel({
     return flowCategoryPreferences[category]
   }, [node.data.category])
 
-  const Icon = prefs.icon
+  const resolveIcon = useIconResolver()
+  const Icon = resolveIcon(node.data?.icon as IconSource) ?? prefs.icon
 
   const visibleSchema = useMemo(
     () => (schema || []).filter((f) => !f.hidden),
@@ -123,11 +130,8 @@ export function NodeSettingsPanel({
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border shrink-0">
-        <div
-          style={{ backgroundColor: prefs.color }}
-          className="size-8 rounded-lg flex items-center justify-center shrink-0"
-        >
-          {Icon && <Icon className="size-4 text-zinc-50" />}
+        <div className="bg-muted ring-border flex size-8 shrink-0 items-center justify-center rounded-lg ring-1">
+          {Icon && <Icon className="size-5" />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium truncate">

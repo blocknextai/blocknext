@@ -121,7 +121,9 @@ const NotificationsTab = ({
                 const actionUrl: string | undefined = notification.actionUrl
                 const external = actionUrl && isExternalUrl(actionUrl)
                 const onActionClick = () => {
-                  if (!isRead) onMarkAsRead(notification.id)
+                  if (!isRead) {
+                    onMarkAsRead(notification.id)
+                  }
                 }
 
                 const titleEl = (

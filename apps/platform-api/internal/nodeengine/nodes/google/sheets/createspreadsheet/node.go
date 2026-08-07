@@ -17,8 +17,14 @@ func NewGoogleSheetsCreateSpreadsheetNode(nodeID string) *GoogleSheetsCreateSpre
 			Name:        "Google Sheets Create Spreadsheet",
 			Description: "Create a new Google Sheets spreadsheet with the given title.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_sheets",
+				Glyph: "table",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Sheets"},

@@ -40,7 +40,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "Slack",
 		Description: "Tools for sending messages and media to Slack.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "slack",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			sendMessageNode,
 			sendMediaNode,

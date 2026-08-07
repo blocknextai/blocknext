@@ -19,8 +19,7 @@ func NewXOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "X (Twitter)",
 		Description: "X (Twitter) OAuth2 credentials for publishing posts.",
 		Icon: domain.CredentialIcon{
-			Light: "x",
-			Dark:  "x",
+			Brand: "x",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

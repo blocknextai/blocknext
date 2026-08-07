@@ -17,8 +17,14 @@ func NewGoogleSheetsDeleteSpreadsheetNode(nodeID string) *GoogleSheetsDeleteSpre
 			Name:        "Google Sheets Delete Spreadsheet",
 			Description: "Delete a Google Sheets spreadsheet by its identifier.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_sheets",
+				Glyph: "trash",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Sheets"},

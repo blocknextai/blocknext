@@ -18,8 +18,14 @@ func NewGoogleDriveUploadFileNode(nodeID string) *GoogleDriveUploadFileNode {
 			Name:        "Google Drive Upload File",
 			Description: "Upload one or more files to Google Drive from a list of source URLs.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_drive",
+				Glyph: "upload",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Drive"},

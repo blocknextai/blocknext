@@ -34,12 +34,16 @@ export function SearchInput({
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
     }
   }, [])
 
   const fireSearch = (next: string) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
     timeoutRef.current = setTimeout(() => {
       onSearchRef.current(next)
     }, debounceMs)
@@ -53,7 +57,9 @@ export function SearchInput({
 
   const handleClear = () => {
     setValue('')
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
     onSearchRef.current('')
   }
 

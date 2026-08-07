@@ -17,8 +17,14 @@ func NewGoogleDocsCreateOrUpdateNode(nodeID string) *GoogleDocsCreateOrUpdateNod
 			Name:        "Google Docs Create or Update",
 			Description: "Create a new Google Docs document or update an existing one with the provided content.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_docs",
+				Glyph: "pencil",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Docs"},

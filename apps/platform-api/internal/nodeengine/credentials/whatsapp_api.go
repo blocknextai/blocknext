@@ -12,8 +12,7 @@ func NewWhatsappAPICredential() *domain.Credential {
 		Name:        "WhatsApp",
 		Description: "WhatsApp Business API credentials for sending messages.",
 		Icon: domain.CredentialIcon{
-			Light: "whatsapp",
-			Dark:  "whatsapp",
+			Brand: "whatsapp",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

@@ -19,8 +19,7 @@ func NewGoogleKeepOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Google Keep",
 		Description: "Google Keep OAuth2 credentials for managing notes.",
 		Icon: domain.CredentialIcon{
-			Light: "google_keep",
-			Dark:  "google_keep",
+			Brand: "google_keep",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

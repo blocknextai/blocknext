@@ -1,5 +1,4 @@
 import coreNode from '@/features/flow-editor/nodes/core-node'
-import starterNode from '@/features/flow-editor/nodes/starter-node'
 import coreEdge from '@/features/flow-editor/nodes/core-edge'
 import coreGroup from '@/features/flow-editor/nodes/core-group'
 import { useBreadcrumbStore } from '@/features/flow-editor/stores/breadcrumb-store'
@@ -53,11 +52,12 @@ const defaultNodes = [
       title: 'ui.text.starterNode',
       description: 'ui.text.starterNodeDescription',
       hide_input: true,
-      hide_left: true,
       tags: ['starter'],
       category: 'system',
+      inputs: [],
+      outputs: [{ key: 'out' }],
     },
-    type: 'starter',
+    type: 'core',
     nodeId: 'system_starter',
     deletable: false,
   },
@@ -65,7 +65,7 @@ const defaultNodes = [
 
 const nodeTypes = {
   core: coreNode,
-  starter: starterNode,
+  starter: coreNode,
   group: coreGroup,
   annotation: Annotation,
 }
@@ -119,7 +119,7 @@ const FlowCanvas = ({
   const { t } = useTranslation()
 
   // Hooks
-  const { apiNodes, nodeList, isLoading } = useNodeEngineNodes()
+  const { apiNodes, providerList, isLoading } = useNodeEngineNodes()
   const { triggerVariables } = useTriggerVariables()
   const { createContextNode } = useFlowNodes(apiNodes)
 
@@ -179,11 +179,20 @@ const FlowCanvas = ({
           label: node.name,
           description: node.description,
           type: node.category,
+          icon: node.icon,
           subCategory: node.subCategory,
           tags: node.tags,
           isComingSoon: node.isComingSoon || false,
         }))
-      setSelectedCategory(filtered)
+      setSelectedCategory(
+        query
+          ? {
+              label: t('ui.text.searchResults'),
+              nodes: filtered,
+              isSearch: true,
+            }
+          : null,
+      )
     },
     [apiNodes, t],
   )
@@ -197,6 +206,9 @@ const FlowCanvas = ({
         description: apiNode?.description || '',
         tags: apiNode?.tags || [],
         category: apiNode?.category || '',
+        icon: apiNode?.icon,
+        inputs: apiNode?.inputs,
+        outputs: apiNode?.outputs,
       }
     },
     [apiNodes],
@@ -289,12 +301,21 @@ const FlowCanvas = ({
   useEffect(() => {
     if (initialFlow) {
       setFunctions()
+      return
     }
+    if (apiNodes.length === 0) {
+      return
+    }
+    setNodes((current) =>
+      current.map((n) => ({ ...n, data: { ...n.data, ...buildNodeData(n) } })),
+    )
   }, [initialFlow, apiNodes])
 
   const applyGeneratedFlow = useCallback(
     (flow) => {
-      if (!flow || apiNodes.length === 0) return
+      if (!flow || apiNodes.length === 0) {
+        return
+      }
       const eds = flow.edges.map((e) => ({ ...e }))
       const nds = flow.nodes.map((n) => {
         const data = buildNodeData(n)
@@ -316,7 +337,9 @@ const FlowCanvas = ({
   )
 
   useEffect(() => {
-    if (generatedFlow) applyGeneratedFlow(generatedFlow)
+    if (generatedFlow) {
+      applyGeneratedFlow(generatedFlow)
+    }
   }, [generatedFlow, applyGeneratedFlow])
 
   const handleApplyWorkflow = useCallback(
@@ -329,6 +352,9 @@ const FlowCanvas = ({
 
   // Node settings panel
   const onNodeClick = useCallback((_event, node) => {
+    if (node.type === 'annotation') {
+      return
+    }
     setSelectedNodeId(node.id)
     setChatOpen(false)
   }, [])
@@ -343,13 +369,17 @@ const FlowCanvas = ({
   )
 
   const selectedNodeSchema = useMemo(() => {
-    if (!selectedNode) return []
+    if (!selectedNode) {
+      return []
+    }
     const apiNode = apiNodes.find((a) => a.id === selectedNode.nodeId)
     return apiNode?.schema || []
   }, [selectedNode, apiNodes])
 
   const selectedNodeHasNaturalLanguage = useMemo(() => {
-    if (!selectedNode) return undefined
+    if (!selectedNode) {
+      return undefined
+    }
     const apiNode = apiNodes.find((a) => a.id === selectedNode.nodeId)
     return apiNode?.hasNaturalLanguage
   }, [selectedNode, apiNodes])
@@ -385,7 +415,9 @@ const FlowCanvas = ({
 
   const handleSetChatOpen = useCallback((v) => {
     setChatOpen(v)
-    if (v) setSelectedNodeId(null)
+    if (v) {
+      setSelectedNodeId(null)
+    }
   }, [])
 
   const nextStepInit = (fn) => {
@@ -435,7 +467,7 @@ const FlowCanvas = ({
             setSidebarOpen={setSidebarOpen}
             selectedCategory={selectedCategory}
             setSelectedCategory={setSelectedCategory}
-            nodeList={nodeList}
+            providerList={providerList}
             apiNodes={apiNodes}
             dragging={dragging}
             startDrag={startDrag}
@@ -453,6 +485,9 @@ const FlowCanvas = ({
             openApiSheet={
               initialFlow?.id ? () => setApiSheetOpen(true) : undefined
             }
+            nodes={nodes}
+            apiNodes={apiNodes}
+            organizationId={organizationId}
           />
           <FlowDragPreview
             dragging={dragging}

@@ -17,8 +17,14 @@ func NewFacebookPublishMediaPostNode(nodeID string) *FacebookPublishMediaPostNod
 			Name:        "Facebook Publish Media Post",
 			Description: "Publish a post with media to a Facebook page.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "facebook",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Facebook"},

@@ -18,8 +18,7 @@ func NewNotionOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Notion",
 		Description: "Notion OAuth2 credentials for managing pages and databases.",
 		Icon: domain.CredentialIcon{
-			Light: "notion",
-			Dark:  "notion",
+			Brand: "notion",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

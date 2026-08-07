@@ -42,7 +42,9 @@ export function useTriggerActions(organizationId: string | null | undefined) {
 
   const update = useCallback(
     async (triggerId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await triggersService.update(
         organizationId,
         triggerId,
@@ -56,7 +58,9 @@ export function useTriggerActions(organizationId: string | null | undefined) {
 
   const regenerateWebhookToken = useCallback(
     async (triggerId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await triggersService.regenerateWebhookToken(
         organizationId,
         triggerId,
@@ -69,7 +73,9 @@ export function useTriggerActions(organizationId: string | null | undefined) {
 
   const remove = useCallback(
     async (triggerId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await triggersService.delete(organizationId, triggerId)
       await invalidate()
       return result.data

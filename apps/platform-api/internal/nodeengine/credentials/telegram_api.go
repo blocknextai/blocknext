@@ -12,8 +12,7 @@ func NewTelegramAPICredential() *domain.Credential {
 		Name:        "Telegram",
 		Description: "Telegram bot credentials for messaging.",
 		Icon: domain.CredentialIcon{
-			Light: "telegram",
-			Dark:  "telegram",
+			Brand: "telegram",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

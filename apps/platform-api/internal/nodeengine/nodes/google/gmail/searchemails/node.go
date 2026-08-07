@@ -17,8 +17,14 @@ func NewGmailSearchEmailsNode(nodeID string) *GmailSearchEmailsNode {
 			Name:        "Gmail Search Emails",
 			Description: "Search Gmail messages using Gmail's standard search syntax and return matching email summaries.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "gmail",
+				Glyph: "search",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Mailing"},
 			SubCategories: []string{"Gmail"},

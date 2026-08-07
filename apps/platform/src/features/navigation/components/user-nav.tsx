@@ -47,7 +47,7 @@ const NavUser = ({ linkedAccounts, alone }) => {
       const sidebar = useSidebar()
       ib = sidebar.isMobile
       st = sidebar.state
-    } catch (error) {
+    } catch {
       // If useSidebar fails (not within SidebarProvider), use defaults
       ib = false
       st = 'expanded'

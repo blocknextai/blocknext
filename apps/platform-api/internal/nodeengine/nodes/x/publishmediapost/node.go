@@ -17,8 +17,14 @@ func NewXPublishMediaPostNode(nodeID string) *XPublishMediaPostNode {
 			Name:        "X Publish Media Post",
 			Description: "Publish a post with media to an X (Twitter) account.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "x",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"X"},

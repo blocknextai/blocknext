@@ -19,8 +19,7 @@ func NewFacebookOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Facebook",
 		Description: "Facebook OAuth2 credentials for managing pages and posts.",
 		Icon: domain.CredentialIcon{
-			Light: "facebook",
-			Dark:  "facebook",
+			Brand: "facebook",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

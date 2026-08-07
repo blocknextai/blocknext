@@ -32,7 +32,9 @@ const ChangePasswordForm = () => {
   }
 
   const clearError = (key: string) => {
-    if (!errors[key]) return
+    if (!errors[key]) {
+      return
+    }
     setErrors((prev) => {
       const next = { ...prev }
       delete next[key]
@@ -57,7 +59,9 @@ const ChangePasswordForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.changePassword({
@@ -96,7 +100,7 @@ const ChangePasswordForm = () => {
             variant="ghost"
             size="sm"
             onClick={reset}
-            aria-label={t('ui.text.cancel', { ns: 'ui' })}
+            aria-label={t('ui.text.cancel')}
             disabled={submitting}
           >
             <X className="w-4 h-4" />
@@ -141,7 +145,7 @@ const ChangePasswordForm = () => {
           />
           <PasswordField
             id="change-confirm-password"
-            label={t('ui.text.confirmPassword', { ns: 'ui' })}
+            label={t('ui.text.confirmPassword')}
             value={confirmPassword}
             onChange={(v) => {
               clearError('confirmPassword')
@@ -208,11 +212,7 @@ const PasswordField = ({
         variant="ghost"
         size="sm"
         tabIndex={-1}
-        aria-label={
-          show
-            ? t('ui.text.hide', { ns: 'ui' })
-            : t('ui.text.show', { ns: 'ui' })
-        }
+        aria-label={show ? t('ui.text.hide') : t('ui.text.show')}
         className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
         onClick={toggleShow}
       >

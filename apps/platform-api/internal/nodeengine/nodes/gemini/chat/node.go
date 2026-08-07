@@ -18,8 +18,14 @@ func NewGeminiChatNode(nodeID string) *GeminiChatNode {
 			Name:        "Gemini Chat",
 			Description: "Generate a chat completion using Google Gemini.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "gemini",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"AI"},
 			SubCategories: []string{"Gemini"},

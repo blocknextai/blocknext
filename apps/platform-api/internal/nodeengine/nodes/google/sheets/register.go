@@ -65,7 +65,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Google Sheets",
 		Description: "Tools for creating, reading, updating, and deleting Google Sheets data.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "google_sheets",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createSpreadsheetNode,
 			readSpreadsheetNode,

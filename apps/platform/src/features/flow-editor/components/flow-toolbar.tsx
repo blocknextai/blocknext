@@ -17,7 +17,9 @@ const FlowToolbar = ({
 }) => {
   const { t } = useTranslation()
 
-  if (previewMode) return null
+  if (previewMode) {
+    return null
+  }
 
   return (
     <div className="flex items-center justify-center p-4 w-full absolute bottom-2">

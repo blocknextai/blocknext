@@ -3,9 +3,6 @@ import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend from 'i18next-http-backend'
 
-// The app uses a single `ui` namespace, loaded eagerly at app boot.
-const criticalNamespaces = ['ui']
-
 i18n
   .use(HttpBackend)
   .use(LanguageDetector)
@@ -21,7 +18,7 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-    ns: criticalNamespaces,
+    ns: 'ui',
     defaultNS: 'ui',
     fallbackNS: 'ui',
     partialBundledLanguages: true,

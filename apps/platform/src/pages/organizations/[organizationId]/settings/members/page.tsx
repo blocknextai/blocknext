@@ -193,7 +193,9 @@ function MembersPage() {
   }
 
   const handleInvite = async () => {
-    if (!validateInviteInput()) return
+    if (!validateInviteInput()) {
+      return
+    }
     setInviteLoading(true)
     try {
       await invite({
@@ -224,7 +226,9 @@ function MembersPage() {
 
   const updateAlias = async (u: any) => {
     const a = alias[u.id]
-    if (a === undefined) return
+    if (a === undefined) {
+      return
+    }
     const trimmed = a.trim()
     await updateInfo(u.id, { alias: trimmed })
     setAlias((prev) => {

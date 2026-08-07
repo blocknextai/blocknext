@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import type {
   FlowNode,
+  IconSource,
+  NodeHandle,
   NodeOutputType,
   SchemaField,
   SetFlowNodes,
@@ -17,6 +19,10 @@ interface DragItem {
   name: string
   description: string
   category: string
+  icon?: IconSource
+  inputs?: NodeHandle[]
+  outputs?: NodeHandle[]
+  subCategory?: string
   tags?: string[]
   isComingSoon?: boolean
   outputTypes?: NodeOutputType[]
@@ -55,11 +61,15 @@ export function useFlowDrag({
     const pane = document.querySelector(
       '.react-flow__pane.draggable',
     ) as HTMLElement
-    if (pane) pane.style.cursor = 'grab'
+    if (pane) {
+      pane.style.cursor = 'grab'
+    }
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
 
-    if (!dragData.current) return
+    if (!dragData.current) {
+      return
+    }
     const position = screenToFlowPosition({
       x: e.clientX + 100,
       y: e.clientY,
@@ -72,6 +82,9 @@ export function useFlowDrag({
         tags: dragData.current.tags,
         title: dragData.current.name,
         category: dragData.current.category,
+        icon: dragData.current.icon,
+        inputs: dragData.current.inputs,
+        outputs: dragData.current.outputs,
       },
       instruction: undefined,
       parameters: {},
@@ -95,12 +108,16 @@ export function useFlowDrag({
     const pane = document.querySelector(
       '.react-flow__pane.draggable',
     ) as HTMLElement
-    if (pane) pane.style.cursor = 'grab'
+    if (pane) {
+      pane.style.cursor = 'grab'
+    }
 
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUpAnnotation)
 
-    if (!dragData.current) return
+    if (!dragData.current) {
+      return
+    }
 
     const position = screenToFlowPosition({
       x: e.clientX + 100,
@@ -139,7 +156,9 @@ export function useFlowDrag({
     const pane = document.querySelector(
       '.react-flow__pane.draggable',
     ) as HTMLElement
-    if (pane) pane.style.cursor = 'grabbing'
+    if (pane) {
+      pane.style.cursor = 'grabbing'
+    }
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onMouseUp)
   }
@@ -161,7 +180,9 @@ export function useFlowDrag({
     const pane = document.querySelector(
       '.react-flow__pane.draggable',
     ) as HTMLElement
-    if (pane) pane.style.cursor = 'grabbing'
+    if (pane) {
+      pane.style.cursor = 'grabbing'
+    }
 
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onMouseUpAnnotation)

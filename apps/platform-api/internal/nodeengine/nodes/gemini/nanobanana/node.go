@@ -18,8 +18,14 @@ func NewGeminiImageGenerationNode(nodeID string) *GeminiImageGenerationNode {
 			Name:        "Gemini Nano Banana",
 			Description: "Generate an image from a text prompt using Google Gemini Nano Banana.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "gemini",
+				Glyph: "image",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Image"},
 			SubCategories: []string{"Gemini"},

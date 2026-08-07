@@ -15,11 +15,15 @@ function AuthForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.requestPasswordReset({ email })
-      if (!response.isSuccess) return
+      if (!response.isSuccess) {
+        return
+      }
       setSubmitted(true)
     } catch (error) {
       console.error('Password reset request error:', error)
@@ -51,9 +55,7 @@ function AuthForgotPasswordPage() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid gap-2">
-            <Label htmlFor="forgot-email">
-              {t('ui.text.emailAddress', { ns: 'ui' })}
-            </Label>
+            <Label htmlFor="forgot-email">{t('ui.text.emailAddress')}</Label>
             <Input
               id="forgot-email"
               type="email"

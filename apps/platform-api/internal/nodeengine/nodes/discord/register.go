@@ -40,7 +40,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "Discord",
 		Description: "Tools for sending messages and media to Discord.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "discord",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			sendMessageNode,
 			sendMediaNode,

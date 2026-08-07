@@ -18,8 +18,14 @@ func NewAirtableListRecordsNode(nodeID string) *AirtableListRecordsNode {
 			Name:        "Airtable List Records",
 			Description: "List records from an Airtable base.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "airtable",
+				Glyph: "list",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Database"},
 			SubCategories: []string{"Airtable"},

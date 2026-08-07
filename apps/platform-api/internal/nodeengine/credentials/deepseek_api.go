@@ -12,8 +12,7 @@ func NewDeepseekAPICredential() *domain.Credential {
 		Name:        "DeepSeek",
 		Description: "DeepSeek API credentials for AI chat models.",
 		Icon: domain.CredentialIcon{
-			Light: "deepseek",
-			Dark:  "deepseek",
+			Brand: "deepseek",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

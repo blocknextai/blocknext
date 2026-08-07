@@ -18,8 +18,14 @@ func NewConditionNode(nodeID string) *ConditionNode {
 			Name:        "Condition",
 			Description: "Branch the workflow based on a conditional expression.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Glyph: "branch",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "true", Label: "True"},
+				{Key: "false", Label: "False"},
 			},
 			Categories:    []string{"System"},
 			SubCategories: []string{"System"},

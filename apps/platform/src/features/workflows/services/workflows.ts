@@ -5,9 +5,15 @@ const getAll = async (
   params?: { offset?: number; limit?: number; query?: string },
 ) => {
   const search = new URLSearchParams()
-  if (params?.offset !== undefined) search.set('offset', String(params.offset))
-  if (params?.limit !== undefined) search.set('limit', String(params.limit))
-  if (params?.query) search.set('query', params.query)
+  if (params?.offset !== undefined) {
+    search.set('offset', String(params.offset))
+  }
+  if (params?.limit !== undefined) {
+    search.set('limit', String(params.limit))
+  }
+  if (params?.query) {
+    search.set('query', params.query)
+  }
   const qs = search.toString()
   return await platformApi.get(
     `/organizations/${organizationId}/workflows${qs ? `?${qs}` : ''}`,

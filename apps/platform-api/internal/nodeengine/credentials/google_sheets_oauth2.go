@@ -19,8 +19,7 @@ func NewGoogleSheetsOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "Google Sheets",
 		Description: "Google Sheets OAuth2 credentials for managing spreadsheets.",
 		Icon: domain.CredentialIcon{
-			Light: "google_sheets",
-			Dark:  "google_sheets",
+			Brand: "google_sheets",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

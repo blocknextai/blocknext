@@ -17,8 +17,14 @@ func NewSendgridSendEmailNode(nodeID string) *SendgridSendEmailNode {
 			Name:        "SendGrid Send Email",
 			Description: "Send an email through SendGrid.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "sendgrid",
+				Glyph: "send",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Mailing"},
 			SubCategories: []string{"SendGrid"},

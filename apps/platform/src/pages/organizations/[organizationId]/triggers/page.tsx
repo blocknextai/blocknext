@@ -96,7 +96,9 @@ function OrganizationTriggersPage() {
   const { sources: webhookSources } = useNodeEngineWebhookSources()
 
   useEffect(() => {
-    if (!detailsTrigger) return
+    if (!detailsTrigger) {
+      return
+    }
     setEditCron(detailsTrigger.cronPattern ?? '')
     setEditTimezone(detailsTrigger.timezone ?? '')
     setEditWebhookSecret('')
@@ -110,14 +112,18 @@ function OrganizationTriggersPage() {
   const canSaveSchedule = isScheduleDirty && editCron.trim().length > 0
 
   const saveSchedule = async () => {
-    if (!detailsTrigger || !canSaveSchedule) return
+    if (!detailsTrigger || !canSaveSchedule) {
+      return
+    }
     setIsSavingSchedule(true)
     try {
       const payload: { cronPattern: string; timezone?: string } = {
         cronPattern: editCron.trim(),
       }
       const tz = editTimezone.trim()
-      if (tz) payload.timezone = tz
+      if (tz) {
+        payload.timezone = tz
+      }
       await update(detailsTrigger.id, payload)
       setDetailsTrigger(null)
     } finally {
@@ -127,7 +133,9 @@ function OrganizationTriggersPage() {
 
   const saveWebhookSecret = async () => {
     const secret = editWebhookSecret.trim()
-    if (!detailsTrigger || !secret) return
+    if (!detailsTrigger || !secret) {
+      return
+    }
     setIsSavingSecret(true)
     try {
       await update(detailsTrigger.id, { webhookSecret: secret })
@@ -173,7 +181,9 @@ function OrganizationTriggersPage() {
 
   const confirmDelete = (id: string) => {
     const trigger = triggers.find((tr) => tr.id === id)
-    if (!trigger) return
+    if (!trigger) {
+      return
+    }
     setConfirmData({
       description: t('ui.text.deleteTriggerConfirmation'),
       action: () => remove(trigger.id),
@@ -196,7 +206,9 @@ function OrganizationTriggersPage() {
           const result: any = await regenerateWebhookToken(triggerId)
           const token = result?.webhookToken
           setDetailsTrigger(null)
-          if (token) setRegeneratedToken(token)
+          if (token) {
+            setRegeneratedToken(token)
+          }
         } finally {
           setIsRegenerating(false)
         }
@@ -509,7 +521,9 @@ function OrganizationTriggersPage() {
           <Dialog
             open={!!regeneratedToken}
             onOpenChange={(o) => {
-              if (!o) setRegeneratedToken(null)
+              if (!o) {
+                setRegeneratedToken(null)
+              }
             }}
           >
             <DialogContent className="sm:max-w-[550px]">

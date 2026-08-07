@@ -18,8 +18,14 @@ func NewYouTubeUploadVideoNode(nodeID string) *YouTubeUploadVideoNode {
 			Name:        "YouTube Upload Video",
 			Description: "Upload a video file to YouTube with the given metadata and privacy setting.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "youtube",
+				Glyph: "film",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"YouTube"},

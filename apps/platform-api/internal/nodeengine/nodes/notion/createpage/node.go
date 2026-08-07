@@ -17,8 +17,14 @@ func NewNotionCreatePageNode(nodeID string) *NotionCreatePageNode {
 			Name:        "Notion Create Page",
 			Description: "Create a new page in a Notion workspace.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "notion",
+				Glyph: "plus",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Notion"},

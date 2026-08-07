@@ -26,7 +26,9 @@ const ChangeEmailForm = () => {
   }
 
   const clearError = (key: string) => {
-    if (!errors[key]) return
+    if (!errors[key]) {
+      return
+    }
     setErrors((prev) => {
       const next = { ...prev }
       delete next[key]
@@ -37,7 +39,7 @@ const ChangeEmailForm = () => {
   const validate = () => {
     const next: Record<string, string> = {}
     if (!newEmail.trim()) {
-      next.newEmail = t('ui.text.emailRequired', { ns: 'ui' })
+      next.newEmail = t('ui.text.emailRequired')
     }
     if (!currentPassword) {
       next.currentPassword = t('ui.text.current_password_required')
@@ -48,7 +50,9 @@ const ChangeEmailForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.changeEmail({
@@ -87,7 +91,7 @@ const ChangeEmailForm = () => {
             variant="ghost"
             size="sm"
             onClick={reset}
-            aria-label={t('ui.text.cancel', { ns: 'ui' })}
+            aria-label={t('ui.text.cancel')}
             disabled={submitting}
           >
             <X className="w-4 h-4" />
@@ -158,9 +162,7 @@ const ChangeEmailForm = () => {
                 size="sm"
                 tabIndex={-1}
                 aria-label={
-                  showPassword
-                    ? t('ui.text.hide', { ns: 'ui' })
-                    : t('ui.text.show', { ns: 'ui' })
+                  showPassword ? t('ui.text.hide') : t('ui.text.show')
                 }
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                 onClick={() => setShowPassword((s) => !s)}

@@ -45,7 +45,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Instagram",
 		Description: "Tools for publishing posts, stories, and reels to Instagram.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "instagram",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			publishPostNode,
 			publishStoryNode,

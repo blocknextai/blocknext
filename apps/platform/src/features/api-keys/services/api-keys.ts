@@ -7,7 +7,9 @@ const getOrganizationApiKeys = async (
   const params = new URLSearchParams()
   params.set('offset', String(offset))
   params.set('limit', String(limit))
-  if (query) params.set('query', query)
+  if (query) {
+    params.set('query', query)
+  }
   return await platformApi.get(
     `/organizations/${organizationId}/api-keys?${params.toString()}`,
   )

@@ -19,13 +19,15 @@ import {
 } from 'lucide-react'
 
 const DEFAULT_PREFS = {
-  color: 'rgba(120, 120, 120, 1)',
+  color: 'var(--muted-foreground)',
   icon: Box,
   labelKey: '',
 }
 
 export const getCategoryPrefs = (key?: string) => {
-  if (!key) return DEFAULT_PREFS
+  if (!key) {
+    return DEFAULT_PREFS
+  }
   return (
     (flowCategoryPreferences as Record<string, typeof DEFAULT_PREFS>)[key] ??
     DEFAULT_PREFS
@@ -34,87 +36,87 @@ export const getCategoryPrefs = (key?: string) => {
 
 export const flowCategoryPreferences = {
   mailing: {
-    color: 'rgba(33, 221, 102, 1)',
+    color: 'var(--category-mailing)',
     icon: Mail,
     labelKey: 'ui.text.category.mail',
   },
   genai: {
-    color: 'rgba(255, 187, 0, 1)',
+    color: 'var(--category-genai)',
     icon: Sparkles,
     labelKey: 'ui.text.category.ai',
   },
   ai: {
-    color: 'rgba(255, 187, 0, 1)',
+    color: 'var(--category-ai)',
     icon: Sparkles,
     labelKey: 'ui.text.category.ai',
   },
   image: {
-    color: 'rgba(69, 221, 222, 1)',
+    color: 'var(--category-image)',
     icon: Image,
     labelKey: 'ui.text.category.image',
   },
   googleworkspace: {
-    color: 'rgba(11, 187, 255, 1)',
+    color: 'var(--category-googleworkspace)',
     icon: Cloud,
     labelKey: 'ui.text.category.googleWorkspace',
   },
-  mediapublishing: {
-    color: 'rgba(182, 86, 255, 1)',
+  publishing: {
+    color: 'var(--category-publishing)',
     icon: MonitorUp,
     labelKey: 'ui.text.category.publishing',
   },
   system: {
-    color: 'rgba(118, 162, 195, 1)',
+    color: 'var(--category-system)',
     icon: Wrench,
     labelKey: 'ui.text.category.system',
   },
   audio: {
-    color: 'rgba(7, 119, 255, 1)',
+    color: 'var(--category-audio)',
     icon: AudioLines,
     labelKey: 'ui.text.category.audio',
   },
   video: {
-    color: 'rgba(255, 86, 119, 1)',
+    color: 'var(--category-video)',
     icon: Video,
     labelKey: 'ui.text.category.video',
   },
   blockchain: {
-    color: 'rgba(252, 165, 3, 1)',
+    color: 'var(--category-blockchain)',
     icon: Blocks,
     labelKey: 'ui.text.category.blockchain',
   },
   database: {
-    color: 'rgba(19, 184, 166, 1)',
+    color: 'var(--category-database)',
     icon: Database,
     labelKey: 'ui.text.category.database',
   },
   marketing: {
-    color: 'rgba(239, 68, 68, 1)',
+    color: 'var(--category-marketing)',
     icon: TrendingUp,
     labelKey: 'ui.text.category.marketing',
   },
   ecommerce: {
-    color: 'rgba(219, 39, 119, 1)',
+    color: 'var(--category-ecommerce)',
     icon: ShoppingCart,
     labelKey: 'ui.text.category.ecommerce',
   },
   crm: {
-    color: 'rgba(79, 70, 229, 1)',
+    color: 'var(--category-crm)',
     icon: Users,
     labelKey: 'ui.text.category.crm',
   },
   productivity: {
-    color: 'rgba(132, 204, 22, 1)',
+    color: 'var(--category-productivity)',
     icon: Calendar,
     labelKey: 'ui.text.category.productivity',
   },
   analytics: {
-    color: 'rgba(217, 119, 6, 1)',
+    color: 'var(--category-analytics)',
     icon: BarChart3,
     labelKey: 'ui.text.category.analytics',
   },
   utility: {
-    color: 'rgba(100, 116, 139, 1)',
+    color: 'var(--category-utility)',
     icon: Lightbulb,
     labelKey: 'ui.text.category.utility',
   },

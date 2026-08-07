@@ -39,7 +39,9 @@ const SettingsBasicInfo = ({
   }
 
   const handleSave = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) {
+      return
+    }
 
     setIsSubmitting(true)
 

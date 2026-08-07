@@ -36,7 +36,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "X",
 		Description: "Tools for publishing posts and media to X (Twitter).",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "x",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			publishPostNode,
 			publishMediaPostNode,

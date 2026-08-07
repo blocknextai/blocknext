@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loading } from '@/components/shared/loading'
 import { SearchInput } from '@/components/shared/search-input'
-import { AppPagination } from '@/components/shared/app-pagination'
 import { useMcpServers } from '@/features/mcp'
 import { McpServerGrid } from '@/features/mcp/components/mcp-server-grid'
 import { McpServerDetailDialog } from '@/features/mcp/components/mcp-server-detail-dialog'
@@ -13,7 +12,9 @@ const matches = (value: string | undefined, q: string) =>
 
 const filterServers = (servers: McpServer[], query: string): McpServer[] => {
   const q = query.trim().toLowerCase()
-  if (!q) return servers
+  if (!q) {
+    return servers
+  }
   return servers.filter(
     (server) =>
       matches(server.name, q) ||
@@ -22,12 +23,9 @@ const filterServers = (servers: McpServer[], query: string): McpServer[] => {
   )
 }
 
-const LIMIT = 10
-
 const McpPage = () => {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
-  const [page, setPage] = useState(1)
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -35,7 +33,6 @@ const McpPage = () => {
 
   const handleSearch = useCallback((value: string) => {
     setQuery(value)
-    setPage(1)
   }, [])
 
   const handleCardClick = useCallback((server: McpServer) => {
@@ -46,12 +43,6 @@ const McpPage = () => {
   const filtered = useMemo(
     () => filterServers(servers, query),
     [servers, query],
-  )
-
-  const offset = (page - 1) * LIMIT
-  const paginated = useMemo(
-    () => filtered.slice(offset, offset + LIMIT),
-    [filtered, offset],
   )
 
   const isInitialLoading = isLoading && servers.length === 0
@@ -79,20 +70,7 @@ const McpPage = () => {
           {t('ui.text.mcpNoSearchResults')}
         </div>
       ) : (
-        <>
-          <McpServerGrid servers={paginated} onCardClick={handleCardClick} />
-          <AppPagination
-            pagination={{
-              total: filtered.length,
-              page,
-              limit: LIMIT,
-              offset,
-              hasPrev: page > 1,
-              hasNext: offset + LIMIT < filtered.length,
-            }}
-            onPageChange={setPage}
-          />
-        </>
+        <McpServerGrid servers={filtered} onCardClick={handleCardClick} />
       )}
 
       <McpServerDetailDialog

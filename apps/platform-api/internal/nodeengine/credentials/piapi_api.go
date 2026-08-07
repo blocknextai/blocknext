@@ -12,8 +12,7 @@ func NewPiapiAPICredential() *domain.Credential {
 		Name:        "PiApi",
 		Description: "PiAPI credentials for image, video, and audio generation.",
 		Icon: domain.CredentialIcon{
-			Light: "piapi",
-			Dark:  "piapi",
+			Brand: "piapi",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

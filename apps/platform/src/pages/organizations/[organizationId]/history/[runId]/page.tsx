@@ -108,25 +108,33 @@ function OrganizationHistoryDetailPage() {
   }
 
   const renderDetails = () => {
-    if (!history) return null
+    if (!history) {
+      return null
+    }
 
     const renderDate = (dateString) => {
-      if (!dateString) return t('ui.text.workInProgress')
+      if (!dateString) {
+        return t('ui.text.workInProgress')
+      }
       const date = new Date(dateString)
-      if (isNaN(date.getTime())) return t('ui.text.invalidDate')
+      if (isNaN(date.getTime())) {
+        return t('ui.text.invalidDate')
+      }
       return <TimeAgoI18n date={dateString} />
     }
 
     const calculateDuration = () => {
       try {
-        if (!history.startedAt || !history.completedAt)
+        if (!history.startedAt || !history.completedAt) {
           return t('ui.text.workInProgress')
+        }
         const startDate = new Date(history.startedAt)
         const endDate = new Date(history.completedAt)
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime()))
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
           return t('ui.text.invalid')
+        }
         return formatDistanceStrict(startDate, endDate)
-      } catch (error) {
+      } catch {
         return t('ui.text.error')
       }
     }

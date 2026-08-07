@@ -58,7 +58,9 @@ export function useOrganizationApiKeys(
 
   const handleCreate = useCallback(
     async (payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const res = await apiKeysService.createOrganizationApiKey(
         organizationId,
         payload as never,
@@ -74,7 +76,9 @@ export function useOrganizationApiKeys(
 
   const handleRegenerate = useCallback(
     async (apiKeyId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const res = await apiKeysService.regenerateOrganizationApiKey(
         organizationId,
         apiKeyId,
@@ -91,7 +95,9 @@ export function useOrganizationApiKeys(
 
   const handleDelete = useCallback(
     async (apiKeyId: string) => {
-      if (!organizationId) return
+      if (!organizationId) {
+        return
+      }
       await apiKeysService.deleteOrganizationApiKey(organizationId, apiKeyId)
       await revalidate()
     },

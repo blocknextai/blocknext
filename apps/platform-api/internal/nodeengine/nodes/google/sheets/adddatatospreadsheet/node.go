@@ -18,8 +18,14 @@ func NewGoogleSheetsAddDataToSpreadsheetNode(nodeID string) *GoogleSheetsAddData
 			Version:     "0.0.1",
 			Description: "Append rows of data to a Google Sheets spreadsheet.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_sheets",
+				Glyph: "plus",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Sheets"},

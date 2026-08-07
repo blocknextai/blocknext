@@ -29,9 +29,15 @@ const getMembers = async (
   params?: { offset?: number; limit?: number; query?: string },
 ) => {
   const search = new URLSearchParams()
-  if (params?.offset !== undefined) search.set('offset', String(params.offset))
-  if (params?.limit !== undefined) search.set('limit', String(params.limit))
-  if (params?.query) search.set('query', params.query)
+  if (params?.offset !== undefined) {
+    search.set('offset', String(params.offset))
+  }
+  if (params?.limit !== undefined) {
+    search.set('limit', String(params.limit))
+  }
+  if (params?.query) {
+    search.set('query', params.query)
+  }
   const qs = search.toString()
   return await platformApi.get(
     `/organizations/${organizationId}/users${qs ? `?${qs}` : ''}`,
@@ -69,7 +75,9 @@ const getOrganizationCredentials = async (
   const params = new URLSearchParams()
   params.set('offset', String(offset))
   params.set('limit', String(limit))
-  if (query) params.set('query', query)
+  if (query) {
+    params.set('query', query)
+  }
   return await platformApi.get(
     `/organizations/${organizationId}/credentials?${params.toString()}`,
   )

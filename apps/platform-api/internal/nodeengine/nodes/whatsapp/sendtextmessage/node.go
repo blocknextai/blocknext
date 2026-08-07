@@ -17,8 +17,14 @@ func NewWhatsAppSendTextMessageNode(nodeID string) *WhatsAppSendTextMessageNode 
 			Name:        "WhatsApp Send Text Message",
 			Description: "Send a text message via WhatsApp.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "whatsapp",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"WhatsApp"},

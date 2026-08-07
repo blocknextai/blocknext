@@ -12,8 +12,7 @@ func NewVeoAPICredential() *domain.Credential {
 		Name:        "Veo",
 		Description: "Google Veo API credentials for video generation.",
 		Icon: domain.CredentialIcon{
-			Light: "veo",
-			Dark:  "veo",
+			Brand: "veo",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

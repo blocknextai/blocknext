@@ -22,14 +22,18 @@ export const AdvancedDebouncedTextarea = React.memo(
 
     useEffect(() => {
       return () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
       }
     }, [])
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value
       setText(newText)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
       timeoutRef.current = setTimeout(() => {
         props.onChange?.(newText)
       }, 500)

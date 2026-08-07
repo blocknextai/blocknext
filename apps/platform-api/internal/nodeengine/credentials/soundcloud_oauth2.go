@@ -18,8 +18,7 @@ func NewSoundcloudOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "SoundCloud",
 		Description: "SoundCloud OAuth2 credentials for managing tracks and playlists.",
 		Icon: domain.CredentialIcon{
-			Light: "soundcloud",
-			Dark:  "soundcloud",
+			Brand: "soundcloud",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

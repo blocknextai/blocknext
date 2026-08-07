@@ -28,7 +28,9 @@ const RunStepDetail = ({
 
   const formatDuration = (startedAt?: string, completedAt?: string) => {
     try {
-      if (!startedAt || !completedAt) return t('ui.text.workInProgress')
+      if (!startedAt || !completedAt) {
+        return t('ui.text.workInProgress')
+      }
       const start = new Date(startedAt)
       const end = new Date(completedAt)
 
@@ -45,9 +47,13 @@ const RunStepDetail = ({
 
   const formatTime = (dateString?: string) => {
     try {
-      if (!dateString) return t('ui.text.workInProgress')
+      if (!dateString) {
+        return t('ui.text.workInProgress')
+      }
       const date = new Date(dateString)
-      if (isNaN(date.getTime())) return t('ui.text.invalid')
+      if (isNaN(date.getTime())) {
+        return t('ui.text.invalid')
+      }
       return format(date, 'HH:mm:ss.SSS')
     } catch {
       return t('ui.text.error')

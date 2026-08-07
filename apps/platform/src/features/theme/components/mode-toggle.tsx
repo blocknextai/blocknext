@@ -31,7 +31,9 @@ const ModeToggle = (props) => {
   }
 
   const handleValueChange = (val: string) => {
-    if (val) setTheme(val)
+    if (val) {
+      setTheme(val)
+    }
   }
 
   return (

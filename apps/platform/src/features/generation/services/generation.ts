@@ -10,7 +10,9 @@ function parseSSEEvents(raw) {
   // Split by double newline to separate SSE events
   const blocks = raw.split('\n\n')
   for (const block of blocks) {
-    if (!block.trim()) continue
+    if (!block.trim()) {
+      continue
+    }
 
     const lines = block.split('\n')
     let eventType = 'message'
@@ -40,7 +42,9 @@ export const generation = {
     { query = '', offset = 0, limit = 10 } = {},
   ) => {
     const params = new URLSearchParams()
-    if (query) params.set('query', query)
+    if (query) {
+      params.set('query', query)
+    }
     params.set('offset', offset)
     params.set('limit', limit)
     return await platformApi.get(
@@ -120,14 +124,18 @@ export const generation = {
 
       while (true) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done) {
+          break
+        }
 
         buffer += decoder.decode(value, { stream: true })
 
         // Only process complete SSE events (terminated by \n\n)
         // Keep incomplete data in buffer for next iteration
         const lastDoubleNewline = buffer.lastIndexOf('\n\n')
-        if (lastDoubleNewline === -1) continue
+        if (lastDoubleNewline === -1) {
+          continue
+        }
 
         const complete = buffer.slice(0, lastDoubleNewline + 2)
         buffer = buffer.slice(lastDoubleNewline + 2)
@@ -157,7 +165,9 @@ export const generation = {
               onDone?.()
               break
             case 'message':
-              if (data) onChunk?.(data)
+              if (data) {
+                onChunk?.(data)
+              }
               break
             case 'error':
               onError?.(data)

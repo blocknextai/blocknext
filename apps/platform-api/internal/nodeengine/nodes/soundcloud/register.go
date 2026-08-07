@@ -36,7 +36,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "SoundCloud",
 		Description: "Tools for managing SoundCloud tracks and playlists.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "soundcloud",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createTrackNode,
 			createPlaylistNode,

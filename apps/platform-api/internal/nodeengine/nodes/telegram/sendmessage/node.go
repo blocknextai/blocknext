@@ -17,8 +17,14 @@ func NewTelegramSendMessageNode(nodeID string) *TelegramSendMessageNode {
 			Name:        "Telegram Send Message",
 			Description: "Send a text message to a Telegram chat.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "telegram",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Publishing"},
 			SubCategories: []string{"Telegram"},

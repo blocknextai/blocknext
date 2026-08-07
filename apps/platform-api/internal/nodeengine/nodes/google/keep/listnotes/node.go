@@ -18,8 +18,14 @@ func NewGoogleKeepListNotesNode(nodeID string) *GoogleKeepListNotesNode {
 			Name:        "Google Keep List Notes",
 			Description: "List notes from Google Keep with optional filtering and pagination.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "google_keep",
+				Glyph: "list",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Google Workspace"},
 			SubCategories: []string{"Google Keep"},

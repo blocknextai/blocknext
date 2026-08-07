@@ -18,8 +18,14 @@ func NewAnthropicChatNode(nodeID string) *AnthropicChatNode {
 			Name:        "Anthropic Chat",
 			Description: "Generate a chat completion using Anthropic Claude.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "anthropic",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"AI"},
 			SubCategories: []string{"Anthropic"},

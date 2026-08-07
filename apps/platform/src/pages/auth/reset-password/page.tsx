@@ -36,14 +36,18 @@ function AuthResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.resetPassword({
         token,
         newPassword: password,
       })
-      if (!response.isSuccess) return
+      if (!response.isSuccess) {
+        return
+      }
       navigate('/preferences/profile')
     } catch (error) {
       console.error('Password reset error:', error)
@@ -91,9 +95,7 @@ function AuthResetPasswordPage() {
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid gap-2">
-          <Label htmlFor="reset-password">
-            {t('ui.text.password', { ns: 'ui' })}
-          </Label>
+          <Label htmlFor="reset-password">{t('ui.text.password')}</Label>
           <div className="relative">
             <Input
               id="reset-password"
@@ -104,7 +106,9 @@ function AuthResetPasswordPage() {
               className={`pr-10 ${errors.password ? 'border-destructive' : ''}`.trim()}
               onChange={(e) => {
                 setPassword(e.target.value)
-                if (errors.password) setErrors({ ...errors, password: '' })
+                if (errors.password) {
+                  setErrors({ ...errors, password: '' })
+                }
               }}
               required
               minLength={MIN_PASSWORD_LENGTH}
@@ -114,11 +118,7 @@ function AuthResetPasswordPage() {
               variant="ghost"
               size="sm"
               tabIndex={-1}
-              aria-label={
-                showPassword
-                  ? t('ui.text.hide', { ns: 'ui' })
-                  : t('ui.text.show', { ns: 'ui' })
-              }
+              aria-label={showPassword ? t('ui.text.hide') : t('ui.text.show')}
               className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
               onClick={() => setShowPassword((s) => !s)}
             >
@@ -134,9 +134,7 @@ function AuthResetPasswordPage() {
           )}
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="reset-confirm">
-            {t('ui.text.confirmPassword', { ns: 'ui' })}
-          </Label>
+          <Label htmlFor="reset-confirm">{t('ui.text.confirmPassword')}</Label>
           <Input
             id="reset-confirm"
             type={showPassword ? 'text' : 'password'}
@@ -148,8 +146,9 @@ function AuthResetPasswordPage() {
             }
             onChange={(e) => {
               setConfirmPassword(e.target.value)
-              if (errors.confirmPassword)
+              if (errors.confirmPassword) {
                 setErrors({ ...errors, confirmPassword: '' })
+              }
             }}
             required
             minLength={MIN_PASSWORD_LENGTH}

@@ -87,7 +87,9 @@ export function useWorkflowActions(organizationId: string | null | undefined) {
 
   const create = useCallback(
     async (payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         workflowsService.create(organizationId, payload as never),
       )
@@ -99,7 +101,9 @@ export function useWorkflowActions(organizationId: string | null | undefined) {
 
   const update = useCallback(
     async (workflowId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         workflowsService.update(organizationId, workflowId, payload as never),
       )
@@ -111,7 +115,9 @@ export function useWorkflowActions(organizationId: string | null | undefined) {
 
   const remove = useCallback(
     async (workflowId: string) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         workflowsService.delete(organizationId, workflowId),
       )
@@ -123,7 +129,9 @@ export function useWorkflowActions(organizationId: string | null | undefined) {
 
   const duplicate = useCallback(
     async (workflowId: string, payload: unknown) => {
-      if (!organizationId) return null
+      if (!organizationId) {
+        return null
+      }
       const result = await unwrap(
         workflowsService.duplicate(
           organizationId,

@@ -18,8 +18,14 @@ func NewCoingeckoPriceMonitorNode(nodeID string) *CoingeckoPriceMonitorNode {
 			Name:        "Coingecko Price Monitor",
 			Description: "Monitor cryptocurrency prices via CoinGecko.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "coingecko",
+				Glyph: "trending",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Blockchain"},
 			SubCategories: []string{"CoinGecko"},

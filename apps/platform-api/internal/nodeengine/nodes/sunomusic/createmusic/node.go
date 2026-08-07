@@ -18,8 +18,14 @@ func NewSunoMusicCreateMusicNode(nodeID string) *SunoMusicCreateMusicNode {
 			Name:        "Suno Create Music",
 			Description: "Generate a music track using Suno.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "sunomusic",
+				Glyph: "music",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"Audio"},
 			SubCategories: []string{"Suno"},

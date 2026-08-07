@@ -55,7 +55,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Google Keep",
 		Description: "Tools for creating, reading, listing, and deleting Google Keep notes.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "google_keep",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			createNoteNode,
 			getNoteNode,

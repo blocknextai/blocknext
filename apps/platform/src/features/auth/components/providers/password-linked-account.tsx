@@ -44,7 +44,9 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
   }
 
   const clearError = (key: string) => {
-    if (!errors[key]) return
+    if (!errors[key]) {
+      return
+    }
     setErrors((prev) => {
       const next = { ...prev }
       delete next[key]
@@ -54,7 +56,9 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.setPassword({ password })
@@ -78,9 +82,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
             <KeyRound className="w-4 h-4" />
           </div>
           <div>
-            <div className="font-medium text-sm">
-              {t('ui.text.password', { ns: 'ui' })}
-            </div>
+            <div className="font-medium text-sm">{t('ui.text.password')}</div>
             <div className="text-xs text-muted-foreground">
               {t('ui.text.set_password_description')}
             </div>
@@ -91,7 +93,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
             variant="ghost"
             size="sm"
             onClick={reset}
-            aria-label={t('ui.text.cancel', { ns: 'ui' })}
+            aria-label={t('ui.text.cancel')}
             disabled={submitting}
           >
             <X className="w-4 h-4" />
@@ -106,9 +108,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
       {expanded && (
         <form onSubmit={handleSubmit} className="space-y-3 mt-3">
           <div className="grid gap-2">
-            <Label htmlFor="set-password">
-              {t('ui.text.password', { ns: 'ui' })}
-            </Label>
+            <Label htmlFor="set-password">{t('ui.text.password')}</Label>
             <div className="relative">
               <Input
                 id="set-password"
@@ -130,9 +130,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
                 size="sm"
                 tabIndex={-1}
                 aria-label={
-                  showPassword
-                    ? t('ui.text.hide', { ns: 'ui' })
-                    : t('ui.text.show', { ns: 'ui' })
+                  showPassword ? t('ui.text.hide') : t('ui.text.show')
                 }
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                 onClick={() => setShowPassword((s) => !s)}
@@ -151,7 +149,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
 
           <div className="grid gap-2">
             <Label htmlFor="set-confirm-password">
-              {t('ui.text.confirmPassword', { ns: 'ui' })}
+              {t('ui.text.confirmPassword')}
             </Label>
             <div className="relative">
               <Input
@@ -174,9 +172,7 @@ const PasswordLinkedAccount = ({ onLinked }: Props) => {
                 size="sm"
                 tabIndex={-1}
                 aria-label={
-                  showConfirmPassword
-                    ? t('ui.text.hide', { ns: 'ui' })
-                    : t('ui.text.show', { ns: 'ui' })
+                  showConfirmPassword ? t('ui.text.hide') : t('ui.text.show')
                 }
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                 onClick={() => setShowConfirmPassword((s) => !s)}

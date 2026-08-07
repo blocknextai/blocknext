@@ -97,14 +97,18 @@ class WSManager {
   }
 
   private setStatus(status: WsStatus) {
-    if (this.status === status) return
+    if (this.status === status) {
+      return
+    }
     this.status = status
     this.statusListeners.forEach((listener) => listener(status))
   }
 
   private createConnection() {
     const token = tokenManager.getAccessToken()
-    if (!token || !this.organizationId) return
+    if (!token || !this.organizationId) {
+      return
+    }
 
     const wsUrl = BASE_URL.replace(/^http/, 'ws')
 
@@ -128,7 +132,9 @@ class WSManager {
 
     this.ws.onclose = () => {
       this.ws = null
-      if (this.shouldReconnect) this.setStatus('reconnecting')
+      if (this.shouldReconnect) {
+        this.setStatus('reconnecting')
+      }
       this.scheduleReconnect()
     }
 
@@ -138,7 +144,9 @@ class WSManager {
   }
 
   private scheduleReconnect() {
-    if (!this.shouldReconnect || !this.organizationId) return
+    if (!this.shouldReconnect || !this.organizationId) {
+      return
+    }
 
     this.reconnectTimer = setTimeout(() => {
       this.createConnection()

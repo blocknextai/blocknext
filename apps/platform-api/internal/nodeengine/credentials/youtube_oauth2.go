@@ -19,8 +19,7 @@ func NewYoutubeOAuth2Credential(redirectURL string) *domain.Credential {
 		Name:        "YouTube",
 		Description: "YouTube OAuth2 credentials for uploading and managing videos.",
 		Icon: domain.CredentialIcon{
-			Light: "youtube",
-			Dark:  "youtube",
+			Brand: "youtube",
 		},
 		Schema: &gjs.Schema{
 			Type: "object",

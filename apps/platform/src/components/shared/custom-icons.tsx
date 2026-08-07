@@ -44,10 +44,14 @@ const flowIconCache = new Map<string, string>()
 
 export const FlowIcon = (seed: string) => {
   const cached = flowIconCache.get(seed)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   let hash = 0
-  for (let i = 0; i < seed.length; i++) hash += seed.charCodeAt(i)
+  for (let i = 0; i < seed.length; i++) {
+    hash += seed.charCodeAt(i)
+  }
   const baseColor = FLOW_ICON_COLORS[hash % FLOW_ICON_COLORS.length]
   const dataUrl = generate(seed, { baseColor }).toDataUrl()
 

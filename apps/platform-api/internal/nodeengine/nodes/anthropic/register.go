@@ -25,7 +25,10 @@ func Register() {
 		ID:          nodeID,
 		Name:        "Anthropic",
 		Description: "Tools for chat completions with Anthropic Claude.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "anthropic",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			chatNode,
 		},

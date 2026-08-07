@@ -25,7 +25,9 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
 
   const validate = () => {
     const next: Record<string, string> = {}
-    if (!email.trim()) next.email = t('ui.text.emailRequired', { ns: 'ui' })
+    if (!email.trim()) {
+      next.email = t('ui.text.emailRequired')
+    }
     if (password.length < MIN_PASSWORD_LENGTH) {
       next.password = t('ui.text.password_too_short')
     }
@@ -38,7 +40,9 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!validate()) return
+    if (!validate()) {
+      return
+    }
     setSubmitting(true)
     try {
       const response = await authService.register({ email, password })
@@ -63,7 +67,9 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
   }
 
   const clearError = (key: string) => {
-    if (!errors[key]) return
+    if (!errors[key]) {
+      return
+    }
     setErrors((prev) => {
       const next = { ...prev }
       delete next[key]
@@ -74,9 +80,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="grid gap-2">
-        <Label htmlFor="register-email">
-          {t('ui.text.emailAddress', { ns: 'ui' })}
-        </Label>
+        <Label htmlFor="register-email">{t('ui.text.emailAddress')}</Label>
         <Input
           id="register-email"
           type="email"
@@ -95,9 +99,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
         )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="register-password">
-          {t('ui.text.password', { ns: 'ui' })}
-        </Label>
+        <Label htmlFor="register-password">{t('ui.text.password')}</Label>
         <div className="relative">
           <Input
             id="register-password"
@@ -118,11 +120,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
             variant="ghost"
             size="sm"
             tabIndex={-1}
-            aria-label={
-              showPassword
-                ? t('ui.text.hide', { ns: 'ui' })
-                : t('ui.text.show', { ns: 'ui' })
-            }
+            aria-label={showPassword ? t('ui.text.hide') : t('ui.text.show')}
             className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
             onClick={() => setShowPassword((s) => !s)}
           >
@@ -138,9 +136,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
         )}
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="register-confirm">
-          {t('ui.text.confirmPassword', { ns: 'ui' })}
-        </Label>
+        <Label htmlFor="register-confirm">{t('ui.text.confirmPassword')}</Label>
         <div className="relative">
           <Input
             id="register-confirm"
@@ -162,9 +158,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
             size="sm"
             tabIndex={-1}
             aria-label={
-              showConfirmPassword
-                ? t('ui.text.hide', { ns: 'ui' })
-                : t('ui.text.show', { ns: 'ui' })
+              showConfirmPassword ? t('ui.text.hide') : t('ui.text.show')
             }
             className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
             onClick={() => setShowConfirmPassword((s) => !s)}

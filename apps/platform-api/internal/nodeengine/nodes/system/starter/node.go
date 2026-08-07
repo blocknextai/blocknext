@@ -17,8 +17,11 @@ func NewStarterNode(nodeID string) *StarterNode {
 			Name:        "Starter",
 			Description: "Entry point that starts the workflow execution.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Glyph: "play",
+			},
+			Inputs: []nodes.NodeHandle{},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"System"},
 			SubCategories: []string{"System"},

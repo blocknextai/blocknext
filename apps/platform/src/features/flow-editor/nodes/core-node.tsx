@@ -1,18 +1,14 @@
 import { memo, useState, useMemo, useCallback, useEffect } from 'react'
-import { Handle, Position, useUpdateNodeInternals } from '@xyflow/react'
+import { Position, useUpdateNodeInternals } from '@xyflow/react'
 import {
   useFlowSetNodes,
   useFlowSetEdges,
 } from '@/features/flow-editor/contexts/flow-nodes-context'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from '@/components/ui/tooltip'
 import { useTranslation } from 'react-i18next'
 import { flowCategoryPreferences } from '@/lib/flow-categories'
-import { directionIcons } from '@/features/flow-editor/icons'
+import { directionIcons, useIconResolver } from '@/features/flow-editor/icons'
+import { NodeHandles } from '@/features/flow-editor/nodes/node-handles'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -57,17 +53,21 @@ const CoreNode = memo(({ selected, data }) => {
   const [name, setName] = useState(data?.title ?? '')
   const [position, setPosition] = useState(data?.position || 'l-r')
   const { t } = useTranslation()
+  const resolveIcon = useIconResolver()
   const { prefs, Icon } = useMemo(() => {
+    const providerIcon = resolveIcon(data?.icon)
     if (!data?.category || !flowCategoryPreferences[data.category]) {
-      return { prefs: { color: '#ffffff' }, Icon: () => null }
+      return { prefs: { color: '#ffffff' }, Icon: providerIcon ?? (() => null) }
     }
     const p = flowCategoryPreferences[data.category]
-    return { prefs: p, Icon: p.icon }
-  }, [data?.category])
+    return { prefs: p, Icon: providerIcon ?? p.icon }
+  }, [data?.category, data?.icon, resolveIcon])
 
   const updateField = useCallback(
     (field, value) => {
-      if (!data?.id) return
+      if (!data?.id) {
+        return
+      }
       setNodes((nodes) =>
         nodes.map((n) => {
           if (n.id === data.id) {
@@ -87,7 +87,9 @@ const CoreNode = memo(({ selected, data }) => {
   )
 
   const deleteNode = useCallback(() => {
-    if (!data?.id) return
+    if (!data?.id) {
+      return
+    }
     setNodes((nodes) => nodes.filter((n) => n.id !== data.id))
     setEdges((edges) =>
       edges.filter((e) => e.source !== data.id && e.target !== data.id),
@@ -95,13 +97,17 @@ const CoreNode = memo(({ selected, data }) => {
   }, [data?.id, setNodes, setEdges])
 
   useEffect(() => {
-    if (!data) return
+    if (!data) {
+      return
+    }
     if (!data.position || (data.position && data.position !== position)) {
       updateField('position', position)
     }
   }, [position])
   useEffect(() => {
-    if (!data?.id) return
+    if (!data?.id) {
+      return
+    }
     updateNodeInternals(data.id)
   }, [position, updateNodeInternals, data?.id])
 
@@ -228,35 +234,23 @@ const CoreNode = memo(({ selected, data }) => {
       <ContextMenu>
         <ContextMenuTrigger>
           <div
-            className={`rounded-xl relative bg-background transition-all duration-200 hover:shadow-md border-2 border-current spread-transition
-                             ${selected ? 'spread-container' : ''}`}
-            style={{ color: prefs?.color }}
+            className={`bg-card relative rounded-xl border transition-all duration-200 hover:shadow-md spread-transition
+                             ${selected ? 'spread-container ring-primary ring-2' : ''}`}
+            style={{ borderColor: prefs?.color }}
           >
-            <div className="bg-current/20 rounded-lg">
-              {/* Giriş Noktası */}
-              {!data?.hide_left && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Handle
-                      type="target"
-                      position={LAYOUT[position][0]}
-                      className="border-ring hover:shadow-md"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="left">
-                    {t('ui.text.dataEntry')}
-                  </TooltipContent>
-                </Tooltip>
-              )}
+            <div className="rounded-lg">
+              <NodeHandles
+                handles={data?.inputs ?? []}
+                type="target"
+                position={LAYOUT[position][0]}
+                tooltip={t('ui.text.dataEntry')}
+              />
 
               <Card className="items-start bg-transparent py-2! shadow-none border-none">
                 <CardContent className="pl-3 pr-4">
                   <div className="flex items-center gap-4 cursor-pointer">
-                    <div
-                      style={{ color: prefs?.color }}
-                      className="size-10 rounded-lg flex items-center justify-center bg-current shrink-0"
-                    >
-                      {Icon && <Icon className="size-6 text-zinc-50" />}
+                    <div className="bg-muted ring-border flex size-10 shrink-0 items-center justify-center rounded-lg ring-1">
+                      {Icon && <Icon className="size-6" />}
                     </div>
                     <div className="flex flex-1 flex-col items-start justify-start gap-0">
                       <div
@@ -271,19 +265,15 @@ const CoreNode = memo(({ selected, data }) => {
                 </CardContent>
               </Card>
 
-              {/* Çıkış Noktası */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Handle
-                    type="source"
-                    position={LAYOUT[position][1]}
-                    className="border-ring hover:shadow-md"
-                  />
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  {t('ui.text.dataOutput')}
-                </TooltipContent>
-              </Tooltip>
+              <NodeHandles
+                handles={data?.outputs ?? []}
+
+                type="source"
+
+                position={LAYOUT[position][1]}
+
+                tooltip={t('ui.text.dataOutput')}
+              />
             </div>
           </div>
         </ContextMenuTrigger>

@@ -63,7 +63,9 @@ function OrganizationDetailPage() {
 
   const updateFavorite = useCallback(
     async (workflow) => {
-      if (!workflow) return
+      if (!workflow) {
+        return
+      }
       await updateWorkflow(workflow.id, { isPinned: !workflow.isPinned })
     },
     [updateWorkflow],
@@ -75,7 +77,9 @@ function OrganizationDetailPage() {
   }, [])
 
   const confirmEdit = useCallback(async () => {
-    if (!selectedWorkflow) return
+    if (!selectedWorkflow) {
+      return
+    }
     await updateWorkflow(selectedWorkflow.id, {
       title: selectedWorkflow.title || '',
       description: selectedWorkflow.description || '',
@@ -90,7 +94,9 @@ function OrganizationDetailPage() {
   }, [])
 
   const confirmDuplicate = useCallback(async () => {
-    if (!selectedWorkflow) return
+    if (!selectedWorkflow) {
+      return
+    }
     await duplicateWorkflow(selectedWorkflow.id, {
       title: selectedWorkflow.title || '',
       description: selectedWorkflow.description || '',
@@ -105,7 +111,9 @@ function OrganizationDetailPage() {
   }, [])
 
   const confirmDelete = useCallback(async () => {
-    if (!selectedWorkflow) return
+    if (!selectedWorkflow) {
+      return
+    }
     await removeWorkflow(selectedWorkflow.id)
     setIsDeleteDialogOpen(false)
     setSelectedWorkflow(null)

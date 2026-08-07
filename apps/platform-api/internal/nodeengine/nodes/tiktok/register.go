@@ -26,7 +26,10 @@ func Register(fileGateway filegateway.FileGateway) {
 		ID:          nodeID,
 		Name:        "TikTok",
 		Description: "Tools for publishing posts to TikTok.",
-		Version:     "0.0.1",
+		Icon: mcp.ServerIcon{
+			Brand: "tiktok",
+		},
+		Version: "0.0.1",
 		Tools: []nodes.NodeManager{
 			publishPostNode,
 		},

@@ -18,8 +18,14 @@ func NewChatgptChatNode(nodeID string) *ChatgptChatNode {
 			Name:        "ChatGPT Chat",
 			Description: "Generate a chat completion using OpenAI ChatGPT.",
 			Icon: nodes.NodeIcon{
-				Light: nodeID,
-				Dark:  nodeID,
+				Brand: "chatgpt",
+				Glyph: "chat",
+			},
+			Inputs: []nodes.NodeHandle{
+				{Key: "in"},
+			},
+			Outputs: []nodes.NodeHandle{
+				{Key: "out"},
 			},
 			Categories:    []string{"AI"},
 			SubCategories: []string{"ChatGPT"},
