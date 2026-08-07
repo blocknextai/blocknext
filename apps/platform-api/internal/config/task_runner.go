@@ -20,13 +20,15 @@ const (
 type TaskLockProvider string
 
 const (
-	TaskLockProviderRedis TaskLockProvider = "redis"
+	TaskLockProviderMemory TaskLockProvider = "memory"
+	TaskLockProviderRedis  TaskLockProvider = "redis"
 )
 
 type TaskSemaphoreProvider string
 
 const (
-	TaskSemaphoreProviderRedis TaskSemaphoreProvider = "redis"
+	TaskSemaphoreProviderMemory TaskSemaphoreProvider = "memory"
+	TaskSemaphoreProviderRedis  TaskSemaphoreProvider = "redis"
 )
 
 type TaskRunnerWorkerOptions struct {

@@ -7,7 +7,8 @@ import (
 type CacheType string
 
 const (
-	CacheTypeRedis CacheType = "redis"
+	CacheTypeMemory CacheType = "memory"
+	CacheTypeRedis  CacheType = "redis"
 )
 
 type CacheOptions struct {

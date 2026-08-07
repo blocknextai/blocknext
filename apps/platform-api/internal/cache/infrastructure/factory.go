@@ -3,7 +3,9 @@ package infrastructure
 import (
 	"github.com/blocknextai/go-packages/apperror"
 	"github.com/blocknextai/go-packages/cache"
+	"github.com/blocknextai/go-packages/cache/memory"
 	"github.com/blocknextai/go-packages/cache/redis"
+	"github.com/blocknextai/go-packages/redisclient"
 	"github.com/blocknextai/platform-api/internal/config"
 )
 
@@ -12,12 +14,16 @@ var (
 )
 
 func NewCacheService(options config.CacheOptions) (cache.Service, error) {
+	if options.Type == config.CacheTypeMemory {
+		return memory.New(), nil
+	}
+
 	if options.Type == config.CacheTypeRedis {
 		return redis.New(
 			options.Redis.Address,
 			options.Redis.Password,
 			options.Redis.DB,
-			redis.PoolOptions{
+			redisclient.PoolOptions{
 				PoolSize:        options.Redis.PoolSize,
 				MinIdleConns:    options.Redis.MinIdleConns,
 				MaxIdleConns:    options.Redis.MaxIdleConns,
