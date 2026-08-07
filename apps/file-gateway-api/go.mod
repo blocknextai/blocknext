@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.43.4
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.34
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.0
-	github.com/blocknextai/go-packages v0.0.122
+	github.com/blocknextai/go-packages v0.0.0
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/gofiber/fiber/v3 v3.4.0
 )
