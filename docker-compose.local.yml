@@ -51,7 +51,7 @@ services:
     restart: "no"
 
   platform-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -70,7 +70,7 @@ services:
       - "${PLATFORM_API_PORT:-3000}:${PLATFORM_API_PORT:-3000}"
 
   mcp-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -89,7 +89,7 @@ services:
       - "${MCP_API_PORT:-3100}:${MCP_API_PORT:-3100}"
 
   webhook-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -108,7 +108,7 @@ services:
       - "${WEBHOOK_API_PORT:-3200}:${WEBHOOK_API_PORT:-3200}"
 
   task-worker:
-    restart: on-failure:10
+    restart: unless-stopped
     profiles:
       - task-runner-queue
     env_file:
@@ -126,7 +126,7 @@ services:
         BINARY_NAME: task-worker
 
   event-relay-worker:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -143,7 +143,7 @@ services:
 
   file-gateway-api:
     container_name: file-gateway-api
-    restart: on-failure:10
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/file-gateway-api/Dockerfile
@@ -151,10 +151,12 @@ services:
       - .env
     ports:
       - "${FILE_GATEWAY_API_PORT:-3300}:${FILE_GATEWAY_API_PORT:-3300}"
+    volumes:
+      - uploads_data:/data/uploads
 
   platform:
     container_name: platform
-    restart: on-failure:10
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/platform/nginx.Dockerfile
@@ -169,3 +171,4 @@ services:
 volumes:
   db_data:
   task_queue_redis_data:
+  uploads_data:

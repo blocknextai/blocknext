@@ -26,11 +26,14 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     cd apps/file-gateway-api && \
     go build -ldflags="-s -w" -trimpath -o /build/file-gateway-api ./cmd/file-gateway-api/main.go
 
+RUN mkdir -p /uploads/public /uploads/private && chown -R 65532:65532 /uploads
+
 FROM gcr.io/distroless/static-debian13:nonroot AS production
 
 WORKDIR /app
 
 COPY --from=build /build/file-gateway-api .
+COPY --from=build --chown=nonroot:nonroot /uploads /data/uploads
 
 EXPOSE 3300
 

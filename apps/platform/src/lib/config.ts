@@ -13,5 +13,4 @@ export const config = {
   platformApiUrl:
     env('VITE_PLATFORM_API_URL') || 'VITE_PLATFORM_API_URL is not set',
   mcpApiUrl: env('VITE_MCP_API_URL') || 'VITE_MCP_API_URL is not set',
-  web3LoginEnabled: env('VITE_WEB3_LOGIN_ENABLED') === 'true',
 }
