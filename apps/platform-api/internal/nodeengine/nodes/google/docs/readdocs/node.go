@@ -13,6 +13,7 @@ func NewGoogleDocsReadDocsNode(nodeID string) *GoogleDocsReadDocsNode {
 	return &GoogleDocsReadDocsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Docs Read",
 			Description: "Read the plain text content of a Google Docs document.",

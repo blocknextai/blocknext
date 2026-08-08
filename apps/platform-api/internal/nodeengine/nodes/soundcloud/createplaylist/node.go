@@ -13,6 +13,7 @@ func NewSoundCloudCreatePlaylistNode(nodeID string) *SoundCloudCreatePlaylistNod
 	return &SoundCloudCreatePlaylistNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "SoundCloud Create Playlist",
 			Description: "Create a new playlist on SoundCloud.",

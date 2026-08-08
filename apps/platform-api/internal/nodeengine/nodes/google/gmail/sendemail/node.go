@@ -13,6 +13,7 @@ func NewGmailSendEmailNode(nodeID string) *GmailSendEmailNode {
 	return &GmailSendEmailNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Gmail Send Email",
 			Description: "Send an email through Gmail.",

@@ -13,6 +13,7 @@ func NewFacebookPublishStoryNode(nodeID string) *FacebookPublishStoryNode {
 	return &FacebookPublishStoryNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Facebook Publish Story",
 			Description: "Publish a story to a Facebook page.",

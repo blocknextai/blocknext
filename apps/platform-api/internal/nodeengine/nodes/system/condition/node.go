@@ -14,6 +14,7 @@ func NewConditionNode(nodeID string) *ConditionNode {
 	return &ConditionNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Condition",
 			Description: "Branch the workflow based on a conditional expression.",

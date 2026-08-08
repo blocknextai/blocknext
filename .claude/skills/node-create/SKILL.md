@@ -185,6 +185,7 @@ func New<Provider><Action>Node(nodeID string) *<Provider><Action>Node {
 	return &<Provider><Action>Node{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "<DisplayName>",
 			Description: "<one-line description>",

@@ -14,6 +14,7 @@ const FlowToolbar = ({
   runFlow,
   setOpen,
   openApiSheet,
+  viewControls,
 }) => {
   const { t } = useTranslation()
 
@@ -22,7 +23,8 @@ const FlowToolbar = ({
   }
 
   return (
-    <div className="flex items-center justify-center p-4 w-full absolute bottom-2">
+    <div className="absolute bottom-2 flex w-full items-center justify-center gap-2 p-4">
+      {viewControls}
       <div
         data-tour="flow-toolbar"
         className="flex

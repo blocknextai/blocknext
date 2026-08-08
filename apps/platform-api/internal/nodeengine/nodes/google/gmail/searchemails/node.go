@@ -13,6 +13,7 @@ func NewGmailSearchEmailsNode(nodeID string) *GmailSearchEmailsNode {
 	return &GmailSearchEmailsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Gmail Search Emails",
 			Description: "Search Gmail messages using Gmail's standard search syntax and return matching email summaries.",

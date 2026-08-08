@@ -13,6 +13,7 @@ func NewAirtableCreateRecordNode(nodeID string) *AirtableCreateRecordNode {
 	return &AirtableCreateRecordNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Airtable Create Record",
 			Description: "Create a new record in an Airtable base.",

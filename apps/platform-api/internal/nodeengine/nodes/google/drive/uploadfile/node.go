@@ -14,6 +14,7 @@ func NewGoogleDriveUploadFileNode(nodeID string) *GoogleDriveUploadFileNode {
 	return &GoogleDriveUploadFileNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Drive Upload File",
 			Description: "Upload one or more files to Google Drive from a list of source URLs.",

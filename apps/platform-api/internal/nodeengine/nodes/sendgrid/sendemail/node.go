@@ -13,6 +13,7 @@ func NewSendgridSendEmailNode(nodeID string) *SendgridSendEmailNode {
 	return &SendgridSendEmailNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "SendGrid Send Email",
 			Description: "Send an email through SendGrid.",

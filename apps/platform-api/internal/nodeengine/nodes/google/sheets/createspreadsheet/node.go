@@ -13,6 +13,7 @@ func NewGoogleSheetsCreateSpreadsheetNode(nodeID string) *GoogleSheetsCreateSpre
 	return &GoogleSheetsCreateSpreadsheetNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Sheets Create Spreadsheet",
 			Description: "Create a new Google Sheets spreadsheet with the given title.",

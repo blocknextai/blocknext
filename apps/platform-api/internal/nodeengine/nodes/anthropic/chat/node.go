@@ -14,6 +14,7 @@ func NewAnthropicChatNode(nodeID string) *AnthropicChatNode {
 	return &AnthropicChatNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Anthropic Chat",
 			Description: "Generate a chat completion using Anthropic Claude.",

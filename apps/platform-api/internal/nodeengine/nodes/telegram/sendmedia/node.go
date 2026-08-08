@@ -13,6 +13,7 @@ func NewTelegramSendMediaNode(nodeID string) *TelegramSendMediaNode {
 	return &TelegramSendMediaNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Telegram Send Media",
 			Description: "Send a media file to a Telegram chat.",

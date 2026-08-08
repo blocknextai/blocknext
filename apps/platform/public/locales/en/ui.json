@@ -7,7 +7,6 @@
   "ui.text.activate": "Activate",
   "ui.text.active": "Active",
   "ui.text.activeSessions": "Active Sessions",
-  "ui.text.addAnnotationToFlow": "Add annotation to your flow",
   "ui.text.addCustomName": "Add Custom Name for this Node",
   "ui.text.addDocuments": "Add Documents (Max 3)",
   "ui.text.addGalleryImages": "Add Gallery Images (Max 10)",
@@ -32,7 +31,6 @@
   "ui.text.alreadyPaidVerifyManually": "Already paid? Verify manually",
   "ui.text.already_have_account": "Already have an account?",
   "ui.text.amount": "Amount",
-  "ui.text.annotationNode": "Annotation",
   "ui.text.annotationPlaceholder": "Annotate your flows any way you'd like.",
   "ui.text.api": "API",
   "ui.text.apiKey": "API Key",
@@ -347,6 +345,7 @@
   "ui.text.files": "Files",
   "ui.text.finish": "Finish",
   "ui.text.finished": "Finished",
+  "ui.text.fitView": "Fit to screen",
   "ui.text.flashAI": "Flash AI",
   "ui.text.flashLiteAI": "Flash-Lite AI",
   "ui.text.flow": "Flow",
@@ -456,6 +455,7 @@
   "ui.text.liveOnline": "Live",
   "ui.text.liveReconnecting": "Reconnecting",
   "ui.text.loading": "Loading",
+  "ui.text.lockCanvas": "Lock canvas",
   "ui.text.locked": "Locked",
   "ui.text.logOut": "Log out",
   "ui.text.magic_link_consume_failed": "Failed to sign you in with this magic link. It may have expired.",
@@ -860,6 +860,7 @@
   "ui.text.uiKey": "UI Key",
   "ui.text.undoCancellation": "Undo Cancellation",
   "ui.text.unknown": "Unknown",
+  "ui.text.unlockCanvas": "Unlock canvas",
   "ui.text.unpin": "Unpin",
   "ui.text.unsavedChanges": "Unsaved Changes",
   "ui.text.unsavedChangesDescription": "You have unsaved changes. Are you sure you want to leave?",
@@ -944,5 +945,7 @@
   "ui.text.yearly": "Annually",
   "ui.text.yes": "Yes",
   "ui.text.yesCancel": "Yes, Cancel",
-  "ui.text.yesRestore": "Yes, Restore"
+  "ui.text.yesRestore": "Yes, Restore",
+  "ui.text.zoomIn": "Zoom in",
+  "ui.text.zoomOut": "Zoom out"
 }

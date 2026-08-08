@@ -14,6 +14,7 @@ func NewGoogleSheetsAddDataToSpreadsheetNode(nodeID string) *GoogleSheetsAddData
 	return &GoogleSheetsAddDataToSpreadsheetNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Name:        "Google Sheets Add Data to Spreadsheet",
 			Version:     "0.0.1",
 			Description: "Append rows of data to a Google Sheets spreadsheet.",

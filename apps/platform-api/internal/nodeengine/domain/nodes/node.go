@@ -6,6 +6,7 @@ import (
 
 type Node struct {
 	ID                   string          `json:"id,omitempty"`
+	Kind                 NodeKind        `json:"kind"`
 	Version              string          `json:"version,omitempty"`
 	Name                 string          `json:"name,omitempty"`
 	Description          string          `json:"description,omitempty"`
@@ -25,6 +26,7 @@ type Node struct {
 
 type NodeManager interface {
 	GetID() string
+	GetKind() NodeKind
 	GetVersion() string
 	GetName() string
 	GetDescription() string
@@ -46,6 +48,10 @@ type NodeManager interface {
 
 func (n *Node) GetID() string {
 	return n.ID
+}
+
+func (n *Node) GetKind() NodeKind {
+	return n.Kind
 }
 
 func (n *Node) GetVersion() string {

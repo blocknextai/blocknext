@@ -14,6 +14,7 @@ func NewGoogleKeepListNotesNode(nodeID string) *GoogleKeepListNotesNode {
 	return &GoogleKeepListNotesNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Keep List Notes",
 			Description: "List notes from Google Keep with optional filtering and pagination.",

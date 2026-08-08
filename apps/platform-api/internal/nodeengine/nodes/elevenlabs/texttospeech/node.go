@@ -14,6 +14,7 @@ func NewElevenlabsTextToSpeechNode(nodeID string) *ElevenlabsTextToSpeechNode {
 	return &ElevenlabsTextToSpeechNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "ElevenLabs Text To Speech",
 			Description: "Convert text to speech using ElevenLabs.",

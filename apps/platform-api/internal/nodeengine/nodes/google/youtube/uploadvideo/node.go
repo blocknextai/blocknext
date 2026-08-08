@@ -14,6 +14,7 @@ func NewYouTubeUploadVideoNode(nodeID string) *YouTubeUploadVideoNode {
 	return &YouTubeUploadVideoNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "YouTube Upload Video",
 			Description: "Upload a video file to YouTube with the given metadata and privacy setting.",

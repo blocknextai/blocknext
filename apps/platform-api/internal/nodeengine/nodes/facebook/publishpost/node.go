@@ -13,6 +13,7 @@ func NewFacebookPublishPostNode(nodeID string) *FacebookPublishPostNode {
 	return &FacebookPublishPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Facebook Publish Post",
 			Description: "Publish a text post to a Facebook page.",

@@ -14,6 +14,7 @@ func NewDeepseekChatNode(nodeID string) *DeepseekChatNode {
 	return &DeepseekChatNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "DeepSeek Chat",
 			Description: "Generate a chat completion using DeepSeek.",

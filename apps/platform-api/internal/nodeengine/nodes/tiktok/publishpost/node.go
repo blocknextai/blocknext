@@ -13,6 +13,7 @@ func NewTiktokPublishPostNode(nodeID string) *TiktokPublishPostNode {
 	return &TiktokPublishPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "TikTok Publish Post",
 			Description: "Publish a video post to a TikTok account.",

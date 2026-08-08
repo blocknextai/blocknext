@@ -13,6 +13,7 @@ func NewSlackSendMessageNode(nodeID string) *SlackSendMessageNode {
 	return &SlackSendMessageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Slack Send Message",
 			Description: "Send a text message to a Slack channel.",

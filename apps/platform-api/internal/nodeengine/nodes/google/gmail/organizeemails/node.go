@@ -13,6 +13,7 @@ func NewGmailOrganizeEmailsNode(nodeID string) *GmailOrganizeEmailsNode {
 	return &GmailOrganizeEmailsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Gmail Organize Emails",
 			Description: "Organize Gmail messages by applying labels, stars, categories, read state, or trash actions to messages matching a search query.",

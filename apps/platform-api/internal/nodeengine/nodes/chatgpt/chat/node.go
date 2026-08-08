@@ -14,6 +14,7 @@ func NewChatgptChatNode(nodeID string) *ChatgptChatNode {
 	return &ChatgptChatNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "ChatGPT Chat",
 			Description: "Generate a chat completion using OpenAI ChatGPT.",

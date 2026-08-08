@@ -13,6 +13,7 @@ func NewTelegramSendMessageNode(nodeID string) *TelegramSendMessageNode {
 	return &TelegramSendMessageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Telegram Send Message",
 			Description: "Send a text message to a Telegram chat.",

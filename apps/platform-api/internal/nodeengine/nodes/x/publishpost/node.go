@@ -14,6 +14,7 @@ func NewXPublishPostNode(nodeID string) *XPublishPostNode {
 	return &XPublishPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "X Publish Post",
 			Description: "Publish a post to an X (Twitter) account.",

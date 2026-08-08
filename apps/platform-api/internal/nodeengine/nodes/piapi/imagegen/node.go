@@ -14,6 +14,7 @@ func NewPiAPIImageGenNode(nodeID string) *PiAPIImageGenNode {
 	return &PiAPIImageGenNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "PiAPI Image Generation",
 			Description: "Generate an image using PiAPI.",

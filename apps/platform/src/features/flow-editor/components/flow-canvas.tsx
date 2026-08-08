@@ -9,10 +9,11 @@ import WelcomeTour from '@/features/tour/components/welcome-tour'
 
 import {
   ReactFlow,
-  Controls,
   useNodesState,
   useEdgesState,
   addEdge,
+  useReactFlow,
+  useNodesInitialized,
   ReactFlowProvider,
   Background,
   BackgroundVariant,
@@ -40,6 +41,7 @@ import { FlowSaveDialog } from '@/features/flow-editor/components/flow-save-dial
 import { FlowNavigationGuard } from '@/features/flow-editor/components/flow-navigation-guard'
 import { FlowDragPreview } from '@/features/flow-editor/components/flow-drag-preview'
 import { NodeSettingsPanel } from '@/features/flow-editor/components/node-settings-panel'
+import { FlowViewControls } from '@/features/flow-editor/components/flow-view-controls'
 import { FlowApiSheet } from '@/features/flow-editor/components/flow-api-sheet'
 import { FlowNodesProvider } from '@/features/flow-editor/contexts/flow-nodes-context'
 
@@ -111,6 +113,9 @@ const FlowCanvas = ({
   const [nodes, setNodes] = useNodesState(initialFlow ? [] : defaultNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [selectedCategory, setSelectedCategory] = useState<any>(null)
+  const reactFlow = useReactFlow()
+  const [locked, setLocked] = useState(false)
+  const [framed, setFramed] = useState(!initialFlow?.nodes?.length)
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen)
   const [chatOpen, setChatOpen] = useState(defaultChatOpen)
   const [apiSheetOpen, setApiSheetOpen] = useState(false)
@@ -128,7 +133,6 @@ const FlowCanvas = ({
     updateFlowData,
     saveFlow,
     runFlow,
-    deleteLastSaved,
     preSave,
     hasUnsavedChanges,
     setHasUnsavedChanges,
@@ -138,8 +142,6 @@ const FlowCanvas = ({
     initialFlow,
     nodes,
     edges,
-    setNodes,
-    setEdges,
   })
 
   const {
@@ -152,14 +154,13 @@ const FlowCanvas = ({
     previewMode,
   })
 
-  const { dragging, previewPos, previewData, startDrag, annotationDrag } =
-    useFlowDrag({
-      apiNodes,
-      setNodes,
-      preSave,
-      getId,
-      nextStep: () => nextStepRef.current?.(),
-    })
+  const { dragging, previewPos, previewData, startDrag } = useFlowDrag({
+    apiNodes,
+    setNodes,
+    preSave,
+    getId,
+    nextStep: () => nextStepRef.current?.(),
+  })
 
   // Search handler
   const handleSearch = useCallback(
@@ -209,6 +210,8 @@ const FlowCanvas = ({
         icon: apiNode?.icon,
         inputs: apiNode?.inputs,
         outputs: apiNode?.outputs,
+        handleLayout: node.handleLayout,
+        note: node.parameters?.note,
       }
     },
     [apiNodes],
@@ -298,6 +301,17 @@ const FlowCanvas = ({
     idRef.current = initialFlow?.nodes?.length || 1
   }, [])
 
+  const nodesInitialized = useNodesInitialized()
+  const framedRef = useRef(false)
+  useEffect(() => {
+    if (framedRef.current || !nodesInitialized || nodes.length === 0) {
+      return
+    }
+    framedRef.current = true
+    reactFlow.fitView({ padding: 0.2 })
+    setFramed(true)
+  }, [nodesInitialized, nodes.length, reactFlow])
+
   useEffect(() => {
     if (initialFlow) {
       setFunctions()
@@ -310,6 +324,28 @@ const FlowCanvas = ({
       current.map((n) => ({ ...n, data: { ...n.data, ...buildNodeData(n) } })),
     )
   }, [initialFlow, apiNodes])
+
+  const revertFlow = useCallback(() => {
+    if (initialFlow) {
+      setFunctions()
+    } else {
+      setNodes(
+        defaultNodes.map((n) => ({
+          ...n,
+          data: { ...n.data, ...buildNodeData(n) },
+        })),
+      )
+      setEdges([])
+    }
+    setHasUnsavedChanges(false)
+  }, [
+    initialFlow,
+    setFunctions,
+    setNodes,
+    setEdges,
+    buildNodeData,
+    setHasUnsavedChanges,
+  ])
 
   const applyGeneratedFlow = useCallback(
     (flow) => {
@@ -454,6 +490,10 @@ const FlowCanvas = ({
           className={`w-full h-full`}
           panOnScroll
           selectionOnDrag
+          style={{ opacity: framed ? 1 : 0 }}
+          nodesDraggable={!locked}
+          nodesConnectable={!locked}
+          elementsSelectable={!locked}
         >
           <EdgeGradients nodes={nodes} edges={edges} />
           <Background
@@ -471,15 +511,21 @@ const FlowCanvas = ({
             apiNodes={apiNodes}
             dragging={dragging}
             startDrag={startDrag}
-            annotationDrag={annotationDrag}
             handleSearch={handleSearch}
             chatOpen={chatOpen}
             setChatOpen={handleSetChatOpen}
           />
           <FlowToolbar
+            viewControls={
+              <FlowViewControls
+                locked={locked}
+                setLocked={setLocked}
+                previewMode={previewMode}
+              />
+            }
             previewMode={previewMode}
             hasUnsavedChanges={hasUnsavedChanges}
-            deleteLastSaved={deleteLastSaved}
+            deleteLastSaved={revertFlow}
             runFlow={runFlow}
             setOpen={setOpen}
             openApiSheet={
@@ -501,7 +547,6 @@ const FlowCanvas = ({
               nextStep={nextStepInit}
             />
           )}
-          <Controls showInteractive={true} />
         </ReactFlow>
 
         <FlowSaveDialog

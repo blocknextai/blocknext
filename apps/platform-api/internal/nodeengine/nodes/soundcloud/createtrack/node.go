@@ -13,6 +13,7 @@ func NewSoundCloudCreateTrackNode(nodeID string) *SoundCloudCreateTrackNode {
 	return &SoundCloudCreateTrackNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "SoundCloud Create Track",
 			Description: "Upload a new track to SoundCloud.",

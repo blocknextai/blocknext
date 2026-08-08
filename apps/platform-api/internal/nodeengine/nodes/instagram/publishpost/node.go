@@ -13,6 +13,7 @@ func NewInstagramPublishPostNode(nodeID string) *InstagramPublishPostNode {
 	return &InstagramPublishPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Instagram Publish Post",
 			Description: "Publish a post to an Instagram account.",

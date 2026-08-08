@@ -5,6 +5,7 @@ import (
 	"github.com/blocknextai/platform-api/internal/nodeengine/domain/executors"
 	"github.com/blocknextai/platform-api/internal/nodeengine/domain/mcp"
 	"github.com/blocknextai/platform-api/internal/nodeengine/domain/nodes"
+	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/system/annotation"
 	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/system/condition"
 	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/system/sleep"
 	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/system/starter"
@@ -35,6 +36,11 @@ func Register() {
 
 	nodes.RegisterNode(starterNode)
 	executors.RegisterExecutor(starterExecutor)
+
+	annotationNodeID := nodeID + "_annotation"
+	annotationNode := annotation.NewAnnotationNode(annotationNodeID)
+
+	nodes.RegisterNode(annotationNode)
 
 	mcp.RegisterServer(&mcp.Server{
 		ID:          nodeID,

@@ -14,6 +14,7 @@ func NewGoogleKeepGetNoteNode(nodeID string) *GoogleKeepGetNoteNode {
 	return &GoogleKeepGetNoteNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Keep Get Note",
 			Description: "Get a single note from Google Keep by its resource name.",

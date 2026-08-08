@@ -13,6 +13,7 @@ func NewWhatsAppSendMediaNode(nodeID string) *WhatsAppSendMediaNode {
 	return &WhatsAppSendMediaNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "WhatsApp Send Media",
 			Description: "Send a media message via WhatsApp.",
