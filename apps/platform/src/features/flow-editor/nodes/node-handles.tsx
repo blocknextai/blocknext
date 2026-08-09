@@ -13,6 +13,7 @@ type NodeHandlesProps = {
   type: 'source' | 'target'
   position: Position
   tooltip: string
+  color?: string
 }
 
 // Labels sit outside the node so they never cover its content.
@@ -28,6 +29,7 @@ const NodeHandles = ({
   type,
   position,
   tooltip,
+  color,
 }: NodeHandlesProps) => {
   const isVertical = position === 'left' || position === 'right'
 
@@ -45,7 +47,7 @@ const NodeHandles = ({
               id={handle.key}
               type={type}
               position={position}
-              style={placement}
+              style={{ ...placement, color }}
               className="border-ring hover:shadow-md"
             />
           </TooltipTrigger>
@@ -57,7 +59,7 @@ const NodeHandles = ({
           <span
             aria-hidden
             className={cn(
-              'text-muted-foreground pointer-events-none absolute text-[10px] whitespace-nowrap',
+              'bg-background ring-border pointer-events-none absolute rounded px-1 py-px text-[10px] leading-tight whitespace-nowrap ring-1',
               LABEL_SIDE[position],
             )}
             style={placement}

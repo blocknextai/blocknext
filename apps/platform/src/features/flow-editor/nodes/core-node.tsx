@@ -244,6 +244,7 @@ const CoreNode = memo(({ selected, data }) => {
                 type="target"
                 position={LAYOUT[handleLayout][0]}
                 tooltip={t('ui.text.dataEntry')}
+                color={prefs?.color}
               />
 
               <Card className="items-start bg-transparent py-2! shadow-none border-none">
@@ -273,6 +274,7 @@ const CoreNode = memo(({ selected, data }) => {
                 position={LAYOUT[handleLayout][1]}
 
                 tooltip={t('ui.text.dataOutput')}
+                color={prefs?.color}
               />
             </div>
           </div>
