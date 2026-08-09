@@ -6,7 +6,7 @@ It is built for end users, not just developers: flows stay simple, readable and 
 
 ## Highlights
 
-- **Visual flow builder** — compose workflows on an intuitive drag-and-drop canvas. Flows are deliberately simple: no loops, no sub-workflows, no expression language to learn.
+- **Visual flow builder** — compose workflows on an intuitive drag-and-drop canvas. Nodes take arrays in and return arrays out, so a node fed ten items runs ten times and emits ten results — batch work needs no loop construct. What is missing is deliberate: no `while`/`for` on the canvas, no sub-workflows, no expression language to learn.
 - **Describe it, don't configure it** — give a node plain-language instructions and an LLM fills in its parameters at run time. Anything you set explicitly always wins over what the model infers. This one and flow generation are the only features that need a key of your own (Gemini); both are off by default. Everything else — the canvas, triggers, the MCP server, every integration node — works on a fresh install.
 - **Built-in MCP server** — every integration node doubles as an [MCP](https://modelcontextprotocol.io) tool. Point Claude (or any MCP client) at your BlockNext server with an API key and use your connected services from chat.
 - **AI-powered nodes** — LLMs and generative AI (text, image, audio, video) as first-class building blocks, alongside integrations for the tools you already use.

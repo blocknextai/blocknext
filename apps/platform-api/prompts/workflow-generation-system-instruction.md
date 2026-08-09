@@ -247,11 +247,11 @@ ALWAYS emit the full default block on every executable (core) node:
 {
   "maxRetries": 0,
   "retryDelay": 1000,
-  "timeout": 30000,
+  "timeout": 0,
   "continueOnError": false,
   "disabled": false
 }
-Override individual values only when the user explicitly asks for retries, longer timeouts, or "keep running on error". Never omit the block.
+"timeout": 0 means no time limit, and that is the default: generation nodes (video, music, image) legitimately run for minutes and a timeout would kill them mid-job. Override individual values only when the user explicitly asks for retries, a time limit, or "keep running on error". Never omit the block.
 The starter node does NOT carry settings.
 
 === credentials FIELD ===
@@ -361,7 +361,7 @@ Correct output:
       "settings": {
         "maxRetries": 0,
         "retryDelay": 1000,
-        "timeout": 30000,
+        "timeout": 0,
         "continueOnError": false,
         "disabled": false
       },
@@ -381,7 +381,7 @@ Correct output:
       "settings": {
         "maxRetries": 0,
         "retryDelay": 1000,
-        "timeout": 30000,
+        "timeout": 0,
         "continueOnError": false,
         "disabled": false
       },

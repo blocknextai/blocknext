@@ -22,7 +22,7 @@ import type {
 const DEFAULT_SETTINGS: NodeSettings = {
   maxRetries: 0,
   retryDelay: 1000,
-  timeout: 30000,
+  timeout: 0,
   continueOnError: false,
   disabled: false,
 }
