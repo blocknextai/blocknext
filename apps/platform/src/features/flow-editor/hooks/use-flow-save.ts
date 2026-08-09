@@ -6,8 +6,6 @@ import type {
   FlowEdge,
   FlowModel,
   FlowNode,
-  SetFlowEdges,
-  SetFlowNodes,
 } from '@/features/flow-editor/types'
 
 interface FlowData {
@@ -19,17 +17,9 @@ interface UseFlowSaveOptions {
   initialFlow: FlowModel | null
   nodes: FlowNode[]
   edges: FlowEdge[]
-  setNodes: SetFlowNodes
-  setEdges: SetFlowEdges
 }
 
-export function useFlowSave({
-  initialFlow,
-  nodes,
-  edges,
-  setNodes,
-  setEdges,
-}: UseFlowSaveOptions) {
+export function useFlowSave({ initialFlow, nodes, edges }: UseFlowSaveOptions) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { organizationId } = useParams()
@@ -90,7 +80,14 @@ export function useFlowSave({
   }
 
   const stripNodesForSave = (nodeList: FlowNode[]) =>
-    nodeList.map(({ data: _data, ...rest }) => rest)
+    nodeList.map(({ data, ...node }) => ({
+      ...node,
+      handleLayout: data?.handleLayout,
+      parameters:
+        data?.note === undefined
+          ? node.parameters
+          : { ...node.parameters, note: data.note },
+    }))
 
   const createOrUpdateFlow = async () => {
     if (autosaveTimeoutRef.current) {
@@ -141,11 +138,6 @@ export function useFlowSave({
     }
   }
 
-  const deleteLastSaved = () => {
-    setNodes(initialFlow?.nodes || [])
-    setEdges(initialFlow?.edges || [])
-  }
-
   useEffect(() => {
     return () => {
       if (autosaveTimeoutRef.current) {
@@ -159,7 +151,6 @@ export function useFlowSave({
     updateFlowData,
     saveFlow,
     runFlow,
-    deleteLastSaved,
     preSave,
     hasUnsavedChanges,
     setHasUnsavedChanges,

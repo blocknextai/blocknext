@@ -14,6 +14,7 @@ func NewPiAPIAudioGenNode(nodeID string) *PiAPIAudioGenNode {
 	return &PiAPIAudioGenNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "PiAPI Audio Generation",
 			Description: "Generate audio using PiAPI.",

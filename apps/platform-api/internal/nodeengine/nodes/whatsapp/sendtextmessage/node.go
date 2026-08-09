@@ -13,6 +13,7 @@ func NewWhatsAppSendTextMessageNode(nodeID string) *WhatsAppSendTextMessageNode 
 	return &WhatsAppSendTextMessageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "WhatsApp Send Text Message",
 			Description: "Send a text message via WhatsApp.",

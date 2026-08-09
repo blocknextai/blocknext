@@ -14,6 +14,7 @@ func NewPiAPIVideoGenNode(nodeID string) *PiAPIVideoGenNode {
 	return &PiAPIVideoGenNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "PiAPI Video Generation",
 			Description: "Generate a video using PiAPI.",

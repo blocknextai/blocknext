@@ -14,6 +14,7 @@ func NewGoogleDriveCreateFolderNode(nodeID string) *GoogleDriveCreateFolderNode 
 	return &GoogleDriveCreateFolderNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Drive Create Folder",
 			Description: "Create a new folder in Google Drive.",

@@ -13,6 +13,7 @@ func NewSunoMusicCreateLyricsNode(nodeID string) *SunoMusicCreateLyricsNode {
 	return &SunoMusicCreateLyricsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Suno Create Lyrics",
 			Description: "Generate song lyrics using Suno.",

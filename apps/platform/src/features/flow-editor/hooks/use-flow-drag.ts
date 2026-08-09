@@ -16,6 +16,7 @@ interface PreviewPos {
 
 interface DragItem {
   id: string
+  kind?: string
   name: string
   description: string
   category: string
@@ -74,6 +75,26 @@ export function useFlowDrag({
       x: e.clientX + 100,
       y: e.clientY,
     })
+
+    if (dragData.current.kind === 'note') {
+      const noteNode = {
+        id,
+        data: {
+          id,
+          note: '',
+          category: dragData.current.category,
+        },
+        parameters: {},
+        nodeId: dragData.current.id,
+        type: 'annotation',
+        position,
+      }
+      setNodes((nds: FlowNode[]) =>
+        preSave(nds.concat(noteNode as FlowNode), true),
+      )
+      return
+    }
+
     const newNode = {
       id,
       data: {
@@ -97,46 +118,6 @@ export function useFlowDrag({
       preSave(nds.concat(newNode as FlowNode), true),
     )
     nextStep()
-  }
-
-  const onMouseUpAnnotation = (e: MouseEvent) => {
-    setDragging(false)
-    setPreviewData(null)
-
-    const id = getId()
-
-    const pane = document.querySelector(
-      '.react-flow__pane.draggable',
-    ) as HTMLElement
-    if (pane) {
-      pane.style.cursor = 'grab'
-    }
-
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUpAnnotation)
-
-    if (!dragData.current) {
-      return
-    }
-
-    const position = screenToFlowPosition({
-      x: e.clientX + 100,
-      y: e.clientY,
-    })
-
-    const newNode = {
-      id,
-      type: 'annotation',
-      position,
-      data: {
-        note: '',
-        category: 'system',
-      },
-    }
-
-    setNodes((nds: FlowNode[]) =>
-      preSave(nds.concat(newNode as FlowNode), true),
-    )
   }
 
   const startDrag = (e: React.MouseEvent, id: string) => {
@@ -163,36 +144,10 @@ export function useFlowDrag({
     document.addEventListener('mouseup', onMouseUp)
   }
 
-  const annotationDrag = (e: React.MouseEvent) => {
-    e.preventDefault()
-
-    const item = {
-      id: 'annotation',
-      name: 'ui.text.annotationNode',
-      description: '',
-      category: 'system',
-    }
-    setDragging(true)
-    dragData.current = item
-    setPreviewData(item)
-    setPreviewPos({ x: e.clientX, y: e.clientY })
-
-    const pane = document.querySelector(
-      '.react-flow__pane.draggable',
-    ) as HTMLElement
-    if (pane) {
-      pane.style.cursor = 'grabbing'
-    }
-
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUpAnnotation)
-  }
-
   return {
     dragging,
     previewPos,
     previewData,
     startDrag,
-    annotationDrag,
   }
 }

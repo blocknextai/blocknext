@@ -13,6 +13,7 @@ func NewNotionUpdatePageNode(nodeID string) *NotionUpdatePageNode {
 	return &NotionUpdatePageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Notion Update Page",
 			Description: "Update an existing page in a Notion workspace.",

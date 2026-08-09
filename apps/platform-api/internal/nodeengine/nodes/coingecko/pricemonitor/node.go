@@ -14,6 +14,7 @@ func NewCoingeckoPriceMonitorNode(nodeID string) *CoingeckoPriceMonitorNode {
 	return &CoingeckoPriceMonitorNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Coingecko Price Monitor",
 			Description: "Monitor cryptocurrency prices via CoinGecko.",

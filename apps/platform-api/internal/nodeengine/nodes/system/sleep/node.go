@@ -14,6 +14,7 @@ func NewSleepNode(nodeID string) *SleepNode {
 	return &SleepNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Sleep",
 			Description: "Pause the workflow for a specified duration.",

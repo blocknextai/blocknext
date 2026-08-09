@@ -13,6 +13,7 @@ func NewGoogleDriveGetFileNode(nodeID string) *GoogleDriveGetFileNode {
 	return &GoogleDriveGetFileNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Drive Get File",
 			Description: "Retrieve a file from Google Drive along with its metadata.",

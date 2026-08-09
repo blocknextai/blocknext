@@ -13,6 +13,7 @@ func NewSlackSendMediaNode(nodeID string) *SlackSendMediaNode {
 	return &SlackSendMediaNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Slack Send Media",
 			Description: "Send a media file to a Slack channel.",

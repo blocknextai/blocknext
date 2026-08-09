@@ -51,7 +51,7 @@ const CoreNode = memo(({ selected, data }) => {
   const setEdges = useFlowSetEdges()
   const [nameOpen, setNameOpen] = useState(false)
   const [name, setName] = useState(data?.title ?? '')
-  const [position, setPosition] = useState(data?.position || 'l-r')
+  const [handleLayout, setHandleLayout] = useState(data?.handleLayout || 't-b')
   const { t } = useTranslation()
   const resolveIcon = useIconResolver()
   const { prefs, Icon } = useMemo(() => {
@@ -100,16 +100,16 @@ const CoreNode = memo(({ selected, data }) => {
     if (!data) {
       return
     }
-    if (!data.position || (data.position && data.position !== position)) {
-      updateField('position', position)
+    if (data.handleLayout !== handleLayout) {
+      updateField('handleLayout', handleLayout)
     }
-  }, [position])
+  }, [handleLayout])
   useEffect(() => {
     if (!data?.id) {
       return
     }
     updateNodeInternals(data.id)
-  }, [position, updateNodeInternals, data?.id])
+  }, [handleLayout, updateNodeInternals, data?.id])
 
   useEffect(() => {
     if (data?.title !== undefined && data.title !== name) {
@@ -124,21 +124,21 @@ const CoreNode = memo(({ selected, data }) => {
           <ContextMenuSubContent className="w-44">
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('l-r')}
+              onClick={() => setHandleLayout('l-r')}
             >
               {' '}
               <directionIcons.lr className="size-4" /> {t('ui.text.right')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('l-t')}
+              onClick={() => setHandleLayout('l-t')}
             >
               {' '}
               <directionIcons.lt className="size-4" /> {t('ui.text.top')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('l-b')}
+              onClick={() => setHandleLayout('l-b')}
             >
               {' '}
               <directionIcons.lb className="size-4" />{' '}
@@ -151,14 +151,14 @@ const CoreNode = memo(({ selected, data }) => {
           <ContextMenuSubContent className="w-44">
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('t-l')}
+              onClick={() => setHandleLayout('t-l')}
             >
               {' '}
               <directionIcons.tl className="size-4" /> {t('ui.text.left')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('t-b')}
+              onClick={() => setHandleLayout('t-b')}
             >
               {' '}
               <directionIcons.tb className="size-4" />{' '}
@@ -166,7 +166,7 @@ const CoreNode = memo(({ selected, data }) => {
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('t-r')}
+              onClick={() => setHandleLayout('t-r')}
             >
               {' '}
               <directionIcons.tr className="size-4" /> {t('ui.text.right')}{' '}
@@ -178,21 +178,21 @@ const CoreNode = memo(({ selected, data }) => {
           <ContextMenuSubContent className="w-44">
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('b-l')}
+              onClick={() => setHandleLayout('b-l')}
             >
               {' '}
               <directionIcons.bl className="size-4" /> {t('ui.text.left')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('b-t')}
+              onClick={() => setHandleLayout('b-t')}
             >
               {' '}
               <directionIcons.bt className="size-4" /> {t('ui.text.top')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('b-r')}
+              onClick={() => setHandleLayout('b-r')}
             >
               {' '}
               <directionIcons.br className="size-4" /> {t('ui.text.right')}{' '}
@@ -204,21 +204,21 @@ const CoreNode = memo(({ selected, data }) => {
           <ContextMenuSubContent className="w-44">
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('r-l')}
+              onClick={() => setHandleLayout('r-l')}
             >
               {' '}
               <directionIcons.rl className="size-4" /> {t('ui.text.left')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('r-t')}
+              onClick={() => setHandleLayout('r-t')}
             >
               {' '}
               <directionIcons.rt className="size-4" /> {t('ui.text.top')}{' '}
             </ContextMenuItem>
             <ContextMenuItem
               className="gap-2"
-              onClick={() => setPosition('r-b')}
+              onClick={() => setHandleLayout('r-b')}
             >
               {' '}
               <directionIcons.rb className="size-4" />{' '}
@@ -228,7 +228,7 @@ const CoreNode = memo(({ selected, data }) => {
         </ContextMenuSub>
       </>
     )
-  }, [position, updateField, t])
+  }, [handleLayout, updateField, t])
   return (
     <>
       <ContextMenu>
@@ -242,7 +242,7 @@ const CoreNode = memo(({ selected, data }) => {
               <NodeHandles
                 handles={data?.inputs ?? []}
                 type="target"
-                position={LAYOUT[position][0]}
+                position={LAYOUT[handleLayout][0]}
                 tooltip={t('ui.text.dataEntry')}
               />
 
@@ -270,7 +270,7 @@ const CoreNode = memo(({ selected, data }) => {
 
                 type="source"
 
-                position={LAYOUT[position][1]}
+                position={LAYOUT[handleLayout][1]}
 
                 tooltip={t('ui.text.dataOutput')}
               />

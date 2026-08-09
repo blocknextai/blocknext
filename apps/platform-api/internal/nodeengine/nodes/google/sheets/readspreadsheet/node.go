@@ -14,6 +14,7 @@ func NewGoogleSheetsReadSpreadsheetNode(nodeID string) *GoogleSheetsReadSpreadsh
 	return &GoogleSheetsReadSpreadsheetNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Sheets Read Spreadsheet",
 			Description: "Read rows from a Google Sheets spreadsheet, optionally filtering and limiting results.",

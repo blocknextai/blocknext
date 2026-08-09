@@ -14,6 +14,7 @@ func NewVeoNode(nodeID string) *VeoNode {
 	return &VeoNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Veo",
 			Description: "Generate a video from a text prompt using Veo.",

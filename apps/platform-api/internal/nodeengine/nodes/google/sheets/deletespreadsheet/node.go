@@ -13,6 +13,7 @@ func NewGoogleSheetsDeleteSpreadsheetNode(nodeID string) *GoogleSheetsDeleteSpre
 	return &GoogleSheetsDeleteSpreadsheetNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Sheets Delete Spreadsheet",
 			Description: "Delete a Google Sheets spreadsheet by its identifier.",

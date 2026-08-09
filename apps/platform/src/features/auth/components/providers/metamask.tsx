@@ -3,14 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import tokenManager from '@/lib/token-manager'
 import { ProviderIcon } from '@/features/auth/components/provider-icon'
-import { config } from '@/lib/config'
 
 const MetaMaskLoginButton = ({ mode = 'login', authActions }) => {
   const { t } = useTranslation()
-
-  if (!config.web3LoginEnabled) {
-    return null
-  }
 
   const isInstalled = typeof window.ethereum !== 'undefined'
 

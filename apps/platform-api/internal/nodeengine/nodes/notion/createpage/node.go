@@ -13,6 +13,7 @@ func NewNotionCreatePageNode(nodeID string) *NotionCreatePageNode {
 	return &NotionCreatePageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Notion Create Page",
 			Description: "Create a new page in a Notion workspace.",

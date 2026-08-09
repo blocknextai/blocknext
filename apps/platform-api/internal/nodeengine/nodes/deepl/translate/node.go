@@ -14,6 +14,7 @@ func NewDeeplTranslateNode(nodeID string) *DeeplTranslateNode {
 	return &DeeplTranslateNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "DeepL Translate",
 			Description: "Translate text using DeepL.",

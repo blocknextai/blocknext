@@ -13,6 +13,7 @@ func NewFacebookPublishMediaPostNode(nodeID string) *FacebookPublishMediaPostNod
 	return &FacebookPublishMediaPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Facebook Publish Media Post",
 			Description: "Publish a post with media to a Facebook page.",

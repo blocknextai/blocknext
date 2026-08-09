@@ -14,6 +14,7 @@ func NewAirtableListRecordsNode(nodeID string) *AirtableListRecordsNode {
 	return &AirtableListRecordsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Airtable List Records",
 			Description: "List records from an Airtable base.",

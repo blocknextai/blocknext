@@ -5,7 +5,6 @@ import {
   Search,
   SearchX,
   Sparkles,
-  StickyNote,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,7 +23,6 @@ const FlowSidebar = ({
   providerList,
   dragging,
   startDrag,
-  annotationDrag,
   handleSearch,
   setChatOpen,
 }) => {
@@ -80,31 +78,9 @@ const FlowSidebar = ({
     )
   }
 
-  const renderAnnotationCard = () => {
-    return (
-      <div
-        key="annotation-node"
-        className={`bg-card border-border hover:bg-accent flex w-full items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        onMouseDown={annotationDrag}
-        role="button"
-        tabIndex={0}
-        aria-label={t('ui.text.annotationNode')}
-      >
-        <StickyNote className="size-5 shrink-0" aria-hidden="true" />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-sm">{t('ui.text.annotationNode')}</span>
-          <span className="text-xs text-muted-foreground">
-            {t('ui.text.addAnnotationToFlow')}
-          </span>
-        </div>
-      </div>
-    )
-  }
-
   const renderNodeList = () => {
     if (selectedCategory) {
       const items = selectedCategory.nodes ?? []
-      const hasSystem = items.some((node: any) => node.type === 'system')
 
       if (items.length === 0) {
         return (
@@ -129,7 +105,6 @@ const FlowSidebar = ({
       return (
         <li className="flex flex-1 flex-col gap-2 p-4" data-tour="node-list">
           {items.map((item: any, j: number) => renderNodeCard(item, j))}
-          {hasSystem && renderAnnotationCard()}
         </li>
       )
     }

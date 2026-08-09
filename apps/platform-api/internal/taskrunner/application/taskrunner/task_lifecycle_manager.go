@@ -7,6 +7,7 @@ import (
 
 	executionsApplicationNodeExecutions "github.com/blocknextai/platform-api/internal/executions/application/nodeexecutions"
 	executionsApplicationTaskexecutions "github.com/blocknextai/platform-api/internal/executions/application/taskexecutions"
+	nodeEngineDomainExecutors "github.com/blocknextai/platform-api/internal/nodeengine/domain/executors"
 	taskRunnerDomain "github.com/blocknextai/platform-api/internal/taskrunner/domain"
 	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
 	taskRunnerDomainTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/domain/taskrunner"
@@ -185,6 +186,10 @@ func (m *taskLifecycleManager) CreateNodeExecutions(ctx context.Context, task *t
 	utcNow := time.Now().UTC()
 	for _, node := range allNodes {
 		if _, exists := task.NodeExecutionIDMap[node.ID]; exists {
+			continue
+		}
+
+		if _, runnable := nodeEngineDomainExecutors.GetExecutor(node.NodeID); !runnable {
 			continue
 		}
 

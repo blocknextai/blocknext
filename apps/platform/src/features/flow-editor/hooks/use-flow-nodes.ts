@@ -176,6 +176,7 @@ export function useNodeEngineNodes() {
     () =>
       (data ?? []).map((item) => ({
         id: item.id ?? '',
+        kind: item.kind,
         name: item.name ?? '',
         description: item.description ?? '',
         icon: item.icon,

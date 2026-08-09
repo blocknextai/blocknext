@@ -13,6 +13,7 @@ func NewStarterNode(nodeID string) *StarterNode {
 	return &StarterNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Starter",
 			Description: "Entry point that starts the workflow execution.",

@@ -13,6 +13,7 @@ func NewGoogleDocsCreateOrUpdateNode(nodeID string) *GoogleDocsCreateOrUpdateNod
 	return &GoogleDocsCreateOrUpdateNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Docs Create or Update",
 			Description: "Create a new Google Docs document or update an existing one with the provided content.",

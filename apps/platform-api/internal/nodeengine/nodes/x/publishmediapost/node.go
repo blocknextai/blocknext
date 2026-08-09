@@ -13,6 +13,7 @@ func NewXPublishMediaPostNode(nodeID string) *XPublishMediaPostNode {
 	return &XPublishMediaPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "X Publish Media Post",
 			Description: "Publish a post with media to an X (Twitter) account.",

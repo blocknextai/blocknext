@@ -14,6 +14,7 @@ func NewGoogleKeepCreateNoteNode(nodeID string) *GoogleKeepCreateNoteNode {
 	return &GoogleKeepCreateNoteNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Keep Create Note",
 			Description: "Create a new note in Google Keep.",

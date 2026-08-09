@@ -14,6 +14,7 @@ func NewLinkedinPublishPostNode(nodeID string) *LinkedinPublishPostNode {
 	return &LinkedinPublishPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "LinkedIn Publish Post",
 			Description: "Publish a post to a LinkedIn account.",

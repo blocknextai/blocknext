@@ -13,6 +13,7 @@ func NewDiscordSendMediaNode(nodeID string) *DiscordSendMediaNode {
 	return &DiscordSendMediaNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Discord Send Media",
 			Description: "Send a media file to a Discord channel.",

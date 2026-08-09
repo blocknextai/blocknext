@@ -14,6 +14,7 @@ func NewNotionSearchPagesNode(nodeID string) *NotionSearchPagesNode {
 	return &NotionSearchPagesNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Notion Search Pages",
 			Description: "Search for pages in a Notion workspace.",

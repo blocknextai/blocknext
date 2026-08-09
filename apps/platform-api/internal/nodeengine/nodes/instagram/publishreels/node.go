@@ -14,6 +14,7 @@ func NewInstagramPublishReelsNode(nodeID string) *InstagramPublishReelsNode {
 	return &InstagramPublishReelsNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Instagram Publish Reels",
 			Description: "Publish a Reel to an Instagram account.",

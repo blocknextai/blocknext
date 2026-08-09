@@ -49,7 +49,7 @@ services:
     restart: "no"
 
   platform-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -63,7 +63,7 @@ services:
       - "${PLATFORM_API_PORT:-3000}:${PLATFORM_API_PORT:-3000}"
 
   mcp-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -77,7 +77,7 @@ services:
       - "${MCP_API_PORT:-3100}:${MCP_API_PORT:-3100}"
 
   webhook-api:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -91,7 +91,7 @@ services:
       - "${WEBHOOK_API_PORT:-3200}:${WEBHOOK_API_PORT:-3200}"
 
   task-worker:
-    restart: on-failure:10
+    restart: unless-stopped
     profiles:
       - task-runner-queue
     env_file:
@@ -105,7 +105,7 @@ services:
     image: ghcr.io/blocknextai/task-worker:${BLOCKNEXT_VERSION:-latest}
 
   event-relay-worker:
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     depends_on:
@@ -119,16 +119,18 @@ services:
   file-gateway-api:
     container_name: file-gateway-api
     image: ghcr.io/blocknextai/file-gateway-api:${BLOCKNEXT_VERSION:-latest}
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     ports:
       - "${FILE_GATEWAY_API_PORT:-3300}:${FILE_GATEWAY_API_PORT:-3300}"
+    volumes:
+      - uploads_data:/data/uploads
 
   platform:
     container_name: platform
     image: ghcr.io/blocknextai/platform:${BLOCKNEXT_VERSION:-latest}
-    restart: on-failure:10
+    restart: unless-stopped
     env_file:
       - .env
     ports:
@@ -137,3 +139,4 @@ services:
 volumes:
   db_data:
   task_queue_redis_data:
+  uploads_data:

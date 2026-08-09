@@ -14,6 +14,7 @@ func NewGoogleDriveCreateTextFileNode(nodeID string) *GoogleDriveCreateTextFileN
 	return &GoogleDriveCreateTextFileNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Drive Create Text File",
 			Description: "Create a plain text file in Google Drive.",

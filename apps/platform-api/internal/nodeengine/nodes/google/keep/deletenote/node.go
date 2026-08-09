@@ -13,6 +13,7 @@ func NewGoogleKeepDeleteNoteNode(nodeID string) *GoogleKeepDeleteNoteNode {
 	return &GoogleKeepDeleteNoteNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Keep Delete Note",
 			Description: "Delete a note from Google Keep. This removes the note immediately and cannot be undone.",

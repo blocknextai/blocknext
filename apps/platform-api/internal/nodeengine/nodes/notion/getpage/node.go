@@ -13,6 +13,7 @@ func NewNotionGetPageNode(nodeID string) *NotionGetPageNode {
 	return &NotionGetPageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Notion Get Page",
 			Description: "Retrieve a page from a Notion workspace.",

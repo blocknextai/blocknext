@@ -13,6 +13,7 @@ func NewGoogleSheetsUpdateNode(nodeID string) *GoogleSheetsUpdateNode {
 	return &GoogleSheetsUpdateNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Google Sheets Update Cell",
 			Description: "Update a single cell in a Google Sheets spreadsheet by row number and column.",

@@ -31,6 +31,7 @@ export interface NodeIcon {
 
 export interface NodeEngineNode {
   id?: string
+  kind?: string
   name?: string
   description?: string
   icon: NodeIcon
@@ -54,6 +55,7 @@ export type IconSource = { brand?: string; glyph?: string } | null | undefined
 
 export interface ResolvedNode {
   id: string
+  kind?: string
   name: string
   description: string
   icon: IconSource

@@ -13,6 +13,7 @@ func NewDiscordSendMessageNode(nodeID string) *DiscordSendMessageNode {
 	return &DiscordSendMessageNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Discord Send Message",
 			Description: "Send a text message to a Discord channel.",

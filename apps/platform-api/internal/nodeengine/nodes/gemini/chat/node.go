@@ -14,6 +14,7 @@ func NewGeminiChatNode(nodeID string) *GeminiChatNode {
 	return &GeminiChatNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Gemini Chat",
 			Description: "Generate a chat completion using Google Gemini.",

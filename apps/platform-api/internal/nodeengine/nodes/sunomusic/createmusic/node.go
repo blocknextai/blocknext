@@ -14,6 +14,7 @@ func NewSunoMusicCreateMusicNode(nodeID string) *SunoMusicCreateMusicNode {
 	return &SunoMusicCreateMusicNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Suno Create Music",
 			Description: "Generate a music track using Suno.",

@@ -14,6 +14,7 @@ func NewWhatsAppSendTemplateNode(nodeID string) *WhatsAppSendTemplateNode {
 	return &WhatsAppSendTemplateNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "WhatsApp Send Template",
 			Description: "Send a template message via WhatsApp.",

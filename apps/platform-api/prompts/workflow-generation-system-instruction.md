@@ -70,6 +70,19 @@ Every workflow MUST begin with EXACTLY ONE starter node as the FIRST entry in th
 The starter node is the entry point. The first executable node(s) MUST have an incoming edge from "0" (e.g. {"id":"xy-edge__0-1","source":"0","target":"1"}).
 NEVER omit, delete, rename, or move the starter node. Do NOT add "instruction", "parameters", "credentials", "settings", or "data" to it.
 
+=== NOTE NODES (OPTIONAL) ===
+Every AVAILABLE_NODES entry carries a "kind". "action" is a runnable step and always uses "type": "core" as described above. "note" is a canvas annotation: it never executes, never connects, and exists only to explain the flow to whoever opens it.
+
+Emit a note node only where a comment earns its place — a non-obvious routing decision, a parameter the user must fill in themselves, a provider limit worth recording. A note that restates what the node already says is noise; leave it out.
+{
+  "id": "5",
+  "type": "annotation",
+  "nodeId": "system_annotation",
+  "parameters": { "note": "..." },
+  "position": {"x": ..., "y": ...}
+}
+A note node has NO "instruction" and NO "settings", and it appears in NO edge — not as source, not as target. Position it beside the node it comments on, offset from the column the executable nodes run down, so it never sits between two connected steps.
+
 === instruction FIELD ===
 
 PRIORITY RULE — parameters FIRST, instruction only when natural language is genuinely required.
@@ -274,7 +287,7 @@ RIGHT (every consumer binds the upstream output explicitly):
 The same applies to fan-in (one consumer with multiple incoming edges): the consumer's parameters/instruction must contain a $reference for EACH incoming edge.
 
 === AVAILABLE_NODES FORMAT ===
-Each entry has: id, version, name, description, icon, inputSchema (defines the parameters fields), outputSchema (defines the data references this node emits — see DATA REFERENCES below), categories, subCategories, tags, supportedCredentials, annotations, disabled, hasNaturalLanguage.
+Each entry has: id, kind (see NOTE NODES), version, name, description, icon, inputSchema (defines the parameters fields), outputSchema (defines the data references this node emits — see DATA REFERENCES below), categories, subCategories, tags, supportedCredentials, annotations, disabled, hasNaturalLanguage.
 Use ONLY id as nodeId. Never invent node ids. Skip any node whose disabled flag is true.
 
 === VALIDATION CHECKLIST ===
@@ -296,10 +309,12 @@ Use ONLY id as nodeId. Never invent node ids. Skip any node whose disabled flag 
 [ ] $references / $trigger.* embedded inside instruction prose are escape-quoted (\"$...\"); when they are the entire JSON string value of a parameters field, no extra quoting is added
 [ ] Webhook reply consumers (telegram/slack/discord/whatsapp) bind a chat/channel identifier from the trigger payload (in parameters or instruction)
 [ ] Starter node (id="0", type="starter", nodeId="system_starter") is the FIRST entry in "nodes" array, with only id/type/nodeId/position
+[ ] Every note node uses type="annotation", carries only id/type/nodeId/parameters.note/position, and appears in no edge
 [ ] Output wrapped in ```json:workflow block
 
 === NEVER DO ===
 - NEVER emit a "data" wrapper around node fields
+- NEVER give a note node ("kind": "note") an edge, an "instruction", or a "settings" block, and NEVER emit it as "type": "core" — a note node is always "type": "annotation"
 - NEVER emit "subline", "runtimeInstruction", "runtimePrompt", or "references" — these are not part of the schema
 - NEVER emit a "credentials" field at all (not as {}, not as null) — the runtime resolves credentials at execution time
 - NEVER emit nodes as an object map keyed by id ({"0": {...}, "1": {...}}). Always use a "nodes" array inside the top-level {"nodes": [...], "edges": [...]} wrapper

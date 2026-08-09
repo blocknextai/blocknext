@@ -14,6 +14,7 @@ func NewGeminiImageGenerationNode(nodeID string) *GeminiImageGenerationNode {
 	return &GeminiImageGenerationNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Gemini Nano Banana",
 			Description: "Generate an image from a text prompt using Google Gemini Nano Banana.",

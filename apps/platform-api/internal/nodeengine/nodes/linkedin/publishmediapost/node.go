@@ -14,6 +14,7 @@ func NewLinkedinPublishMediaPostNode(nodeID string) *LinkedinPublishMediaPostNod
 	return &LinkedinPublishMediaPostNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "LinkedIn Publish Media Post",
 			Description: "Publish a post with media to a LinkedIn account.",

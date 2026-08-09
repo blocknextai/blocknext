@@ -14,6 +14,7 @@ func NewCoingeckoAirdropTrackerNode(nodeID string) *CoingeckoAirdropTrackerNode 
 	return &CoingeckoAirdropTrackerNode{
 		Node: nodes.Node{
 			ID:          nodeID,
+			Kind:        nodes.NodeKindAction,
 			Version:     "0.0.1",
 			Name:        "Coingecko Airdrop Tracker",
 			Description: "Track cryptocurrency airdrops via CoinGecko.",
