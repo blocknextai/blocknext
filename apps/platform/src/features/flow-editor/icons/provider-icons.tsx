@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import type { ReactNode } from 'react'
 
 import type { IconSource } from '@/features/flow-editor/types'
+import { Image } from '@/components/shared/image'
 import { cn } from '@/lib/utils'
 import { useThemeStore } from '@/stores/theme-store'
 
@@ -18,11 +19,10 @@ export type ProviderIconComponent = (props: IconProps) => ReactNode
 const builtIcons = new Map<string, ProviderIconComponent>()
 
 const artwork = (source: string, className?: string) => (
-  <img
+  <Image
     src={source}
     alt=""
     aria-hidden
-    loading="lazy"
     className={cn('size-4 object-contain', className)}
   />
 )

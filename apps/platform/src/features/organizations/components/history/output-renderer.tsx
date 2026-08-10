@@ -12,6 +12,7 @@ import {
   Copy,
   Table,
 } from 'lucide-react'
+import { Image } from '@/components/shared/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import toast from '@/lib/toast'
@@ -94,11 +95,10 @@ const TextOutput = ({ value }: { value: string }) => (
 const ImageOutput = ({ value }: { value: string }) => (
   <div className="rounded-lg overflow-hidden border">
     <a href={value} target="_blank" rel="noopener noreferrer">
-      <img
+      <Image
         src={value}
         alt={i18next.t('ui.text.dataOutput')}
         className="max-w-full max-h-80 object-contain bg-muted/30"
-        loading="lazy"
       />
     </a>
     <div className="flex items-center justify-between p-2 bg-muted/30 text-xs">

@@ -24,6 +24,7 @@ const AuthLayout = () => {
       <div className="flex min-h-app-screen flex-col bg-background">
         <div className="flex flex-1 md:flex">
           <Image
+            priority
             src={`/assets/images/${landingImg}`}
             alt={t('ui.text.platformPreview')}
             className="hidden w-1/2 object-cover md:block"
