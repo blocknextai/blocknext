@@ -26,6 +26,7 @@ const PlatformLogo = ({ width = 200, height = 40, className = '' }) => {
 
   return (
     <Image
+      priority
       src={`/assets/images/${logoName}`}
       alt={t('ui.text.platformLogo')}
       width={width}
