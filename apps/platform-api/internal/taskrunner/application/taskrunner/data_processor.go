@@ -1,6 +1,7 @@
 package taskrunner
 
 import (
+	"log/slog"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,17 +23,18 @@ var (
 	methodCallRegex  = regexp.MustCompile(`\$([\w.]+_[\w-]+)\.(first|last|get)\((\d*)\)\.([a-zA-Z0-9_.]+)`)
 	arrayAccessRegex = regexp.MustCompile(`\$([\w.]+_[\w-]+)(?:\[(\d+|\*)\])?\.([a-zA-Z0-9_.]+)`)
 	triggerVarRegex  = regexp.MustCompile(`\$trigger\.([\w.]+)`)
+	inputRegex       = regexp.MustCompile(`\$input\.([a-zA-Z0-9_.]+)`)
 )
 
-func (p *DataProcessor) ProcessNodeData(data map[string]any, itemIndex int, triggerData map[string]any) map[string]any {
+func (p *DataProcessor) ProcessNodeData(data map[string]any, itemIndex int, triggerData map[string]any, view *BranchView) map[string]any {
 	processed := make(map[string]any, len(data))
 
 	for k, v := range data {
 		switch value := v.(type) {
 		case string:
-			processed[k] = p.processStringValue(value, itemIndex, triggerData)
+			processed[k] = p.processStringValue(value, itemIndex, triggerData, view)
 		case map[string]any:
-			processed[k] = p.ProcessNodeData(value, itemIndex, triggerData)
+			processed[k] = p.ProcessNodeData(value, itemIndex, triggerData, view)
 		default:
 			processed[k] = v
 		}
@@ -40,16 +42,18 @@ func (p *DataProcessor) ProcessNodeData(data map[string]any, itemIndex int, trig
 	return processed
 }
 
-func (p *DataProcessor) processStringValue(value string, currentItemIndex int, triggerData map[string]any) any {
+func (p *DataProcessor) processStringValue(value string, currentItemIndex int, triggerData map[string]any, view *BranchView) any {
 	resolvedStr := value
 
 	if triggerData != nil {
 		resolvedStr = p.resolveTriggerVariables(resolvedStr, triggerData)
 	}
 
-	resolvedStr = p.resolveMethodCalls(resolvedStr)
+	resolvedStr = p.resolveInputReferences(resolvedStr, currentItemIndex, view)
 
-	resolvedStr = p.resolveArrayAccess(resolvedStr, currentItemIndex)
+	resolvedStr = p.resolveMethodCalls(resolvedStr, view)
+
+	resolvedStr = p.resolveArrayAccess(resolvedStr, currentItemIndex, view)
 
 	return resolvedStr
 }
@@ -65,12 +69,64 @@ func (p *DataProcessor) resolveTriggerVariables(value string, triggerData map[st
 	})
 }
 
-func (p *DataProcessor) resolveMethodCalls(value string) string {
+func (p *DataProcessor) resolveInputReferences(value string, currentItemIndex int, view *BranchView) string {
+	if p.outputStore == nil || view.Input() == "" {
+		return value
+	}
+
+	matches := view.Matches("input", value, func(template string) [][]string {
+		return inputRegex.FindAllStringSubmatch(template, -1)
+	})
+	if len(matches) == 0 {
+		return value
+	}
+
+	inputOutputs, ok := p.outputStore.Get(view.Task(), view.Input())
+	if !ok || len(inputOutputs) == 0 {
+		return value
+	}
+
+	itemIndex := currentItemIndex
+	if itemIndex >= len(inputOutputs) {
+		itemIndex = 0
+	}
+
+	resolvedStr := value
+	for _, match := range matches {
+		if len(match) < 2 {
+			continue
+		}
+
+		fieldPath := match[1]
+		resolvedValue := p.getNestedValueWithArrayAccess(inputOutputs[itemIndex], fieldPath)
+		if resolvedValue == nil || p.isComplexType(resolvedValue) {
+			continue
+		}
+
+		placeholder := "$input." + fieldPath
+		replacementValue := cast.ToString(resolvedValue)
+		if strings.TrimSpace(value) != placeholder {
+			var b strings.Builder
+			b.WriteString(`"`)
+			b.WriteString(replacementValue)
+			b.WriteString(`"`)
+			replacementValue = b.String()
+		}
+
+		resolvedStr = strings.ReplaceAll(resolvedStr, placeholder, replacementValue)
+	}
+
+	return resolvedStr
+}
+
+func (p *DataProcessor) resolveMethodCalls(value string, view *BranchView) string {
 	if p.outputStore == nil {
 		return value
 	}
 
-	matches := methodCallRegex.FindAllStringSubmatch(value, -1)
+	matches := view.Matches("method", value, func(template string) [][]string {
+		return methodCallRegex.FindAllStringSubmatch(template, -1)
+	})
 	resolvedStr := value
 
 	for _, match := range matches {
@@ -83,7 +139,7 @@ func (p *DataProcessor) resolveMethodCalls(value string) string {
 		methodArg := match[3]
 		fieldPath := match[4]
 
-		nodeOutputs, ok := p.outputStore.Get(nodeKey)
+		nodeOutputs, ok := p.outputStore.Get(view.Task(), view.StoreKey(nodeKey))
 		if !ok || len(nodeOutputs) == 0 {
 			continue
 		}
@@ -100,11 +156,14 @@ func (p *DataProcessor) resolveMethodCalls(value string) string {
 
 		placeholder := p.buildMethodCallPlaceholder(nodeKey, method, methodArg, fieldPath)
 
-		var b strings.Builder
-		b.WriteString(`"`)
-		b.WriteString(cast.ToString(resolvedValue))
-		b.WriteString(`"`)
-		replacementValue := b.String()
+		replacementValue := cast.ToString(resolvedValue)
+		if strings.TrimSpace(value) != placeholder {
+			var b strings.Builder
+			b.WriteString(`"`)
+			b.WriteString(replacementValue)
+			b.WriteString(`"`)
+			replacementValue = b.String()
+		}
 
 		resolvedStr = strings.ReplaceAll(resolvedStr, placeholder, replacementValue)
 	}
@@ -112,12 +171,14 @@ func (p *DataProcessor) resolveMethodCalls(value string) string {
 	return resolvedStr
 }
 
-func (p *DataProcessor) resolveArrayAccess(value string, currentItemIndex int) string {
+func (p *DataProcessor) resolveArrayAccess(value string, currentItemIndex int, view *BranchView) string {
 	if p.outputStore == nil {
 		return value
 	}
 
-	matches := arrayAccessRegex.FindAllStringSubmatch(value, -1)
+	matches := view.Matches("array", value, func(template string) [][]string {
+		return arrayAccessRegex.FindAllStringSubmatch(template, -1)
+	})
 	resolvedStr := value
 
 	for _, match := range matches {
@@ -129,23 +190,33 @@ func (p *DataProcessor) resolveArrayAccess(value string, currentItemIndex int) s
 		indexStr := match[2]
 		fieldPath := match[3]
 
-		nodeOutputs, ok := p.outputStore.Get(nodeKey)
-		if !ok || len(nodeOutputs) == 0 {
+		nodeOutputs, ok := p.outputStore.Get(view.Task(), view.StoreKey(nodeKey))
+		if !ok {
+			slog.Warn("reference has no stored outputs to resolve against",
+				"component", "data_processor",
+				"task_id", view.Task(),
+				"node_key", nodeKey)
+			continue
+		}
+		if len(nodeOutputs) == 0 {
 			continue
 		}
 
-		resolvedValue := p.resolveByIndex(nodeOutputs, indexStr, fieldPath, currentItemIndex)
+		resolvedValue := p.resolveByIndex(nodeOutputs, nodeKey, indexStr, fieldPath, view.ItemIndex(nodeKey, currentItemIndex), view)
 		if resolvedValue == nil || p.isComplexType(resolvedValue) {
 			continue
 		}
 
 		placeholder := p.buildArrayAccessPlaceholder(nodeKey, indexStr, fieldPath)
 
-		var b strings.Builder
-		b.WriteString(`"`)
-		b.WriteString(cast.ToString(resolvedValue))
-		b.WriteString(`"`)
-		replacementValue := b.String()
+		replacementValue := cast.ToString(resolvedValue)
+		if strings.TrimSpace(value) != placeholder {
+			var b strings.Builder
+			b.WriteString(`"`)
+			b.WriteString(replacementValue)
+			b.WriteString(`"`)
+			replacementValue = b.String()
+		}
 
 		resolvedStr = strings.ReplaceAll(resolvedStr, placeholder, replacementValue)
 	}
@@ -173,7 +244,12 @@ func (p *DataProcessor) getTargetResult(nodeOutputs []map[string]any, method, me
 	return nil
 }
 
-func (p *DataProcessor) resolveByIndex(nodeOutputs []map[string]any, indexStr, fieldPath string, currentItemIndex int) any {
+func (p *DataProcessor) resolveByIndex(
+	nodeOutputs []map[string]any,
+	nodeKey, indexStr, fieldPath string,
+	currentItemIndex int,
+	view *BranchView,
+) any {
 	switch indexStr {
 	case "":
 		if currentItemIndex < len(nodeOutputs) {
@@ -183,12 +259,22 @@ func (p *DataProcessor) resolveByIndex(nodeOutputs []map[string]any, indexStr, f
 			return p.getNestedValueWithArrayAccess(nodeOutputs[0], fieldPath)
 		}
 	case "*":
+		cacheKey := nodeKey + "[*]." + fieldPath
+		if cached, ok := view.Collected(cacheKey); ok {
+			if len(cached) > 0 {
+				return cached
+			}
+			return nil
+		}
+
 		allValues := make([]any, 0, len(nodeOutputs))
 		for _, result := range nodeOutputs {
 			if val := p.getNestedValueWithArrayAccess(result, fieldPath); val != nil {
 				allValues = append(allValues, val)
 			}
 		}
+		view.Collect(cacheKey, allValues)
+
 		if len(allValues) > 0 {
 			return allValues
 		}

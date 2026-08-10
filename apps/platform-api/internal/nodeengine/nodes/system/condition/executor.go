@@ -38,49 +38,70 @@ func NewConditionExecutor(
 }
 
 func (e *ConditionExecutor) ExecuteWithContext(ctx context.Context, credentials map[string]any, data []map[string]any) ([]map[string]any, error) {
+	outputs, _, err := e.ExecuteBranches(ctx, credentials, data)
+	return outputs, err
+}
+
+func (e *ConditionExecutor) ExecuteBranches(ctx context.Context, credentials map[string]any, data []map[string]any) ([]map[string]any, map[string][]int, error) {
 	select {
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return nil, nil, ctx.Err()
 	default:
-		// TODO: only the first item is evaluated, so a node fed 10 items decides
-		// the whole flow from item 0. Routing items per branch needs the runner
-		// to carry item identity and keep outputs per edge; see the branching
-		// notes before changing this.
-		input, err := e.validator.Parse(data[0])
-		if err != nil {
-			return nil, err
+		outputs := make([]map[string]any, 0, len(data))
+		branches := map[string][]int{
+			BranchTrue:  make([]int, 0, len(data)),
+			BranchFalse: make([]int, 0, len(data)),
 		}
 
-		result := false
-		switch input.Operator {
-		case "eq":
-			result = input.LeftValue == input.RightValue
-		case "neq":
-			result = input.LeftValue != input.RightValue
-		case "gt":
-			result = cast.ToFloat(input.LeftValue) > cast.ToFloat(input.RightValue)
-		case "gte":
-			result = cast.ToFloat(input.LeftValue) >= cast.ToFloat(input.RightValue)
-		case "lt":
-			result = cast.ToFloat(input.LeftValue) < cast.ToFloat(input.RightValue)
-		case "lte":
-			result = cast.ToFloat(input.LeftValue) <= cast.ToFloat(input.RightValue)
-		case "contains":
-			result = strings.Contains(input.LeftValue, input.RightValue)
-		case "not_contains":
-			result = !strings.Contains(input.LeftValue, input.RightValue)
-		case "is_empty":
-			result = input.LeftValue == ""
-		case "is_not_empty":
-			result = input.LeftValue != ""
-		default:
-			return nil, ErrInvalidOperator
+		for index, item := range data {
+			result, err := e.evaluate(item)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			outputs = append(outputs, map[string]any{"status": result})
+			if result {
+				branches[BranchTrue] = append(branches[BranchTrue], index)
+				continue
+			}
+			branches[BranchFalse] = append(branches[BranchFalse], index)
 		}
 
-		return []map[string]any{
-			{
-				"status": result,
-			},
-		}, nil
+		return outputs, branches, nil
+	}
+}
+
+func (e *ConditionExecutor) evaluate(item map[string]any) (bool, error) {
+	input, err := e.validator.Parse(item)
+	if err != nil {
+		return false, err
+	}
+
+	left := strings.TrimSpace(input.LeftValue)
+	right := strings.TrimSpace(input.RightValue)
+
+	switch input.Operator {
+	case "eq":
+		return left == right, nil
+	case "neq":
+		return left != right, nil
+	case "gt":
+		return cast.ToFloat(left) > cast.ToFloat(right), nil
+	case "gte":
+		return cast.ToFloat(left) >= cast.ToFloat(right), nil
+	case "lt":
+		return cast.ToFloat(left) < cast.ToFloat(right), nil
+	case "lte":
+		return cast.ToFloat(left) <= cast.ToFloat(right), nil
+	case "contains":
+		return strings.Contains(left, right), nil
+	case "not_contains":
+		return !strings.Contains(left, right), nil
+	case "is_empty":
+		return left == "", nil
+	case "is_not_empty":
+		return left != "", nil
+	default:
+		return false, ErrInvalidOperator
 	}
 }

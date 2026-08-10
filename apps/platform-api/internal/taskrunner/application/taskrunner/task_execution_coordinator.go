@@ -12,7 +12,6 @@ import (
 	credentialOAuthApplicationRegenerate "github.com/blocknextai/platform-api/internal/credentialoauth/application/regenerate"
 	executionsApplicationNodeExecutions "github.com/blocknextai/platform-api/internal/executions/application/nodeexecutions"
 	executionsApplicationTaskexecutions "github.com/blocknextai/platform-api/internal/executions/application/taskexecutions"
-	"github.com/blocknextai/platform-api/internal/executions/domain/nodeexecutions"
 	nodeEngineDomainExecutors "github.com/blocknextai/platform-api/internal/nodeengine/domain/executors"
 	taskRunnerDomain "github.com/blocknextai/platform-api/internal/taskrunner/domain"
 	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
@@ -45,6 +44,7 @@ func NewTaskExecutionCoordinator(
 }
 
 func (c *taskExecutionCoordinator) ExecuteTask(ctx context.Context, task *taskRunnerDomainTask.Task) error {
+	defer c.nodeExecutor.outputStore.Release(task.ID)
 	return c.executeTaskNodes(ctx, task)
 }
 
@@ -52,7 +52,8 @@ func (c *taskExecutionCoordinator) CancelExecution(ctx context.Context, taskID u
 	return nil
 }
 
-func (c *taskExecutionCoordinator) restoreOutputStore(ctx context.Context, taskID uuid.UUID) {
+func (c *taskExecutionCoordinator) seedFromDatabase(ctx context.Context, task *taskRunnerDomainTask.Task) {
+	taskID := task.ID
 	nodeExecutions, err := c.nodeExecutionService.GetAllByTaskID(ctx, taskID)
 	if err != nil {
 		slog.WarnContext(ctx, "failed to load node executions for output restoration",
@@ -64,6 +65,8 @@ func (c *taskExecutionCoordinator) restoreOutputStore(ctx context.Context, taskI
 
 	restored := 0
 	for _, nx := range nodeExecutions {
+		task.NodeStatuses.Store(nx.NodeID, nx.Status)
+
 		if nx.Status != taskRunnerDomain.StatusSuccess.String() {
 			continue
 		}
@@ -71,7 +74,7 @@ func (c *taskExecutionCoordinator) restoreOutputStore(ctx context.Context, taskI
 			continue
 		}
 		nodeKey := BuildNodeKey(nx.NodeType, nx.NodeID)
-		c.nodeExecutor.outputStore.Store(nodeKey, nx.Outputs)
+		c.nodeExecutor.outputStore.Store(taskID, nodeKey, nx.Outputs)
 		restored++
 	}
 
@@ -88,7 +91,7 @@ func (c *taskExecutionCoordinator) executeTaskNodes(ctx context.Context, task *t
 		return ErrTaskDAGIsEmpty
 	}
 
-	c.restoreOutputStore(ctx, task.ID)
+	c.seedFromDatabase(ctx, task)
 
 	startNodeIDs := task.DAG.StartNodes()
 	if len(startNodeIDs) == 0 {
@@ -146,6 +149,10 @@ func (c *taskExecutionCoordinator) executeNode(ctx context.Context, task *taskRu
 	default:
 	}
 
+	if _, started := task.StartedNodes.LoadOrStore(node.ID, struct{}{}); started {
+		return nil
+	}
+
 	nodeExecutionID, exists := task.NodeExecutionIDMap[node.ID]
 	if !exists {
 		if _, runnable := nodeEngineDomainExecutors.GetExecutor(node.NodeID); !runnable {
@@ -154,11 +161,12 @@ func (c *taskExecutionCoordinator) executeNode(ctx context.Context, task *taskRu
 		return ErrNodeExecutionNotFound
 	}
 
-	if task.PreviousNodeOutputs != nil {
+	if task.PreviousNodeOutputs != nil && !routesItems(node) {
 		nodeKey := BuildNodeKey(node.NodeID, node.ID)
 		outputs, hasPreviousOutputs := task.PreviousNodeOutputs[nodeKey]
 		if hasPreviousOutputs {
-			c.nodeExecutor.outputStore.Store(nodeKey, outputs)
+			c.nodeExecutor.outputStore.Store(task.ID, nodeKey, outputs)
+			task.NodeStatuses.Store(node.ID, taskRunnerDomain.StatusSuccess.String())
 
 			c.eventPublisher.PublishNodeEvent(
 				ctx,
@@ -185,7 +193,7 @@ func (c *taskExecutionCoordinator) executeNode(ctx context.Context, task *taskRu
 	}
 
 	if node.Settings != nil && node.Settings.Disabled {
-		c.markNodeAsSkipped(ctx, task, node)
+		c.markNodeAsSkipped(ctx, task, node, ErrNodeDisabled.Error())
 		return c.executeChildNodes(ctx, task, node)
 	}
 
@@ -214,22 +222,21 @@ func (c *taskExecutionCoordinator) executeChildNodes(ctx context.Context, task *
 		return nil
 	}
 
-	nodeExecutions, err := c.nodeExecutionService.GetAllByTaskID(ctx, task.ID)
-	if err != nil {
-		return err
-	}
-
-	var builder strings.Builder
-	nodeExecutionsByKey := make(map[string]*nodeexecutions.NodeExecution, len(nodeExecutions))
-	for _, ne := range nodeExecutions {
-		key := BuildNodeKeyWithBuilder(&builder, ne.NodeType, ne.NodeID)
-		nodeExecutionsByKey[key] = ne
-	}
-
 	readyChildren := make([]*dag.Node, 0)
 	for _, childNodeID := range childNodes {
 		childNode := task.DAG.NodeByID(childNodeID)
-		if childNode == nil || !c.areParentNodesCompleted(task, childNode, nodeExecutionsByKey) {
+		if childNode == nil {
+			continue
+		}
+		reached, err := branchReaches(c.nodeExecutor.outputStore, task.ID, task.DAG, node, childNodeID)
+		if err != nil {
+			return err
+		}
+		if !reached {
+			c.skipUnreachable(ctx, task, childNode)
+			continue
+		}
+		if !c.areParentNodesCompleted(task, childNode) {
 			continue
 		}
 		readyChildren = append(readyChildren, childNode)
@@ -270,7 +277,7 @@ func (c *taskExecutionCoordinator) executeChildNodes(ctx context.Context, task *
 	return nil
 }
 
-func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *taskRunnerDomainTask.Task, node *dag.Node) {
+func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *taskRunnerDomainTask.Task, node *dag.Node, reason string) {
 	nodeExecutionID, exists := task.NodeExecutionIDMap[node.ID]
 	if !exists {
 		return
@@ -312,9 +319,14 @@ func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *
 		0,
 	)
 
-	skipMessage := ErrNodeDisabled.Error()
 	endTime := time.Now().UTC()
 	executionTime := endTime.Sub(startTime).Milliseconds()
+	task.NodeStatuses.Store(node.ID, taskRunnerDomain.StatusSkipped.String())
+
+	var errorMessage *string
+	if strings.TrimSpace(reason) != "" {
+		errorMessage = new(reason)
+	}
 
 	if err := c.nodeExecutionService.Update(
 		ctx,
@@ -324,7 +336,7 @@ func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *
 		nil,
 		nil,
 		nil,
-		&skipMessage,
+		errorMessage,
 		nil,
 		&endTime,
 	); err != nil {
@@ -346,7 +358,7 @@ func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *
 		node.NodeID,
 		taskRunnerDomain.StatusSkipped,
 		nil,
-		skipMessage,
+		reason,
 		executionTime,
 	)
 }
@@ -354,28 +366,23 @@ func (c *taskExecutionCoordinator) markNodeAsSkipped(ctx context.Context, task *
 func (c *taskExecutionCoordinator) areParentNodesCompleted(
 	task *taskRunnerDomainTask.Task,
 	node *dag.Node,
-	nodeExecutionsByKey map[string]*nodeexecutions.NodeExecution,
 ) bool {
 	parentNodes := task.DAG.NodeParents(node.ID)
 	if len(parentNodes) == 0 {
 		return true
 	}
 
-	var builder strings.Builder
 	for _, parentNodeID := range parentNodes {
 		parentNode := task.DAG.NodeByID(parentNodeID)
 		if parentNode == nil {
 			continue
 		}
 
-		key := BuildNodeKeyWithBuilder(&builder, parentNode.NodeID, parentNode.ID)
-
-		nodeExecution, exists := nodeExecutionsByKey[key]
+		status, exists := nodeStatus(task, parentNode.ID)
 		if !exists {
 			return false
 		}
 
-		status := nodeExecution.Status
 		isCompleted := status == taskRunnerDomain.StatusSuccess.String() ||
 			status == taskRunnerDomain.StatusSkipped.String() ||
 			(status == taskRunnerDomain.StatusFailed.String() && parentNode.Settings != nil && parentNode.Settings.ContinueOnError)
@@ -386,4 +393,61 @@ func (c *taskExecutionCoordinator) areParentNodesCompleted(
 	}
 
 	return true
+}
+
+func (c *taskExecutionCoordinator) skipUnreachable(
+	ctx context.Context,
+	task *taskRunnerDomainTask.Task,
+	root *dag.Node,
+) {
+	skipped := make(map[string]bool)
+
+	var walk func(node *dag.Node)
+	walk = func(node *dag.Node) {
+		if skipped[node.ID] {
+			return
+		}
+		skipped[node.ID] = true
+		c.markNodeAsSkipped(ctx, task, node, "")
+
+		for _, childID := range task.DAG.NodeChildren(node.ID) {
+			child := task.DAG.NodeByID(childID)
+			if child == nil {
+				continue
+			}
+			if c.hasLiveParent(task, childID, skipped) {
+				continue
+			}
+			walk(child)
+		}
+	}
+
+	walk(root)
+}
+
+func (c *taskExecutionCoordinator) hasLiveParent(
+	task *taskRunnerDomainTask.Task,
+	nodeID string,
+	skipped map[string]bool,
+) bool {
+	for _, parentID := range task.DAG.NodeParents(nodeID) {
+		if skipped[parentID] {
+			continue
+		}
+		if status, ok := nodeStatus(task, parentID); ok &&
+			status == taskRunnerDomain.StatusSkipped.String() {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
+func nodeStatus(task *taskRunnerDomainTask.Task, nodeID string) (string, bool) {
+	value, ok := task.NodeStatuses.Load(nodeID)
+	if !ok {
+		return "", false
+	}
+	status, ok := value.(string)
+	return status, ok
 }

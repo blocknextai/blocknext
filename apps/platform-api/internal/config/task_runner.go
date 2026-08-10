@@ -107,6 +107,7 @@ type TaskRunnerOptions struct {
 	Mode TaskRunnerMode `env:"MODE"`
 
 	ShutdownTimeout    time.Duration `env:"SHUTDOWN_TIMEOUT"`
+	MaxExecutionTime   time.Duration `env:"MAX_EXECUTION_TIME"`
 	RecoveryInterval   time.Duration `env:"RECOVERY_INTERVAL"`
 	HeartbeatInterval  time.Duration `env:"HEARTBEAT_INTERVAL"`
 	MaxConcurrentTasks int64         `env:"MAX_CONCURRENT_TASKS"`

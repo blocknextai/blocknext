@@ -210,6 +210,7 @@ func (m *taskLifecycleManager) CreateNodeExecutions(ctx context.Context, task *t
 				return err
 			}
 			task.NodeExecutionIDMap[node.ID] = nodeExecutionID
+			task.NodeStatuses.Store(node.ID, taskRunnerDomain.StatusSuccess.String())
 
 			if err := m.nodeExecutionService.Update(
 				ctx,

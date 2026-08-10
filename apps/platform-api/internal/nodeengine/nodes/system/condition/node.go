@@ -25,8 +25,8 @@ func NewConditionNode(nodeID string) *ConditionNode {
 				{Key: "in"},
 			},
 			Outputs: []nodes.NodeHandle{
-				{Key: "true", Label: "True"},
-				{Key: "false", Label: "False"},
+				{Key: BranchTrue, Label: "True"},
+				{Key: BranchFalse, Label: "False"},
 			},
 			Categories:    []string{"System"},
 			SubCategories: []string{"System"},

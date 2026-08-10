@@ -123,6 +123,7 @@ func NewModule(deps Dependencies) (*Module, error) {
 		concurrencyLimitResolver,
 		workerID,
 		deps.TaskRunnerOptions.HeartbeatInterval,
+		deps.TaskRunnerOptions.MaxExecutionTime,
 	)
 
 	dispatcher, err := taskRunnerInfrastructure.NewDispatcher(

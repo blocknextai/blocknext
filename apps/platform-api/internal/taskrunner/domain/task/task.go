@@ -1,6 +1,7 @@
 package task
 
 import (
+	"sync"
 	"time"
 
 	"github.com/blocknextai/go-packages/dag"
@@ -23,6 +24,8 @@ type Task struct {
 	StartTime          *time.Time
 	EndTime            *time.Time
 	NodeExecutionIDMap map[string]uuid.UUID
+	StartedNodes       sync.Map
+	NodeStatuses       sync.Map
 
 	PreviousNodeOutputs map[string][]map[string]any
 	TriggerContext      *nodeEngineDomainAdapters.TriggerContext
