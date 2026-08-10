@@ -82,6 +82,7 @@ export function useFlowSave({ initialFlow, nodes, edges }: UseFlowSaveOptions) {
   const stripNodesForSave = (nodeList: FlowNode[]) =>
     nodeList.map(({ data, ...node }) => ({
       ...node,
+      title: data?.title === data?.catalogTitle ? undefined : data?.title,
       handleLayout: data?.handleLayout,
       parameters:
         data?.note === undefined

@@ -9,6 +9,10 @@ type Executor struct {
 	Disabled bool   `json:"disabled,omitempty"`
 }
 
+type BranchingExecutor interface {
+	ExecuteBranches(ctx context.Context, credentials map[string]any, data []map[string]any) ([]map[string]any, map[string][]int, error)
+}
+
 type ExecutorManager interface {
 	GetID() string
 	GetDisabled() bool

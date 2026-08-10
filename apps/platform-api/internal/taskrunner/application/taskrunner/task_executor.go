@@ -27,6 +27,7 @@ type TaskExecutor struct {
 	concurrencyLimitResolver taskRunnerDomainTaskRunner.ConcurrencyLimitResolver
 	workerID                 string
 	heartbeatInterval        time.Duration
+	maxExecutionTime         time.Duration
 }
 
 func NewTaskExecutor(
@@ -40,6 +41,7 @@ func NewTaskExecutor(
 	concurrencyLimitResolver taskRunnerDomainTaskRunner.ConcurrencyLimitResolver,
 	workerID string,
 	heartbeatInterval time.Duration,
+	maxExecutionTime time.Duration,
 ) *TaskExecutor {
 	return &TaskExecutor{
 		taskExecutionService:     taskExecutionService,
@@ -52,6 +54,7 @@ func NewTaskExecutor(
 		concurrencyLimitResolver: concurrencyLimitResolver,
 		workerID:                 workerID,
 		heartbeatInterval:        heartbeatInterval,
+		maxExecutionTime:         maxExecutionTime,
 	}
 }
 
@@ -304,6 +307,12 @@ func (e *TaskExecutor) runTask(ctx context.Context, task *taskRunnerDomainTask.T
 
 	taskCtx := e.contextManager.CreateContext(task.ID, ctx)
 
+	if e.maxExecutionTime > 0 {
+		var cancelExecution context.CancelFunc
+		taskCtx, cancelExecution = context.WithTimeout(taskCtx, e.maxExecutionTime)
+		defer cancelExecution()
+	}
+
 	if err := e.lifecycleManager.StartTask(taskCtx, task); err != nil {
 		if failErr := e.lifecycleManager.HandleTaskFailure(ctx, task, err); failErr != nil {
 			slog.ErrorContext(ctx, "failed to handle task failure after start error",
@@ -315,6 +324,9 @@ func (e *TaskExecutor) runTask(ctx context.Context, task *taskRunnerDomainTask.T
 	}
 
 	if err := e.executionCoordinator.ExecuteTask(taskCtx, task); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			err = ErrTaskExecutionTimeLimit
+		}
 		if errors.Is(err, context.Canceled) {
 			if cancelErr := e.lifecycleManager.HandleTaskCancellation(ctx, task); cancelErr != nil {
 				slog.ErrorContext(ctx, "failed to handle task cancellation",

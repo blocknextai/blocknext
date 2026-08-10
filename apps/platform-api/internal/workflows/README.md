@@ -25,11 +25,14 @@ This context is the system of record for workflow definitions scoped to an organ
 | `$<nodeId>_<canvasId>.<field.path>` | Field from the referenced node's output for the current item (node key = catalog `nodeId` + `_` + canvas `id`, e.g. `$gemini.imagen_2.images`) |
 | `$<key>[0].<field>` / `$<key>[*].<field>` | Explicit index / all items collected into an array |
 | `$<key>.first().<field>` / `.last()` / `.get(n)` | Positional access over the node's output list |
+| `$input.<field.path>` | The item feeding this node at the same position, without naming the node it comes from; only defined when the node has exactly one incoming edge |
 | `$trigger.source` / `.sender` / `.prompt` / `.payload` | Fields of the run's `TriggerContext` (webhook adapter output or runtime prompt) |
 
 **Credentials are referenced, never stored.** The workflow JSON carries no secrets: a node's `credentials` map holds opaque reference strings of the form `credential:<user\|organization>:<uuid>` (`internal/common/domain/credential`). At execution time taskrunner's `CredentialProcessor` parses the reference, resolves the owner scope, and fetches (refreshing OAuth tokens if needed) the actual credential material — which therefore lives only in the credentials store, and a duplicated or exported workflow leaks nothing.
 
-**Deliberate simplicity.** Control flow is intentionally minimal: the only system nodes are `starter`, `condition` (boolean branch — edges carry `condition: "true"|"false"` and `dag.ConditionalChildren` picks the branch from the node's `status` output), and `sleep`. There is **no loop, no sub-workflow, and no generic HTTP node type**, and the graph must be acyclic — `dag.New` runs a topological sort and rejects cycles (`ErrCycleDetected`).
+**Deliberate simplicity.** Control flow is intentionally minimal: the only system nodes are `starter`, `condition`, `sleep` and the canvas-only `annotation`. There is **no loop, no sub-workflow, and no generic HTTP node type**, and the graph must be acyclic — `dag.New` runs a topological sort and rejects cycles (`ErrCycleDetected`).
+
+**Branching is per item.** A node that routes implements `executors.BranchingExecutor`, returning the indexes of the items that leave through each output handle; `condition` returns them under `true` and `false`. The runner stores each branch separately (`<nodeKey>#<handle>`) together with the original index of every item it kept, so a consumer reads the branch its own edge leaves from, and a `$reference` to a node *upstream* of the branch still resolves to the matching item rather than to position `i` of the filtered list. A handle with no items reaches nothing: its children are marked `skipped`, and the skip walks on to any descendant whose every parent is skipped — a join with one live parent still runs. An edge with no `sourceHandle` is not routed, so flows authored before handles existed keep their old behaviour.
 
 ## AI workflow generation
 

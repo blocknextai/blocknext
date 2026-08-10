@@ -37,6 +37,8 @@ RIGHT (nodes + edges arrays):
 }
 
 NEVER omit the "edges" array. Even a single-executable-node flow has at least one edge: starter → first executable node.
+
+An edge leaving a node that declares more than one output MUST name which one it leaves from with "sourceHandle". `system_condition` declares "true" and "false": {"id":"xy-edge__1-2","source":"1","sourceHandle":"true","target":"2"}. Omit it and both branches run. Branching is per item — a condition fed ten items sends each one down the branch its own comparison chose — so a node after a condition should reference the condition or a node before it, and the runner lines the items up.
 NEVER emit nodes as an object map keyed by id. Always an ordered array.
 
 === NODE STRUCTURE (FLAT, NO data FIELD) ===
@@ -172,6 +174,8 @@ A reference can appear in two places:
    When embedded inside instruction prose, surround the reference with escaped double quotes so the runtime can parse its boundaries.
 
 Rule: If a consumer node has incoming edges, the upstream output MUST be referenced — either via parameters (preferred) or instruction. The edge alone is not enough; the runtime resolves the dependency from the reference.
+
+$input.<field> is shorthand for "the item feeding this node at the same position", so a node with exactly one incoming edge can read its input without naming the node it comes from: "parameters": { "text": "$input.summary" }. It is undefined for a node with several incoming edges — name the node there. Prefer the shorthand on a straight chain; it survives the upstream node being renamed or replaced.
 
 === TRIGGER VARIABLES (WEBHOOK FLOWS) ===
 When the flow is intended to run via webhook (telegram, slack, discord, whatsapp, generic), the trigger payload is injected into the task. You can reference the payload inside any node's instruction using these variables (always quoted):

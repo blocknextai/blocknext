@@ -75,13 +75,14 @@ func (e *NodeExecutor) ExecuteNode(ctx context.Context, task *taskRunnerDomainTa
 		}
 	}
 
-	processedDataList := e.prepareAndProcessNodeData(task, node)
+	view := e.buildBranchView(task, node)
+	processedDataList := e.prepareAndProcessNodeData(task, node, view)
 
 	e.updateNodeExecution(ctx, task.ID, task.NodeExecutionIDMap[node.ID], taskRunnerDomain.StatusRunning,
 		processedDataList, nil, nil, nil, &startTime, nil)
 
 	return e.executeWithRetries(ctx, task, node, executor, processedCredentials,
-		processedDataList, node.Parameters, maxRetries, retryDelay, timeout, startTime)
+		processedDataList, node.Parameters, maxRetries, retryDelay, timeout, startTime, view)
 }
 
 func (e *NodeExecutor) executeWithRetries(
@@ -94,6 +95,7 @@ func (e *NodeExecutor) executeWithRetries(
 	parameters map[string]any,
 	maxRetries, retryDelay, timeout int,
 	startTime time.Time,
+	view *BranchView,
 ) error {
 	var lastErr error
 	var lastFunctionCallingOutputs []map[string]any
@@ -104,11 +106,11 @@ func (e *NodeExecutor) executeWithRetries(
 			e.finalizeNode(ctx, task, node, nil, lastFunctionCallingOutputs, ctx.Err(), startTime, taskRunnerDomain.StatusCancelled)
 			return ctx.Err()
 		default:
-			outputs, functionCallingOutputs, err := e.executeOperation(ctx, task, executor, credentials, processedDataList, parameters, timeout)
+			outputs, functionCallingOutputs, branches, err := e.executeOperation(ctx, task, executor, credentials, processedDataList, parameters, timeout, view)
 			lastFunctionCallingOutputs = functionCallingOutputs
 
 			if err == nil {
-				e.storeNodeOutputs(node, outputs)
+				e.storeNodeOutputs(task.ID, node, outputs, processedDataList, branches, view)
 				e.finalizeNode(ctx, task, node, outputs, functionCallingOutputs, nil, startTime, taskRunnerDomain.StatusSuccess)
 				return nil
 			}
@@ -145,7 +147,8 @@ func (e *NodeExecutor) executeOperation(
 	processedDataList []map[string]any,
 	parameters map[string]any,
 	timeout int,
-) ([]map[string]any, []map[string]any, error) {
+	view *BranchView,
+) ([]map[string]any, []map[string]any, map[string][]int, error) {
 	attemptCtx := ctx
 	if timeout > 0 {
 		var cancel context.CancelFunc
@@ -184,7 +187,7 @@ func (e *NodeExecutor) executeOperation(
 		}
 
 		for i, data := range processedDataList {
-			resolvedParameters := e.dataProcessor.ProcessNodeData(parameters, i, triggerData)
+			resolvedParameters := e.dataProcessor.ProcessNodeData(parameters, i, triggerData, view)
 			for k, v := range resolvedParameters {
 				if v == nil {
 					continue
@@ -198,11 +201,16 @@ func (e *NodeExecutor) executeOperation(
 		}
 	}
 
+	if branching, ok := executor.(nodeEngineDomainExecutors.BranchingExecutor); ok {
+		executorOutputs, branches, err := branching.ExecuteBranches(attemptCtx, credentials, processedDataList)
+		return executorOutputs, functionCallingOutputs, branches, err
+	}
+
 	executorOutputs, err := executor.ExecuteWithContext(attemptCtx, credentials, processedDataList)
-	return executorOutputs, functionCallingOutputs, err
+	return executorOutputs, functionCallingOutputs, nil, err
 }
 
-func (e *NodeExecutor) prepareAndProcessNodeData(task *taskRunnerDomainTask.Task, node *dag.Node) []map[string]any {
+func (e *NodeExecutor) prepareAndProcessNodeData(task *taskRunnerDomainTask.Task, node *dag.Node, view *BranchView) []map[string]any {
 	nodeDataMap := make(map[string]any)
 
 	if node.Instruction != "" {
@@ -223,17 +231,17 @@ func (e *NodeExecutor) prepareAndProcessNodeData(task *taskRunnerDomainTask.Task
 	}
 
 	parentNodes := task.DAG.NodeParents(node.ID)
-	maxItems := e.calculateMaxItems(task, parentNodes)
+	maxItems := e.calculateMaxItems(task, parentNodes, view)
 	executionDataList := e.createExecutionDataList(nodeDataMap, maxItems)
 
 	for i, data := range executionDataList {
-		executionDataList[i] = e.dataProcessor.ProcessNodeData(data, i, triggerData)
+		executionDataList[i] = e.dataProcessor.ProcessNodeData(data, i, triggerData, view)
 	}
 
 	return executionDataList
 }
 
-func (e *NodeExecutor) calculateMaxItems(task *taskRunnerDomainTask.Task, parentNodes []string) int {
+func (e *NodeExecutor) calculateMaxItems(task *taskRunnerDomainTask.Task, parentNodes []string, view *BranchView) int {
 	maxItems := 1
 	var builder strings.Builder
 	for _, parentID := range parentNodes {
@@ -242,7 +250,7 @@ func (e *NodeExecutor) calculateMaxItems(task *taskRunnerDomainTask.Task, parent
 			continue
 		}
 		nodeKey := BuildNodeKeyWithBuilder(&builder, parentNode.NodeID, parentNode.ID)
-		if outputs, ok := e.outputStore.Get(nodeKey); ok && len(outputs) > maxItems {
+		if outputs, ok := e.outputStore.Get(view.Task(), view.StoreKey(nodeKey)); ok && len(outputs) > maxItems {
 			maxItems = len(outputs)
 		}
 	}
@@ -270,6 +278,7 @@ func (e *NodeExecutor) finalizeNode(
 	status taskRunnerDomain.Status,
 ) {
 	executionTime := time.Since(startTime).Milliseconds()
+	task.NodeStatuses.Store(node.ID, status.String())
 	nodeExecutionID, exists := task.NodeExecutionIDMap[node.ID]
 	if !exists {
 		return
@@ -292,9 +301,29 @@ func (e *NodeExecutor) finalizeNode(
 	e.publishNodeEvent(ctx, task, node, status, outputs, errorStr, executionTime)
 }
 
-func (e *NodeExecutor) storeNodeOutputs(node *dag.Node, outputs []map[string]any) {
+func (e *NodeExecutor) storeNodeOutputs(
+	taskID uuid.UUID,
+	node *dag.Node,
+	outputs []map[string]any,
+	items []map[string]any,
+	branches map[string][]int,
+	view *BranchView,
+) {
 	nodeKey := BuildNodeKey(node.NodeID, node.ID)
-	e.outputStore.Store(nodeKey, outputs)
+	e.outputStore.Store(taskID, nodeKey, outputs)
+
+	for handle, indexes := range branches {
+		branchItems := make([]map[string]any, 0, len(indexes))
+		absolute := make([]int, 0, len(indexes))
+		for _, index := range indexes {
+			if index < 0 || index >= len(items) {
+				continue
+			}
+			branchItems = append(branchItems, items[index])
+			absolute = append(absolute, view.AbsoluteIndex(index))
+		}
+		e.outputStore.StoreBranch(taskID, nodeKey, handle, branchItems, absolute)
+	}
 }
 
 func (e *NodeExecutor) extractSettings(node *dag.Node) (maxRetries, retryDelay, timeout int) {
