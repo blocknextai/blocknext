@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { RunStepDetail } from './run-step-detail'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Play, CheckCircle2, XCircle } from 'lucide-react'
+import { Play, CheckCircle2, XCircle, SkipForward } from 'lucide-react'
 
 const RunStepList = ({
   nodeExecutions,
@@ -16,6 +16,8 @@ const RunStepList = ({
     nodeExecutions?.filter((n) => n.status === 'success').length || 0
   const failedNodes =
     nodeExecutions?.filter((n) => n.status === 'failed').length || 0
+  const skippedNodes =
+    nodeExecutions?.filter((n) => n.status === 'skipped').length || 0
 
   return (
     <>
@@ -27,7 +29,7 @@ const RunStepList = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/20">
                 <Play className="size-4 text-blue-600" />
@@ -60,6 +62,19 @@ const RunStepList = ({
                 <div className="text-sm font-medium">{t('ui.text.failed')}</div>
                 <div className="text-2xl font-bold text-destructive">
                   {failedNodes}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="bg-muted rounded-full p-2">
+                <SkipForward className="text-muted-foreground size-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">
+                  {t('ui.text.skipped')}
+                </div>
+                <div className="text-muted-foreground text-2xl font-bold">
+                  {skippedNodes}
                 </div>
               </div>
             </div>

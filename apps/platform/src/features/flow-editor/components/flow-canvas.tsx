@@ -203,7 +203,8 @@ const FlowCanvas = ({
       const apiNode = apiNodes.find((a) => a.id === node.nodeId)
       return {
         id: node.id,
-        title: apiNode?.name || node.nodeId,
+        title: node.title || apiNode?.name || node.nodeId,
+        catalogTitle: apiNode?.name || node.nodeId,
         description: apiNode?.description || '',
         tags: apiNode?.tags || [],
         category: apiNode?.category || '',

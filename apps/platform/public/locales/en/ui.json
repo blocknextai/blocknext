@@ -815,6 +815,7 @@
   "ui.text.submit": "Submit",
   "ui.text.success": "Success",
   "ui.text.successful": "Successful",
+  "ui.text.skipped": "Skipped",
   "ui.text.summary": "Summary",
   "ui.text.summaryPlaceholder": "Brief description that appears in search results",
   "ui.text.symbol": "Symbol",
