@@ -4,6 +4,10 @@ BlockNext is a no-code platform for building and running AI-powered workflows. D
 
 It is built for end users, not just developers: flows stay simple, readable and predictable by design.
 
+![BlockNext flow editor](docs/images/example-flow.png)
+
+*Two models write the copy, Veo renders the video, and the result goes out to YouTube, Instagram and X — one flow, no code.*
+
 ## Highlights
 
 - **Visual flow builder** — compose workflows on an intuitive drag-and-drop canvas. Nodes take arrays in and return arrays out, so a node fed ten items runs ten times and emits ten results — batch work needs no loop construct. What is missing is deliberate: no `while`/`for` on the canvas, no sub-workflows, no expression language to learn.
