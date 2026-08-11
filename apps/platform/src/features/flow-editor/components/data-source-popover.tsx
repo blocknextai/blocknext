@@ -74,10 +74,15 @@ export function DataSourcePopover({
                 <button
                   key={`${item.value}-${index}`}
                   type="button"
-                  className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-left text-xs font-mono text-muted-foreground hover:bg-accent hover:text-foreground transition-colors cursor-pointer"
+                  className="hover:bg-accent flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-md px-2 py-1.5 text-left transition-colors"
                   onClick={() => onSelect(item.value)}
                 >
-                  {item.value}
+                  <span className="text-foreground w-full truncate text-xs">
+                    {item.label || item.value}
+                  </span>
+                  <span className="text-muted-foreground w-full truncate font-mono text-[10px]">
+                    {item.value}
+                  </span>
                 </button>
               ))}
             </div>
