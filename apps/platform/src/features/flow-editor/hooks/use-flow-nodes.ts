@@ -287,33 +287,64 @@ export function useFlowNodes(apiNodes: ResolvedNode[] = []) {
         })
         contextMenu = cNew
       } else if (source) {
-        const edges = source.edges.filter((e) => e.target === ref)
-        for (let i = 0; i < edges.length; i++) {
-          const edge = edges[i]
-          if (edge.source === '0') {
-            continue
+        const currentApiNodes = apiNodesArg || apiOriginRef.current
+        const nodeName = (
+          node: { title?: string; data?: { title?: string } },
+          fallback: string,
+        ) => node.title || node.data?.title || fallback
+
+        const directParents = source.edges.filter((e) => e.target === ref)
+        if (directParents.length === 1 && directParents[0].source !== '0') {
+          const parentNode = source.nodes.find(
+            (n) => n.id === directParents[0].source,
+          )
+          const parentApiNode = currentApiNodes?.find(
+            (n) => n.id === parentNode?.nodeId,
+          )
+          for (const outputType of parentApiNode?.outputTypes ?? []) {
+            contextMenu.push({
+              label: `${t('ui.text.input', 'Input')} ${outputType.key}`,
+              value: `$input.${outputType.key}`,
+              isEditable: outputType.isEditable ?? false,
+            })
           }
-          const sourceNode = source.nodes.find((n) => n.id === edge.source)
+        }
+
+        const ancestors: string[] = []
+        const seenNodes = new Set<string>([ref])
+        const queue = [ref]
+
+        while (queue.length > 0) {
+          const current = queue.shift()!
+          for (const edge of source.edges) {
+            if (edge.target !== current || seenNodes.has(edge.source)) {
+              continue
+            }
+            seenNodes.add(edge.source)
+            queue.push(edge.source)
+            if (edge.source !== '0') {
+              ancestors.push(edge.source)
+            }
+          }
+        }
+
+        for (const ancestorID of ancestors) {
+          const sourceNode = source.nodes.find((n) => n.id === ancestorID)
           if (!sourceNode) {
             continue
           }
-          const currentApiNodes = apiNodesArg || apiOriginRef.current
           const apiNode = currentApiNodes?.find(
             (n) => n.id === sourceNode.nodeId,
           )
-
           if (apiNode === undefined) {
             continue
           }
-          const sourceContextMenu = sourceNode.data?.contextMenu
-          if (sourceContextMenu && sourceContextMenu.length > 0) {
-            contextMenu = contextMenu.concat(sourceContextMenu)
-          }
+
           const outputs = apiNode.outputTypes ?? []
           for (let j = 0; j < outputs.length; j++) {
             const outputType = outputs[j]
             contextMenu.push({
-              label: `${t(sourceNode.data?.title || apiNode.name)} ${outputType.key}`,
+              label: `${t(nodeName(sourceNode, apiNode.name))} ${outputType.key}`,
               value: `$${apiNode.id}_${sourceNode.id}.${outputType.key}`,
               isEditable: outputType.isEditable ?? false,
             })
