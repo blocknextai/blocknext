@@ -25,20 +25,50 @@ Curious how it works under the hood? See the [architecture overview](ARCHITECTUR
 
 ## Getting started
 
+Docker is the only prerequisite — Go and Bun are needed just for
+[development](.github/CONTRIBUTING.md). `make` is a convenience: its targets are thin
+wrappers, so every step below is also given without it.
+
+```bash
+git clone https://github.com/blocknextai/blocknext.git
+cd blocknext
+```
+
+### Linux & macOS
+
 ```bash
 make setup      # creates .env with generated secrets
 make docker-up  # pulls the published images and starts the full stack
 ```
 
-Docker and `make` are all you need — Go and Bun are only required for
-[development](.github/CONTRIBUTING.md).
+Without `make` — on macOS it arrives with the Xcode command line tools, so a fresh
+machine may not have it:
+
+```bash
+./scripts/setup.sh
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Windows
+
+Docker Desktop installs a WSL 2 backend, and a WSL shell has `make` — open one and
+follow the steps above. To stay in PowerShell, use the PowerShell setup script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Both setup scripts do the same thing: copy `.env.example` to `.env` and give each
+`REPLACE_ME_OPENSSL_*` placeholder its own generated secret. An existing `.env` is
+left untouched.
 
 The UI is served on http://localhost:4000. Run `make help` for every target.
 
 One thing to know on a fresh install: `EMAIL_SENDER_PROVIDER` defaults to `log`, so
 every outbound mail is printed instead of sent. Signing up with a password does not
 wait for verification — you land in the app straight away — but magic-link sign-in and
-password reset need the link, and it is in `make docker-logs`. Point the sender at
+password reset need the link, and it is in the container logs. Point the sender at
 SMTP, Resend or SendGrid when you have credentials.
 
 To build and run everything from source instead, see
@@ -53,6 +83,13 @@ then:
 ```bash
 make docker-pull
 make docker-up
+```
+
+Or, without `make`:
+
+```bash
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 Migrations run in their own container before the services start, so schema changes
