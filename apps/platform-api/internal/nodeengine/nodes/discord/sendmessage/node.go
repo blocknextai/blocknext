@@ -11,74 +11,72 @@ type DiscordSendMessageNode struct {
 
 func NewDiscordSendMessageNode(nodeID string) *DiscordSendMessageNode {
 	return &DiscordSendMessageNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Discord Send Message",
-			Description: "Send a text message to a Discord channel.",
-			Icon: nodes.NodeIcon{
-				Brand: "discord",
-				Glyph: "chat",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Discord Send Message",
+		Description: "Send a text message to a Discord channel.",
+		Icon: nodes.NodeIcon{
+			Brand: "discord",
+			Glyph: "chat",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"Discord"},
+		Tags: []string{
+			"chat",
+			"messaging",
+			"send",
+			"message",
+			"community",
+			"notification",
+		},
+		SupportedCredentials: []string{
+			"discord_api",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"channelId": {
+					Type:        "string",
+					Title:       "Channel ID",
+					Description: "Discord channel identifier where the message will be sent.",
+				},
+				"content": {
+					Type:        "string",
+					Title:       "Content",
+					Description: "Text content of the Discord message.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"channelId",
+				"content",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Publishing"},
-			SubCategories: []string{"Discord"},
-			Tags: []string{
-				"chat",
-				"messaging",
-				"send",
-				"message",
-				"community",
-				"notification",
-			},
-			SupportedCredentials: []string{
-				"discord_api",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"channelId": {
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the message was sent successfully.",
+					},
+					"messageId": {
 						Type:        "string",
-						Title:       "Channel ID",
-						Description: "Discord channel identifier where the message will be sent.",
-					},
-					"content": {
-						Type:        "string",
-						Title:       "Content",
-						Description: "Text content of the Discord message.",
-					},
-				},
-				Required: []string{
-					"channelId",
-					"content",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the message was sent successfully.",
-						},
-						"messageId": {
-							Type:        "string",
-							Description: "Identifier of the Discord message that was created.",
-						},
+						Description: "Identifier of the Discord message that was created.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

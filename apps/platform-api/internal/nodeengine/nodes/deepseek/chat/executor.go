@@ -30,9 +30,7 @@ func NewDeepseekChatExecutor(
 	validator *jsonschema.Validator[DeepseekChatExecutorInput],
 ) *DeepseekChatExecutor {
 	return &DeepseekChatExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

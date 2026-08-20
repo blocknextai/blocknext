@@ -31,9 +31,7 @@ func NewDeeplTranslateExecutor(
 	validator *jsonschema.Validator[DeeplTranslateExecutorInput],
 ) *DeeplTranslateExecutor {
 	return &DeeplTranslateExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

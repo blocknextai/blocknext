@@ -27,12 +27,10 @@ func NewUserSocial(
 	utcNow := time.Now().UTC()
 
 	social := &UserSocial{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:        bnuuid.NewV7(),
+		CreatedAt: utcNow,
+		UpdatedAt: utcNow,
+		DeletedAt: nil,
 		UserID:    userID,
 		Platform:  platform,
 		URL:       url,

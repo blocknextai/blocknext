@@ -34,9 +34,7 @@ func NewCoingeckoAirdropTrackerExecutor(
 	validator *jsonschema.Validator[CoingeckoAirdropTrackerExecutorInput],
 ) *CoingeckoAirdropTrackerExecutor {
 	return &CoingeckoAirdropTrackerExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -32,9 +32,7 @@ func NewAnthropicChatExecutor(
 	validator *jsonschema.Validator[AnthropicChatExecutorInput],
 ) *AnthropicChatExecutor {
 	return &AnthropicChatExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

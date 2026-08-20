@@ -23,12 +23,10 @@ func NewPasswordCredential(
 	utcNow := time.Now().UTC()
 
 	credential := &PasswordCredential{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:           bnuuid.NewV7(),
+		CreatedAt:    utcNow,
+		UpdatedAt:    utcNow,
+		DeletedAt:    nil,
 		UserID:       userID,
 		PasswordHash: passwordHash,
 	}

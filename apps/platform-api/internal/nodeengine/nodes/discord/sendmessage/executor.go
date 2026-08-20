@@ -30,9 +30,7 @@ func NewDiscordSendMessageExecutor(
 	validator *jsonschema.Validator[DiscordSendMessageExecutorInput],
 ) *DiscordSendMessageExecutor {
 	return &DiscordSendMessageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

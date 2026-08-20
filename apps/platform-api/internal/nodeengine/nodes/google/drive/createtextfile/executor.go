@@ -29,9 +29,7 @@ func NewGoogleDriveCreateTextFileExecutor(
 	validator *jsonschema.Validator[GoogleDriveCreateTextFileExecutorInput],
 ) *GoogleDriveCreateTextFileExecutor {
 	return &GoogleDriveCreateTextFileExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -12,81 +12,79 @@ type WhatsAppSendTemplateNode struct {
 
 func NewWhatsAppSendTemplateNode(nodeID string) *WhatsAppSendTemplateNode {
 	return &WhatsAppSendTemplateNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "WhatsApp Send Template",
-			Description: "Send a template message via WhatsApp.",
-			Icon: nodes.NodeIcon{
-				Brand: "whatsapp",
-				Glyph: "file",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "WhatsApp Send Template",
+		Description: "Send a template message via WhatsApp.",
+		Icon: nodes.NodeIcon{
+			Brand: "whatsapp",
+			Glyph: "file",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"WhatsApp"},
+		Tags: []string{
+			"chat",
+			"messaging",
+			"send",
+			"template",
+			"notification",
+			"sms",
+		},
+		SupportedCredentials: []string{
+			"whatsapp_api",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"phoneNumber": {
+					Type:        "string",
+					Title:       "Phone Number",
+					Description: "Recipient phone number in international format.",
+				},
+				"templateName": {
+					Type:        "string",
+					Title:       "Template Name",
+					Description: "Name of the WhatsApp template to send.",
+				},
+				"languageCode": {
+					Type:        "string",
+					Title:       "Language Code",
+					Description: "Locale code for the template (e.g. en_US).",
+					Default:     json.RawMessage(`"en_US"`),
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"phoneNumber",
+				"templateName",
+				"languageCode",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Publishing"},
-			SubCategories: []string{"WhatsApp"},
-			Tags: []string{
-				"chat",
-				"messaging",
-				"send",
-				"template",
-				"notification",
-				"sms",
-			},
-			SupportedCredentials: []string{
-				"whatsapp_api",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"phoneNumber": {
-						Type:        "string",
-						Title:       "Phone Number",
-						Description: "Recipient phone number in international format.",
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the template message was sent successfully.",
 					},
-					"templateName": {
+					"messageId": {
 						Type:        "string",
-						Title:       "Template Name",
-						Description: "Name of the WhatsApp template to send.",
-					},
-					"languageCode": {
-						Type:        "string",
-						Title:       "Language Code",
-						Description: "Locale code for the template (e.g. en_US).",
-						Default:     json.RawMessage(`"en_US"`),
-					},
-				},
-				Required: []string{
-					"phoneNumber",
-					"templateName",
-					"languageCode",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the template message was sent successfully.",
-						},
-						"messageId": {
-							Type:        "string",
-							Description: "Identifier of the sent WhatsApp template message.",
-						},
+						Description: "Identifier of the sent WhatsApp template message.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

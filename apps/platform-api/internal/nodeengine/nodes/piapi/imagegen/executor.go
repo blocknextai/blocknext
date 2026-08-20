@@ -37,9 +37,7 @@ func NewPiAPIImageGenExecutor(
 	validator *jsonschema.Validator[PiAPIImageGenInput],
 ) *PiAPIImageGenExecutor {
 	return &PiAPIImageGenExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

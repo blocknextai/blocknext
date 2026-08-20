@@ -36,12 +36,10 @@ func NewUserPreference(
 	utcNow := time.Now().UTC()
 
 	pref := &UserPreference{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:         bnuuid.NewV7(),
+		CreatedAt:  utcNow,
+		UpdatedAt:  utcNow,
+		DeletedAt:  nil,
 		UserID:     userID,
 		ThemeMode:  themeMode,
 		ThemeColor: themeColor,

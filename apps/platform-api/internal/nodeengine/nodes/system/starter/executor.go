@@ -12,9 +12,7 @@ type StarterExecutor struct {
 
 func NewStarterExecutor(nodeID string) *StarterExecutor {
 	return &StarterExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID: nodeID,
 	}
 }
 

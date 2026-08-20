@@ -29,9 +29,7 @@ func NewGoogleSheetsCreateSpreadsheetExecutor(
 	validator *jsonschema.Validator[GoogleSheetsCreateSpreadsheetExecutorInput],
 ) *GoogleSheetsCreateSpreadsheetExecutor {
 	return &GoogleSheetsCreateSpreadsheetExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

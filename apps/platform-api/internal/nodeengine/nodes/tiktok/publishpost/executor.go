@@ -48,9 +48,7 @@ func NewTiktokPublishPostExecutor(
 	fileGateway filegateway.FileGateway,
 ) *TiktokPublishPostExecutor {
 	return &TiktokPublishPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

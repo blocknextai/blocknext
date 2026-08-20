@@ -21,13 +21,11 @@ func NewUser() (*User, error) {
 	utcNow := time.Now().UTC()
 
 	user := &User{
-		BaseEntity: database.BaseEntity{
-			ID:        uuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
-		Role: rbac.GlobalAdminRole.Name,
+		ID:        uuid.NewV7(),
+		CreatedAt: utcNow,
+		UpdatedAt: utcNow,
+		DeletedAt: nil,
+		Role:      rbac.GlobalAdminRole.Name,
 	}
 
 	return user.validateThenReturn()

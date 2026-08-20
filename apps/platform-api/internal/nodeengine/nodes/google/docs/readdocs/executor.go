@@ -26,9 +26,7 @@ func NewGoogleDocsReadDocsExecutor(
 	validator *jsonschema.Validator[GoogleDocsReadDocsExecutorInput],
 ) *GoogleDocsReadDocsExecutor {
 	return &GoogleDocsReadDocsExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

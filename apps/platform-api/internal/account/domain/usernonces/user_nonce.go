@@ -32,12 +32,10 @@ func NewUserNonce(
 	utcNow := time.Now().UTC()
 
 	userNonce := &UserNonce{
-		BaseEntity: database.BaseEntity{
-			ID:        uuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:                  uuid.NewV7(),
+		CreatedAt:           utcNow,
+		UpdatedAt:           utcNow,
+		DeletedAt:           nil,
 		AuthProvider:        authProvider,
 		ProviderID:          providerId,
 		Nonce:               nonce,

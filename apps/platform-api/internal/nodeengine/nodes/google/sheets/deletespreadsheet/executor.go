@@ -25,9 +25,7 @@ func NewGoogleSheetsDeleteSpreadsheetExecutor(
 	validator *jsonschema.Validator[GoogleSheetsDeleteSpreadsheetExecutorInput],
 ) *GoogleSheetsDeleteSpreadsheetExecutor {
 	return &GoogleSheetsDeleteSpreadsheetExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -31,9 +31,7 @@ func NewTelegramSendMessageExecutor(
 	validator *jsonschema.Validator[TelegramSendMessageExecutorInput],
 ) *TelegramSendMessageExecutor {
 	return &TelegramSendMessageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

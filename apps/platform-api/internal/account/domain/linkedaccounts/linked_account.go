@@ -34,12 +34,10 @@ func NewLinkedAccount(
 	utcNow := time.Now().UTC()
 
 	linkedAccount := &LinkedAccount{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:           bnuuid.NewV7(),
+		CreatedAt:    utcNow,
+		UpdatedAt:    utcNow,
+		DeletedAt:    nil,
 		UserID:       userID,
 		AuthProvider: authProvider,
 		ProviderID:   providerId,

@@ -35,12 +35,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	session := &Session{
-		BaseEntity: database.BaseEntity{
-			ID:        id,
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:                    id,
+		CreatedAt:             utcNow,
+		UpdatedAt:             utcNow,
+		DeletedAt:             nil,
 		UserID:                userID,
 		AuthProvider:          authProvider,
 		IPAddress:             ipAddress,

@@ -44,9 +44,7 @@ func NewXPublishMediaPostExecutor(
 	fileGateway filegateway.FileGateway,
 ) *XPublishMediaPostExecutor {
 	return &XPublishMediaPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

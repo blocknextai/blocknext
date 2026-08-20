@@ -31,9 +31,7 @@ func NewChatgptChatExecutor(
 	validator *jsonschema.Validator[ChatgptChatExecutorInput],
 ) *ChatgptChatExecutor {
 	return &ChatgptChatExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

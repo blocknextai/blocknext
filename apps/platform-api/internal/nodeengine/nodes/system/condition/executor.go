@@ -30,9 +30,7 @@ func NewConditionExecutor(
 	validator *jsonschema.Validator[ConditionExecutorInput],
 ) *ConditionExecutor {
 	return &ConditionExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

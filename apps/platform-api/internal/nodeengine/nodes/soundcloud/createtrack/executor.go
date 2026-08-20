@@ -36,9 +36,7 @@ func NewSoundCloudCreateTrackExecutor(
 	fileGateway filegateway.FileGateway,
 ) *SoundCloudCreateTrackExecutor {
 	return &SoundCloudCreateTrackExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

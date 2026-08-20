@@ -12,85 +12,83 @@ type VeoNode struct {
 
 func NewVeoNode(nodeID string) *VeoNode {
 	return &VeoNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Veo",
-			Description: "Generate a video from a text prompt using Veo.",
-			Icon: nodes.NodeIcon{
-				Brand: "veo",
-				Glyph: "film",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Veo",
+		Description: "Generate a video from a text prompt using Veo.",
+		Icon: nodes.NodeIcon{
+			Brand: "veo",
+			Glyph: "film",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Video"},
+		SubCategories: []string{"Veo"},
+		Tags: []string{
+			"google",
+			"ai",
+			"video",
+			"generation",
+			"media",
+			"creative",
+		},
+		SupportedCredentials: []string{
+			"veo_api",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"model": {
+					Type:        "string",
+					Title:       "Model",
+					Description: "Veo model identifier to use for generation.",
+					Enum: []any{
+						"veo-3.1-generate-preview",
+						"veo-3.1-lite-generate-preview",
+					},
+					Default: json.RawMessage(`"veo-3.1-lite-generate-preview"`),
+				},
+				"prompt": {
+					Type:        "string",
+					Title:       "Prompt",
+					Description: "Text prompt describing the video to generate.",
+				},
+				"image": {
+					Type:        "string",
+					Title:       "Image",
+					Description: "Optional reference image URL for image-to-video generation.",
+				},
+				"aspectRatio": {
+					Type:        "string",
+					Title:       "Aspect Ratio",
+					Description: "Aspect ratio of the generated video.",
+					Enum:        []any{"16:9"},
+					Default:     json.RawMessage(`"16:9"`),
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
-			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Video"},
-			SubCategories: []string{"Veo"},
-			Tags: []string{
-				"google",
-				"ai",
-				"video",
-				"generation",
-				"media",
-				"creative",
-			},
-			SupportedCredentials: []string{
-				"veo_api",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"model": {
+					"video": {
 						Type:        "string",
-						Title:       "Model",
-						Description: "Veo model identifier to use for generation.",
-						Enum: []any{
-							"veo-3.1-generate-preview",
-							"veo-3.1-lite-generate-preview",
-						},
-						Default: json.RawMessage(`"veo-3.1-lite-generate-preview"`),
-					},
-					"prompt": {
-						Type:        "string",
-						Title:       "Prompt",
-						Description: "Text prompt describing the video to generate.",
-					},
-					"image": {
-						Type:        "string",
-						Title:       "Image",
-						Description: "Optional reference image URL for image-to-video generation.",
-					},
-					"aspectRatio": {
-						Type:        "string",
-						Title:       "Aspect Ratio",
-						Description: "Aspect ratio of the generated video.",
-						Enum:        []any{"16:9"},
-						Default:     json.RawMessage(`"16:9"`),
+						Description: "URL of the generated Veo video.",
+						Format:      "uri",
 					},
 				},
 			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"video": {
-							Type:        "string",
-							Description: "URL of the generated Veo video.",
-							Format:      "uri",
-						},
-					},
-				},
-			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				ReadOnly:    true,
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			ReadOnly:    true,
+			Destructive: new(false),
 		},
 	}
 }

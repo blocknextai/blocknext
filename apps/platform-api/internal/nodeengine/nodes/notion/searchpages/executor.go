@@ -31,9 +31,7 @@ func NewNotionSearchPagesExecutor(
 	validator *jsonschema.Validator[NotionSearchPagesExecutorInput],
 ) *NotionSearchPagesExecutor {
 	return &NotionSearchPagesExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

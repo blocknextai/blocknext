@@ -33,12 +33,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	credential := &Credential{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:         bnuuid.NewV7(),
+		CreatedAt:  utcNow,
+		UpdatedAt:  utcNow,
+		DeletedAt:  nil,
 		OwnerType:  ownerType,
 		OwnerID:    ownerId,
 		SourceType: sourceType,

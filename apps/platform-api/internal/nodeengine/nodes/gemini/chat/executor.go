@@ -31,9 +31,7 @@ func NewGeminiChatExecutor(
 	validator *jsonschema.Validator[GeminiChatExecutorInput],
 ) *GeminiChatExecutor {
 	return &GeminiChatExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -36,12 +36,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	workflow := &Workflow{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:             bnuuid.NewV7(),
+		CreatedAt:      utcNow,
+		UpdatedAt:      utcNow,
+		DeletedAt:      nil,
 		OrganizationID: organizationID,
 		OwnerID:        ownerID,
 		Title:          title,

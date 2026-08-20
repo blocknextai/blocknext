@@ -24,12 +24,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	recipient := &NotificationRecipient{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:             bnuuid.NewV7(),
+		CreatedAt:      utcNow,
+		UpdatedAt:      utcNow,
+		DeletedAt:      nil,
 		NotificationID: notificationID,
 		UserID:         userID,
 	}

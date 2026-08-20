@@ -11,10 +11,8 @@ type DiscordAdapter struct {
 
 func NewDiscordAdapter(nodeID string) *DiscordAdapter {
 	return &DiscordAdapter{
-		Adapter: nodeEngineDomainAdapters.Adapter{
-			ID:   nodeID,
-			Name: "Discord",
-		},
+		ID:   nodeID,
+		Name: "Discord",
 	}
 }
 

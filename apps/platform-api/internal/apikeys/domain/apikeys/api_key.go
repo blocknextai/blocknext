@@ -31,11 +31,9 @@ func New(
 	now := time.Now().UTC()
 
 	apiKey := &APIKey{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
+		ID:        bnuuid.NewV7(),
+		CreatedAt: now,
+		UpdatedAt: now,
 		OwnerType: ownerType,
 		OwnerID:   ownerID,
 		Name:      name,

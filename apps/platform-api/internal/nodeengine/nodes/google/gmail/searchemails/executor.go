@@ -57,9 +57,7 @@ func NewGmailSearchEmailsExecutor(
 	validator *jsonschema.Validator[GmailSearchEmailsExecutorInput],
 ) *GmailSearchEmailsExecutor {
 	return &GmailSearchEmailsExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

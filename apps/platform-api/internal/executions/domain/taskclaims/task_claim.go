@@ -22,12 +22,10 @@ func New(taskExecutionID uuid.UUID) (*TaskClaim, error) {
 	utcNow := time.Now().UTC()
 
 	taskClaim := &TaskClaim{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:              bnuuid.NewV7(),
+		CreatedAt:       utcNow,
+		UpdatedAt:       utcNow,
+		DeletedAt:       nil,
 		TaskExecutionID: taskExecutionID,
 		RetryCount:      0,
 	}

@@ -28,9 +28,7 @@ func NewGoogleSheetsAddDataToSpreadsheetExecutor(
 	validator *jsonschema.Validator[GoogleSheetsAddDataToSpreadsheetExecutorInput],
 ) *GoogleSheetsAddDataToSpreadsheetExecutor {
 	return &GoogleSheetsAddDataToSpreadsheetExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

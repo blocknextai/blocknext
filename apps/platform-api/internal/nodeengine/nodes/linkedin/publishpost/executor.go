@@ -62,9 +62,7 @@ func NewLinkedinPublishPostExecutor(
 	validator *jsonschema.Validator[LinkedinPublishPostExecutorInput],
 ) *LinkedinPublishPostExecutor {
 	return &LinkedinPublishPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

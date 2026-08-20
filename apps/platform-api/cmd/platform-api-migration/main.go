@@ -231,8 +231,7 @@ func migrateDown(db *sql.DB, databaseName string, targetModules []string, dryRun
 	}
 
 	slog.Info("Running DOWN migrations", "component", "migration")
-	for i := len(targetModules) - 1; i >= 0; i-- {
-		module := targetModules[i]
+	for _, module := range slices.Backward(targetModules) {
 		slog.Info("Processing module", "component", "migration", "module", module)
 
 		if !hasMigrationFiles(module) {
@@ -255,8 +254,8 @@ func checkMigrationStatus(db *sql.DB, databaseName string, targetModules []strin
 	modulesToCheck := targetModules
 	if direction == "down" {
 		reversed := make([]string, 0, len(targetModules))
-		for i := len(targetModules) - 1; i >= 0; i-- {
-			reversed = append(reversed, targetModules[i])
+		for _, targetModule := range slices.Backward(targetModules) {
+			reversed = append(reversed, targetModule)
 		}
 		modulesToCheck = reversed
 	}

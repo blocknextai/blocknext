@@ -32,9 +32,7 @@ func NewSendgridSendEmailExecutor(
 	validator *jsonschema.Validator[SendgridSendEmailExecutorInput],
 ) *SendgridSendEmailExecutor {
 	return &SendgridSendEmailExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }
