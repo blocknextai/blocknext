@@ -34,9 +34,7 @@ func NewWhatsAppSendMediaExecutor(
 	validator *jsonschema.Validator[WhatsAppSendMediaExecutorInput],
 ) *WhatsAppSendMediaExecutor {
 	return &WhatsAppSendMediaExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

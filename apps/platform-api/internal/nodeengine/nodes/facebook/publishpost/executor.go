@@ -32,9 +32,7 @@ func NewFacebookPublishPostExecutor(
 	validator *jsonschema.Validator[FacebookPublishPostExecutorInput],
 ) *FacebookPublishPostExecutor {
 	return &FacebookPublishPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

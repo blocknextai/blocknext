@@ -32,9 +32,7 @@ func NewCoingeckoPriceMonitorExecutor(
 	validator *jsonschema.Validator[CoingeckoPriceMonitorExecutorInput],
 ) *CoingeckoPriceMonitorExecutor {
 	return &CoingeckoPriceMonitorExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

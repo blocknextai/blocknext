@@ -6,7 +6,7 @@ Reusable Go packages shared by the BlockNext services.
 
 This module is consumed in-repo: the Go workspace (`go.work`) at the monorepo root and `replace` directives in each app's `go.mod` point `github.com/blocknextai/go-packages` at this directory — no separate publishing or `go get` required.
 
-Requires Go `1.26.5`.
+Requires Go `1.27.0`.
 
 ## Packages
 

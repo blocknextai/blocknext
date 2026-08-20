@@ -11,10 +11,8 @@ type TelegramAdapter struct {
 
 func NewTelegramAdapter(nodeID string) *TelegramAdapter {
 	return &TelegramAdapter{
-		Adapter: nodeEngineDomainAdapters.Adapter{
-			ID:   nodeID,
-			Name: "Telegram",
-		},
+		ID:   nodeID,
+		Name: "Telegram",
 	}
 }
 

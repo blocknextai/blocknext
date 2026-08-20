@@ -11,86 +11,84 @@ type GoogleDriveGetFileNode struct {
 
 func NewGoogleDriveGetFileNode(nodeID string) *GoogleDriveGetFileNode {
 	return &GoogleDriveGetFileNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Google Drive Get File",
-			Description: "Retrieve a file from Google Drive along with its metadata.",
-			Icon: nodes.NodeIcon{
-				Brand: "google_drive",
-				Glyph: "file",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Google Drive Get File",
+		Description: "Retrieve a file from Google Drive along with its metadata.",
+		Icon: nodes.NodeIcon{
+			Brand: "google_drive",
+			Glyph: "file",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Google Workspace"},
+		SubCategories: []string{"Google Drive"},
+		Tags: []string{
+			"google",
+			"drive",
+			"file",
+			"get",
+			"download",
+			"storage",
+		},
+		SupportedCredentials: []string{
+			"google_drive_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"fileId": {
+					Type:        "string",
+					Title:       "File ID",
+					Description: "Identifier of the Google Drive file to retrieve.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"fileId",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Google Workspace"},
-			SubCategories: []string{"Google Drive"},
-			Tags: []string{
-				"google",
-				"drive",
-				"file",
-				"get",
-				"download",
-				"storage",
-			},
-			SupportedCredentials: []string{
-				"google_drive_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"fileId": {
+					"file": {
 						Type:        "string",
-						Title:       "File ID",
-						Description: "Identifier of the Google Drive file to retrieve.",
+						Description: "File contents (text) or hosted URL for binary uploads.",
 					},
-				},
-				Required: []string{
-					"fileId",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"file": {
-							Type:        "string",
-							Description: "File contents (text) or hosted URL for binary uploads.",
-						},
-						"metadata": {
-							Type: "object",
-							Properties: map[string]*gjs.Schema{
-								"id": {
-									Type:        "string",
-									Description: "Identifier of the file.",
-								},
-								"name": {
-									Type:        "string",
-									Description: "Name of the file.",
-								},
-								"size": {
-									Type:        "string",
-									Description: "Size of the file in bytes.",
-								},
-								"mimeType": {
-									Type:        "string",
-									Description: "MIME type of the file.",
-								},
+					"metadata": {
+						Type: "object",
+						Properties: map[string]*gjs.Schema{
+							"id": {
+								Type:        "string",
+								Description: "Identifier of the file.",
+							},
+							"name": {
+								Type:        "string",
+								Description: "Name of the file.",
+							},
+							"size": {
+								Type:        "string",
+								Description: "Size of the file in bytes.",
+							},
+							"mimeType": {
+								Type:        "string",
+								Description: "MIME type of the file.",
 							},
 						},
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				ReadOnly:   true,
-				Idempotent: true,
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			ReadOnly:   true,
+			Idempotent: true,
 		},
 	}
 }

@@ -45,9 +45,7 @@ func NewGoogleDriveGetFileExecutor(
 	fileGateway filegateway.FileGateway,
 ) *GoogleDriveGetFileExecutor {
 	return &GoogleDriveGetFileExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

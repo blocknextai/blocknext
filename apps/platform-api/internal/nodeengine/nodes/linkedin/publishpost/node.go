@@ -12,82 +12,80 @@ type LinkedinPublishPostNode struct {
 
 func NewLinkedinPublishPostNode(nodeID string) *LinkedinPublishPostNode {
 	return &LinkedinPublishPostNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "LinkedIn Publish Post",
-			Description: "Publish a post to a LinkedIn account.",
-			Icon: nodes.NodeIcon{
-				Brand: "linkedin",
-				Glyph: "send",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "LinkedIn Publish Post",
+		Description: "Publish a post to a LinkedIn account.",
+		Icon: nodes.NodeIcon{
+			Brand: "linkedin",
+			Glyph: "send",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"LinkedIn"},
+		Tags: []string{
+			"social",
+			"social-media",
+			"professional",
+			"b2b",
+			"publish",
+			"post",
+			"share",
+		},
+		SupportedCredentials: []string{
+			"linkedin_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"text": {
+					Type:        "string",
+					Title:       "Text",
+					Description: "Text content of the LinkedIn post.",
+				},
+				"visibility": {
+					Type:        "string",
+					Title:       "Visibility",
+					Description: "Visibility of the post (PUBLIC or CONNECTIONS).",
+					Enum:        []any{"PUBLIC", "CONNECTIONS"},
+					Default:     json.RawMessage(`"PUBLIC"`),
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"text",
+				"visibility",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Publishing"},
-			SubCategories: []string{"LinkedIn"},
-			Tags: []string{
-				"social",
-				"social-media",
-				"professional",
-				"b2b",
-				"publish",
-				"post",
-				"share",
-			},
-			SupportedCredentials: []string{
-				"linkedin_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"text": {
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the post was published successfully.",
+					},
+					"postId": {
 						Type:        "string",
-						Title:       "Text",
-						Description: "Text content of the LinkedIn post.",
+						Description: "Identifier of the published LinkedIn post.",
 					},
-					"visibility": {
+					"postUrl": {
 						Type:        "string",
-						Title:       "Visibility",
-						Description: "Visibility of the post (PUBLIC or CONNECTIONS).",
-						Enum:        []any{"PUBLIC", "CONNECTIONS"},
-						Default:     json.RawMessage(`"PUBLIC"`),
-					},
-				},
-				Required: []string{
-					"text",
-					"visibility",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the post was published successfully.",
-						},
-						"postId": {
-							Type:        "string",
-							Description: "Identifier of the published LinkedIn post.",
-						},
-						"postUrl": {
-							Type:        "string",
-							Description: "URL of the published LinkedIn post.",
-							Format:      "uri",
-						},
+						Description: "URL of the published LinkedIn post.",
+						Format:      "uri",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

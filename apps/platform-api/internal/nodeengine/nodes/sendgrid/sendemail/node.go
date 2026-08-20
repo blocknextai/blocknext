@@ -11,83 +11,81 @@ type SendgridSendEmailNode struct {
 
 func NewSendgridSendEmailNode(nodeID string) *SendgridSendEmailNode {
 	return &SendgridSendEmailNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "SendGrid Send Email",
-			Description: "Send an email through SendGrid.",
-			Icon: nodes.NodeIcon{
-				Brand: "sendgrid",
-				Glyph: "send",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "SendGrid Send Email",
+		Description: "Send an email through SendGrid.",
+		Icon: nodes.NodeIcon{
+			Brand: "sendgrid",
+			Glyph: "send",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Mailing"},
+		SubCategories: []string{"SendGrid"},
+		Tags: []string{
+			"email",
+			"send",
+			"transactional",
+			"mailing",
+			"notification",
+		},
+		SupportedCredentials: []string{
+			"sendgrid_api",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"from": {
+					Type:        "string",
+					Title:       "From",
+					Description: "Sender email address.",
+					Format:      "email",
+				},
+				"to": {
+					Type:        "array",
+					Title:       "To",
+					Description: "List of recipient email addresses.",
+					Items:       &gjs.Schema{Type: "string", Format: "email"},
+				},
+				"subject": {
+					Type:        "string",
+					Title:       "Subject",
+					Description: "Email subject line.",
+				},
+				"content": {
+					Type:        "string",
+					Title:       "Content",
+					Description: "HTML body content of the email.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"from",
+				"to",
+				"subject",
+				"content",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Mailing"},
-			SubCategories: []string{"SendGrid"},
-			Tags: []string{
-				"email",
-				"send",
-				"transactional",
-				"mailing",
-				"notification",
-			},
-			SupportedCredentials: []string{
-				"sendgrid_api",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"from": {
-						Type:        "string",
-						Title:       "From",
-						Description: "Sender email address.",
-						Format:      "email",
-					},
-					"to": {
-						Type:        "array",
-						Title:       "To",
-						Description: "List of recipient email addresses.",
-						Items:       &gjs.Schema{Type: "string", Format: "email"},
-					},
-					"subject": {
-						Type:        "string",
-						Title:       "Subject",
-						Description: "Email subject line.",
-					},
-					"content": {
-						Type:        "string",
-						Title:       "Content",
-						Description: "HTML body content of the email.",
-					},
-				},
-				Required: []string{
-					"from",
-					"to",
-					"subject",
-					"content",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the email was sent successfully.",
-						},
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the email was sent successfully.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

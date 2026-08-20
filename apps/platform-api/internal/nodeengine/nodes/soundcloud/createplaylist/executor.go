@@ -32,9 +32,7 @@ func NewSoundCloudCreatePlaylistExecutor(
 	validator *jsonschema.Validator[SoundCloudCreatePlaylistExecutorInput],
 ) *SoundCloudCreatePlaylistExecutor {
 	return &SoundCloudCreatePlaylistExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

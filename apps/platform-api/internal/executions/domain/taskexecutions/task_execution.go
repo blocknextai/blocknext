@@ -43,12 +43,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	taskExecution := &TaskExecution{
-		BaseEntity: database.BaseEntity{
-			ID:        id,
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:                id,
+		CreatedAt:         utcNow,
+		UpdatedAt:         utcNow,
+		DeletedAt:         nil,
 		OrganizationID:    organizationID,
 		TriggeredByUserID: triggeredByUserID,
 		ExecutionContext:  executionContext,

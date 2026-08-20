@@ -12,108 +12,106 @@ type PiAPIAudioGenNode struct {
 
 func NewPiAPIAudioGenNode(nodeID string) *PiAPIAudioGenNode {
 	return &PiAPIAudioGenNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "PiAPI Audio Generation",
-			Description: "Generate audio using PiAPI.",
-			Icon: nodes.NodeIcon{
-				Brand: "piapi",
-				Glyph: "speaker",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "PiAPI Audio Generation",
+		Description: "Generate audio using PiAPI.",
+		Icon: nodes.NodeIcon{
+			Brand: "piapi",
+			Glyph: "speaker",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Audio"},
+		SubCategories: []string{"PiApi"},
+		Tags: []string{
+			"ai",
+			"audio",
+			"music",
+			"generation",
+			"sound",
+			"creative",
+		},
+		SupportedCredentials: []string{
+			"piapi_api",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"prompt": {
+					Type:        "string",
+					Title:       "Prompt",
+					Description: "Prompt describing the audio to generate.",
+				},
+				"negativeTags": {
+					Type:        "string",
+					Title:       "Negative Tags",
+					Description: "Tags to exclude from the generated audio.",
+				},
+				"gptDescriptionPrompt": {
+					Type:        "string",
+					Title:       "GPT Description Prompt",
+					Description: "Optional GPT-generated description prompt for guidance.",
+				},
+				"title": {
+					Type:        "string",
+					Title:       "Title",
+					Description: "Title for the generated track.",
+				},
+				"lyricsType": {
+					Type:        "string",
+					Title:       "Lyrics Type",
+					Description: "How lyrics should be produced for the track.",
+					Enum:        []any{"generate", "user", "instrumental"},
+					Default:     json.RawMessage(`"generate"`),
+				},
+				"seed": {
+					Type:        "number",
+					Title:       "Seed",
+					Description: "Seed used for deterministic generation.",
+				},
+				"lyrics": {
+					Type:        "string",
+					Title:       "Lyrics",
+					Description: "User-provided lyrics when lyricsType is set to user.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"prompt",
+				"lyricsType",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Audio"},
-			SubCategories: []string{"PiApi"},
-			Tags: []string{
-				"ai",
-				"audio",
-				"music",
-				"generation",
-				"sound",
-				"creative",
-			},
-			SupportedCredentials: []string{
-				"piapi_api",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"prompt": {
+					"audio": {
 						Type:        "string",
-						Title:       "Prompt",
-						Description: "Prompt describing the audio to generate.",
+						Description: "URL of the generated audio file.",
+						Format:      "uri",
 					},
-					"negativeTags": {
+					"image": {
 						Type:        "string",
-						Title:       "Negative Tags",
-						Description: "Tags to exclude from the generated audio.",
+						Description: "URL of the generated cover image.",
+						Format:      "uri",
 					},
-					"gptDescriptionPrompt": {
+					"text": {
 						Type:        "string",
-						Title:       "GPT Description Prompt",
-						Description: "Optional GPT-generated description prompt for guidance.",
-					},
-					"title": {
-						Type:        "string",
-						Title:       "Title",
-						Description: "Title for the generated track.",
-					},
-					"lyricsType": {
-						Type:        "string",
-						Title:       "Lyrics Type",
-						Description: "How lyrics should be produced for the track.",
-						Enum:        []any{"generate", "user", "instrumental"},
-						Default:     json.RawMessage(`"generate"`),
-					},
-					"seed": {
-						Type:        "number",
-						Title:       "Seed",
-						Description: "Seed used for deterministic generation.",
-					},
-					"lyrics": {
-						Type:        "string",
-						Title:       "Lyrics",
-						Description: "User-provided lyrics when lyricsType is set to user.",
-					},
-				},
-				Required: []string{
-					"prompt",
-					"lyricsType",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"audio": {
-							Type:        "string",
-							Description: "URL of the generated audio file.",
-							Format:      "uri",
-						},
-						"image": {
-							Type:        "string",
-							Description: "URL of the generated cover image.",
-							Format:      "uri",
-						},
-						"text": {
-							Type:        "string",
-							Description: "Generated lyrics text.",
-						},
+						Description: "Generated lyrics text.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				ReadOnly:    true,
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			ReadOnly:    true,
+			Destructive: new(false),
 		},
 	}
 }

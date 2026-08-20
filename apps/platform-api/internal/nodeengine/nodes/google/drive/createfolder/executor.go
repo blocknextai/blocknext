@@ -26,9 +26,7 @@ func NewGoogleDriveCreateFolderExecutor(
 	validator *jsonschema.Validator[GoogleDriveCreateFolderExecutorInput],
 ) *GoogleDriveCreateFolderExecutor {
 	return &GoogleDriveCreateFolderExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

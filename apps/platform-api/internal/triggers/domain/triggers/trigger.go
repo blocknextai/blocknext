@@ -41,11 +41,9 @@ func New(
 	utcNow := time.Now().UTC()
 
 	flowTrigger := &Trigger{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-		},
+		ID:                bnuuid.NewV7(),
+		CreatedAt:         utcNow,
+		UpdatedAt:         utcNow,
 		OrganizationID:    organizationID,
 		TriggeredByUserID: triggeredByUserID,
 		ExecutionContext:  executionContext,

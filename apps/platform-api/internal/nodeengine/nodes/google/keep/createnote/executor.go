@@ -26,9 +26,7 @@ func NewGoogleKeepCreateNoteExecutor(
 	validator *jsonschema.Validator[GoogleKeepCreateNoteExecutorInput],
 ) *GoogleKeepCreateNoteExecutor {
 	return &GoogleKeepCreateNoteExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

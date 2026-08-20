@@ -31,9 +31,7 @@ func NewPiAPIAudioGenExecutor(
 	validator *jsonschema.Validator[PiAPIAudioGenInput],
 ) *PiAPIAudioGenExecutor {
 	return &PiAPIAudioGenExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

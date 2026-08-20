@@ -29,9 +29,7 @@ func NewInstagramPublishReelsExecutor(
 	validator *jsonschema.Validator[InstagramPublishReelsExecutorInput],
 ) *InstagramPublishReelsExecutor {
 	return &InstagramPublishReelsExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

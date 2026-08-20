@@ -11,75 +11,73 @@ type SoundCloudCreatePlaylistNode struct {
 
 func NewSoundCloudCreatePlaylistNode(nodeID string) *SoundCloudCreatePlaylistNode {
 	return &SoundCloudCreatePlaylistNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "SoundCloud Create Playlist",
-			Description: "Create a new playlist on SoundCloud.",
-			Icon: nodes.NodeIcon{
-				Brand: "soundcloud",
-				Glyph: "list",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "SoundCloud Create Playlist",
+		Description: "Create a new playlist on SoundCloud.",
+		Icon: nodes.NodeIcon{
+			Brand: "soundcloud",
+			Glyph: "list",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"SoundCloud"},
+		Tags: []string{
+			"playlist",
+			"create",
+			"collection",
+			"music",
+			"audio",
+			"media",
+			"share",
+		},
+		SupportedCredentials: []string{
+			"soundcloud_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"title": {
+					Type:        "string",
+					Title:       "Title",
+					Description: "Title of the SoundCloud playlist.",
+				},
+				"description": {
+					Type:        "string",
+					Title:       "Description",
+					Description: "Optional description of the SoundCloud playlist.",
+				},
+				"trackIds": {
+					Type:        "string",
+					Title:       "Track IDs",
+					Description: "Identifiers of the tracks to include in the playlist.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"title",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Publishing"},
-			SubCategories: []string{"SoundCloud"},
-			Tags: []string{
-				"playlist",
-				"create",
-				"collection",
-				"music",
-				"audio",
-				"media",
-				"share",
-			},
-			SupportedCredentials: []string{
-				"soundcloud_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"title": {
-						Type:        "string",
-						Title:       "Title",
-						Description: "Title of the SoundCloud playlist.",
-					},
-					"description": {
-						Type:        "string",
-						Title:       "Description",
-						Description: "Optional description of the SoundCloud playlist.",
-					},
-					"trackIds": {
-						Type:        "string",
-						Title:       "Track IDs",
-						Description: "Identifiers of the tracks to include in the playlist.",
-					},
-				},
-				Required: []string{
-					"title",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the SoundCloud playlist was created successfully.",
-						},
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the SoundCloud playlist was created successfully.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

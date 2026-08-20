@@ -36,9 +36,7 @@ func NewElevenlabsTextToSpeechExecutor(
 	fileGateway filegateway.FileGateway,
 ) *ElevenlabsTextToSpeechExecutor {
 	return &ElevenlabsTextToSpeechExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

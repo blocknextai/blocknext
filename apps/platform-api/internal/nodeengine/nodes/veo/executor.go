@@ -40,9 +40,7 @@ func NewVeoExecutor(
 	fileGateway filegateway.FileGateway,
 ) *VeoExecutor {
 	return &VeoExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

@@ -36,12 +36,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	nodeExecution := &NodeExecution{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:                     bnuuid.NewV7(),
+		CreatedAt:              utcNow,
+		UpdatedAt:              utcNow,
+		DeletedAt:              nil,
 		TaskID:                 taskID,
 		NodeType:               nodeType,
 		NodeID:                 nodeID,

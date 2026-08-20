@@ -41,9 +41,7 @@ func NewSlackSendMediaExecutor(
 	fileGateway filegateway.FileGateway,
 ) *SlackSendMediaExecutor {
 	return &SlackSendMediaExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

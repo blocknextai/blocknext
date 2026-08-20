@@ -2,6 +2,7 @@ package cqrs
 
 import (
 	"context"
+	"slices"
 )
 
 type Handler[C any, R any] interface {
@@ -17,8 +18,8 @@ func (f HandlerFunc[C, R]) Handle(ctx context.Context, command C) (R, error) {
 type Behavior[C any, R any] func(next Handler[C, R]) Handler[C, R]
 
 func Chain[C any, R any](handler Handler[C, R], behaviors ...Behavior[C, R]) Handler[C, R] {
-	for i := len(behaviors) - 1; i >= 0; i-- {
-		handler = behaviors[i](handler)
+	for _, behavior := range slices.Backward(behaviors) {
+		handler = behavior(handler)
 	}
 
 	return handler

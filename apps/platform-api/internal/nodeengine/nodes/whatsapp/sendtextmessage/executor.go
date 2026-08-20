@@ -30,9 +30,7 @@ func NewWhatsAppSendTextMessageExecutor(
 	validator *jsonschema.Validator[WhatsAppSendTextMessageExecutorInput],
 ) *WhatsAppSendTextMessageExecutor {
 	return &WhatsAppSendTextMessageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

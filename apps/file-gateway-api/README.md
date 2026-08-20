@@ -13,7 +13,7 @@ A Go-based file gateway service built with [Fiber v3](https://gofiber.io/) that 
 ## Requirements
 
 - Docker and Docker Compose
-- Go 1.26+ (only for local builds outside Docker)
+- Go 1.27.0 (only for local builds outside Docker)
 - S3-compatible or Bunny.net storage credentials (optional — the default driver stores files on local disk)
 
 ## Setup

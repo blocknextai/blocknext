@@ -34,9 +34,7 @@ func NewInstagramPublishPostExecutor(
 	validator *jsonschema.Validator[InstagramPublishPostExecutorInput],
 ) *InstagramPublishPostExecutor {
 	return &InstagramPublishPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -83,9 +83,7 @@ func NewLinkedinPublishMediaPostExecutor(
 	fileGateway filegateway.FileGateway,
 ) *LinkedinPublishMediaPostExecutor {
 	return &LinkedinPublishMediaPostExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

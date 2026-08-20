@@ -25,9 +25,7 @@ func NewSunoMusicCreateLyricsExecutor(
 	validator *jsonschema.Validator[SunoMusicCreateLyricsInput],
 ) *SunoMusicCreateLyricsExecutor {
 	return &SunoMusicCreateLyricsExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

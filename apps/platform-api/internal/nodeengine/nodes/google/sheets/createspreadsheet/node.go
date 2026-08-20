@@ -11,77 +11,75 @@ type GoogleSheetsCreateSpreadsheetNode struct {
 
 func NewGoogleSheetsCreateSpreadsheetNode(nodeID string) *GoogleSheetsCreateSpreadsheetNode {
 	return &GoogleSheetsCreateSpreadsheetNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Google Sheets Create Spreadsheet",
-			Description: "Create a new Google Sheets spreadsheet with the given title.",
-			Icon: nodes.NodeIcon{
-				Brand: "google_sheets",
-				Glyph: "table",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Google Sheets Create Spreadsheet",
+		Description: "Create a new Google Sheets spreadsheet with the given title.",
+		Icon: nodes.NodeIcon{
+			Brand: "google_sheets",
+			Glyph: "table",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Google Workspace"},
+		SubCategories: []string{"Google Sheets"},
+		Tags: []string{
+			"google",
+			"sheets",
+			"spreadsheet",
+			"create",
+			"data",
+			"productivity",
+		},
+		SupportedCredentials: []string{
+			"google_sheets_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"title": {
+					Type:        "string",
+					Title:       "Title",
+					Description: "Title of the new spreadsheet.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"title",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Google Workspace"},
-			SubCategories: []string{"Google Sheets"},
-			Tags: []string{
-				"google",
-				"sheets",
-				"spreadsheet",
-				"create",
-				"data",
-				"productivity",
-			},
-			SupportedCredentials: []string{
-				"google_sheets_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"title": {
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the spreadsheet was created successfully.",
+					},
+					"id": {
 						Type:        "string",
-						Title:       "Title",
-						Description: "Title of the new spreadsheet.",
+						Description: "Identifier of the created spreadsheet.",
 					},
-				},
-				Required: []string{
-					"title",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the spreadsheet was created successfully.",
-						},
-						"id": {
-							Type:        "string",
-							Description: "Identifier of the created spreadsheet.",
-						},
-						"name": {
-							Type:        "string",
-							Description: "Name of the created spreadsheet.",
-						},
-						"webViewLink": {
-							Type:        "string",
-							Format:      "uri",
-							Description: "Web view link to open the spreadsheet.",
-						},
+					"name": {
+						Type:        "string",
+						Description: "Name of the created spreadsheet.",
+					},
+					"webViewLink": {
+						Type:        "string",
+						Format:      "uri",
+						Description: "Web view link to open the spreadsheet.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

@@ -31,9 +31,7 @@ func NewWhatsAppSendTemplateExecutor(
 	validator *jsonschema.Validator[WhatsAppSendTemplateExecutorInput],
 ) *WhatsAppSendTemplateExecutor {
 	return &WhatsAppSendTemplateExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

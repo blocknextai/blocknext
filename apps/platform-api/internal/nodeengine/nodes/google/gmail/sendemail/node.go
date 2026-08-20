@@ -11,77 +11,75 @@ type GmailSendEmailNode struct {
 
 func NewGmailSendEmailNode(nodeID string) *GmailSendEmailNode {
 	return &GmailSendEmailNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Gmail Send Email",
-			Description: "Send an email through Gmail.",
-			Icon: nodes.NodeIcon{
-				Brand: "gmail",
-				Glyph: "send",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Gmail Send Email",
+		Description: "Send an email through Gmail.",
+		Icon: nodes.NodeIcon{
+			Brand: "gmail",
+			Glyph: "send",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Mailing"},
+		SubCategories: []string{"Gmail"},
+		Tags: []string{
+			"google",
+			"email",
+			"mail",
+			"send",
+			"mailing",
+			"notification",
+		},
+		SupportedCredentials: []string{
+			"gmail_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"to": {
+					Type:        "string",
+					Title:       "To",
+					Description: "Recipient email address.",
+					Format:      "email",
+				},
+				"subject": {
+					Type:        "string",
+					Title:       "Subject",
+					Description: "Email subject line.",
+				},
+				"body": {
+					Type:        "string",
+					Title:       "Body",
+					Description: "Plain text body of the email.",
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"to",
+				"subject",
+				"body",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Mailing"},
-			SubCategories: []string{"Gmail"},
-			Tags: []string{
-				"google",
-				"email",
-				"mail",
-				"send",
-				"mailing",
-				"notification",
-			},
-			SupportedCredentials: []string{
-				"gmail_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"to": {
-						Type:        "string",
-						Title:       "To",
-						Description: "Recipient email address.",
-						Format:      "email",
-					},
-					"subject": {
-						Type:        "string",
-						Title:       "Subject",
-						Description: "Email subject line.",
-					},
-					"body": {
-						Type:        "string",
-						Title:       "Body",
-						Description: "Plain text body of the email.",
-					},
-				},
-				Required: []string{
-					"to",
-					"subject",
-					"body",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the email was sent successfully.",
-						},
+					"status": {
+						Type:        "boolean",
+						Description: "Whether the email was sent successfully.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

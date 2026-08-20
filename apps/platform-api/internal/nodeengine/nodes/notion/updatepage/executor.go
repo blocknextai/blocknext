@@ -34,9 +34,7 @@ func NewNotionUpdatePageExecutor(
 	validator *jsonschema.Validator[NotionUpdatePageExecutorInput],
 ) *NotionUpdatePageExecutor {
 	return &NotionUpdatePageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

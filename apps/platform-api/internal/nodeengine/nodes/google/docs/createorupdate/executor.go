@@ -27,9 +27,7 @@ func NewGoogleDocsCreateOrUpdateExecutor(
 	validator *jsonschema.Validator[GoogleDocsCreateOrUpdateExecutorInput],
 ) *GoogleDocsCreateOrUpdateExecutor {
 	return &GoogleDocsCreateOrUpdateExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -32,9 +32,7 @@ func NewAirtableCreateRecordExecutor(
 	validator *jsonschema.Validator[AirtableCreateRecordExecutorInput],
 ) *AirtableCreateRecordExecutor {
 	return &AirtableCreateRecordExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

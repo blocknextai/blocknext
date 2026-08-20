@@ -38,9 +38,7 @@ func NewDiscordSendMediaExecutor(
 	fileGateway filegateway.FileGateway,
 ) *DiscordSendMediaExecutor {
 	return &DiscordSendMediaExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

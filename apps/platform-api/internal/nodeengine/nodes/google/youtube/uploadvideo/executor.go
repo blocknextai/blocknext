@@ -50,9 +50,7 @@ func NewYouTubeUploadVideoExecutor(
 	fileGateway filegateway.FileGateway,
 ) *YouTubeUploadVideoExecutor {
 	return &YouTubeUploadVideoExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:          nodeID,
 		validator:   validator,
 		fileGateway: fileGateway,
 	}

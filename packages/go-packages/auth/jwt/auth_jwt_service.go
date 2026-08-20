@@ -63,14 +63,12 @@ func (s *authJWTService) GenerateAccessToken(userID uuid.UUID, sessionID uuid.UU
 	now := time.Now().UTC()
 
 	claims := AccessTokenClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    s.issuer,
-			Audience:  []string{s.audience},
-			Subject:   userID.String(),
-			ExpiresAt: jwt.NewNumericDate(now.Add(s.accessTokenExpirationTime)),
-			IssuedAt:  jwt.NewNumericDate(now),
-			NotBefore: jwt.NewNumericDate(now),
-		},
+		Issuer:    s.issuer,
+		Audience:  []string{s.audience},
+		Subject:   userID.String(),
+		ExpiresAt: jwt.NewNumericDate(now.Add(s.accessTokenExpirationTime)),
+		IssuedAt:  jwt.NewNumericDate(now),
+		NotBefore: jwt.NewNumericDate(now),
 		TokenType: TokenTypeAccessToken,
 		SessionID: sessionID.String(),
 	}
@@ -83,14 +81,12 @@ func (s *authJWTService) GenerateRefreshToken(userID uuid.UUID, sessionID uuid.U
 	now := time.Now().UTC()
 
 	claims := RefreshTokenClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    s.issuer,
-			Audience:  []string{s.audience},
-			Subject:   userID.String(),
-			ExpiresAt: jwt.NewNumericDate(now.Add(s.refreshTokenExpirationTime)),
-			IssuedAt:  jwt.NewNumericDate(now),
-			NotBefore: jwt.NewNumericDate(now),
-		},
+		Issuer:    s.issuer,
+		Audience:  []string{s.audience},
+		Subject:   userID.String(),
+		ExpiresAt: jwt.NewNumericDate(now.Add(s.refreshTokenExpirationTime)),
+		IssuedAt:  jwt.NewNumericDate(now),
+		NotBefore: jwt.NewNumericDate(now),
 		TokenType: TokenTypeRefreshToken,
 		SessionID: sessionID.String(),
 	}

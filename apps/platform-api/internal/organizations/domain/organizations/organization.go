@@ -24,12 +24,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	organization := &Organization{
-		BaseEntity: database.BaseEntity{
-			ID:        uuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:          uuid.NewV7(),
+		CreatedAt:   utcNow,
+		UpdatedAt:   utcNow,
+		DeletedAt:   nil,
 		Title:       title,
 		Description: description,
 		IsVerified:  isVerified,

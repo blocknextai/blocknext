@@ -41,9 +41,7 @@ func NewGmailOrganizeEmailsExecutor(
 	validator *jsonschema.Validator[GmailOrganizeEmailsExecutorInput],
 ) *GmailOrganizeEmailsExecutor {
 	return &GmailOrganizeEmailsExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

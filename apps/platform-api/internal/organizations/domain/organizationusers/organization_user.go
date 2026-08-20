@@ -28,12 +28,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	organizationUser := &OrganizationUser{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:             bnuuid.NewV7(),
+		CreatedAt:      utcNow,
+		UpdatedAt:      utcNow,
+		DeletedAt:      nil,
 		OrganizationID: organizationID,
 		UserID:         userID,
 		Role:           role,

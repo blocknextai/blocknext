@@ -36,9 +36,7 @@ func NewGmailSendEmailExecutor(
 	validator *jsonschema.Validator[GmailSendEmailExecutorInput],
 ) *GmailSendEmailExecutor {
 	return &GmailSendEmailExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

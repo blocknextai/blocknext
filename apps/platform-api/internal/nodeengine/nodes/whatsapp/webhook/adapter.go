@@ -17,10 +17,8 @@ type WhatsAppAdapter struct {
 
 func NewWhatsAppAdapter(nodeID string) *WhatsAppAdapter {
 	return &WhatsAppAdapter{
-		Adapter: nodeEngineDomainAdapters.Adapter{
-			ID:   nodeID,
-			Name: "WhatsApp",
-		},
+		ID:   nodeID,
+		Name: "WhatsApp",
 	}
 }
 

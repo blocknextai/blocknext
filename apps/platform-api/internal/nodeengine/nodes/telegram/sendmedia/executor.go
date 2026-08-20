@@ -33,9 +33,7 @@ func NewTelegramSendMediaExecutor(
 	validator *jsonschema.Validator[TelegramSendMediaExecutorInput],
 ) *TelegramSendMediaExecutor {
 	return &TelegramSendMediaExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

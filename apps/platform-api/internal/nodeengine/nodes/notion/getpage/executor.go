@@ -30,9 +30,7 @@ func NewNotionGetPageExecutor(
 	validator *jsonschema.Validator[NotionGetPageExecutorInput],
 ) *NotionGetPageExecutor {
 	return &NotionGetPageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

@@ -26,12 +26,10 @@ func New(
 	utcNow := time.Now().UTC()
 
 	message := &GenerationMessage{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:        bnuuid.NewV7(),
+		CreatedAt: utcNow,
+		UpdatedAt: utcNow,
+		DeletedAt: nil,
 		SessionID: sessionID,
 		Role:      role,
 		Content:   content,

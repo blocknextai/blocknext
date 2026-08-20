@@ -12,86 +12,84 @@ type InstagramPublishReelsNode struct {
 
 func NewInstagramPublishReelsNode(nodeID string) *InstagramPublishReelsNode {
 	return &InstagramPublishReelsNode{
-		Node: nodes.Node{
-			ID:          nodeID,
-			Kind:        nodes.NodeKindAction,
-			Version:     "0.0.1",
-			Name:        "Instagram Publish Reels",
-			Description: "Publish a Reel to an Instagram account.",
-			Icon: nodes.NodeIcon{
-				Brand: "instagram",
-				Glyph: "film",
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Instagram Publish Reels",
+		Description: "Publish a Reel to an Instagram account.",
+		Icon: nodes.NodeIcon{
+			Brand: "instagram",
+			Glyph: "film",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"Instagram"},
+		Tags: []string{
+			"social",
+			"social-media",
+			"video",
+			"short-video",
+			"publish",
+			"share",
+		},
+		SupportedCredentials: []string{
+			"instagram_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"videoUrl": {
+					Type:        "string",
+					Title:       "Video URL",
+					Description: "URL of the video to publish as a reel.",
+					Format:      "uri",
+				},
+				"caption": {
+					Type:        "string",
+					Title:       "Caption",
+					Description: "Caption text for the reel.",
+				},
+				"coverImageUrl": {
+					Type:        "string",
+					Title:       "Cover Image URL",
+					Description: "Optional cover image URL for the reel.",
+					Format:      "uri",
+				},
+				"shareToFeed": {
+					Type:        "boolean",
+					Title:       "Share to Feed",
+					Description: "Whether to also share the reel to the Instagram feed.",
+					Default:     json.RawMessage(`true`),
+				},
 			},
-			Inputs: []nodes.NodeHandle{
-				{Key: "in"},
+			Required: []string{
+				"videoUrl",
 			},
-			Outputs: []nodes.NodeHandle{
-				{Key: "out"},
-			},
-			Categories:    []string{"Publishing"},
-			SubCategories: []string{"Instagram"},
-			Tags: []string{
-				"social",
-				"social-media",
-				"video",
-				"short-video",
-				"publish",
-				"share",
-			},
-			SupportedCredentials: []string{
-				"instagram_oauth2",
-			},
-			InputSchema: &gjs.Schema{
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
 				Type: "object",
 				Properties: map[string]*gjs.Schema{
-					"videoUrl": {
-						Type:        "string",
-						Title:       "Video URL",
-						Description: "URL of the video to publish as a reel.",
-						Format:      "uri",
-					},
-					"caption": {
-						Type:        "string",
-						Title:       "Caption",
-						Description: "Caption text for the reel.",
-					},
-					"coverImageUrl": {
-						Type:        "string",
-						Title:       "Cover Image URL",
-						Description: "Optional cover image URL for the reel.",
-						Format:      "uri",
-					},
-					"shareToFeed": {
+					"status": {
 						Type:        "boolean",
-						Title:       "Share to Feed",
-						Description: "Whether to also share the reel to the Instagram feed.",
-						Default:     json.RawMessage(`true`),
+						Description: "Whether the reel was published successfully.",
 					},
-				},
-				Required: []string{
-					"videoUrl",
-				},
-			},
-			OutputSchema: &gjs.Schema{
-				Type: "array",
-				Items: &gjs.Schema{
-					Type: "object",
-					Properties: map[string]*gjs.Schema{
-						"status": {
-							Type:        "boolean",
-							Description: "Whether the reel was published successfully.",
-						},
-						"reelsId": {
-							Type:        "string",
-							Description: "Identifier of the published reel.",
-						},
+					"reelsId": {
+						Type:        "string",
+						Description: "Identifier of the published reel.",
 					},
 				},
 			},
-			HasNaturalLanguage: true,
-			Annotations: nodes.NodeAnnotations{
-				Destructive: new(false),
-			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			Destructive: new(false),
 		},
 	}
 }

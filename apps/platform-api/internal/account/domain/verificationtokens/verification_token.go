@@ -31,12 +31,10 @@ func NewVerificationToken(
 	normalizedEmail := domain.NormalizeEmail(email)
 
 	token := &VerificationToken{
-		BaseEntity: database.BaseEntity{
-			ID:        bnuuid.NewV7(),
-			CreatedAt: utcNow,
-			UpdatedAt: utcNow,
-			DeletedAt: nil,
-		},
+		ID:        bnuuid.NewV7(),
+		CreatedAt: utcNow,
+		UpdatedAt: utcNow,
+		DeletedAt: nil,
 		UserID:    userID,
 		Purpose:   purpose,
 		TokenHash: tokenHash,

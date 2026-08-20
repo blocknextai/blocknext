@@ -32,9 +32,7 @@ func NewNotionCreatePageExecutor(
 	validator *jsonschema.Validator[NotionCreatePageExecutorInput],
 ) *NotionCreatePageExecutor {
 	return &NotionCreatePageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

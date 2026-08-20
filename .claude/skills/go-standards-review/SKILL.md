@@ -183,7 +183,7 @@ for _, v := range src {
 
 ### 8. `new(value)` over `&value`
 
-**Memory:** `feedback_go_new_keyword` — Go 1.26+ idiom in this project.
+**Memory:** `feedback_go_new_keyword` — Go 1.27.0 idiom in this project.
 
 **Detect:** `&` immediately followed by a literal value or a local variable being captured for nullable purposes.
 ```bash

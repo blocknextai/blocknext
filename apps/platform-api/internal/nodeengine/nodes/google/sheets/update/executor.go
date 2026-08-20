@@ -33,9 +33,7 @@ func NewGoogleSheetsUpdateExecutor(
 	validator *jsonschema.Validator[GoogleSheetsUpdateExecutorInput],
 ) *GoogleSheetsUpdateExecutor {
 	return &GoogleSheetsUpdateExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

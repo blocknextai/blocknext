@@ -30,9 +30,7 @@ func NewSlackSendMessageExecutor(
 	validator *jsonschema.Validator[SlackSendMessageExecutorInput],
 ) *SlackSendMessageExecutor {
 	return &SlackSendMessageExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }

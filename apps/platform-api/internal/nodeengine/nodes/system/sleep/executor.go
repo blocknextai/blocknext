@@ -22,9 +22,7 @@ func NewSleepExecutor(
 	validator *jsonschema.Validator[SleepExecutorInput],
 ) *SleepExecutor {
 	return &SleepExecutor{
-		Executor: executors.Executor{
-			ID: nodeID,
-		},
+		ID:        nodeID,
 		validator: validator,
 	}
 }
