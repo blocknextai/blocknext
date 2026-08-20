@@ -6,7 +6,7 @@ A modern, scalable API service built with Go, following Domain-Driven Design (DD
 
 ### Prerequisites
 - Docker, Docker Compose and Make
-- Go 1.26.5 (optional, for local development)
+- Go 1.27.0 (optional, for local development)
 
 ### 🐳 Docker
 
@@ -50,7 +50,7 @@ The `cmd/` directory contains the entry points for each runnable service:
 
 ## 🛠️ Key Technologies
 
-- **Language**: Go 1.26.5
+- **Language**: Go 1.27.0
 - **Web Framework**: [Fiber v3](https://github.com/gofiber/fiber)
 - **Database**: PostgreSQL 18 via `database/sql` + `lib/pq` (no ORM)
 - **Migrations**: [golang-migrate](https://github.com/golang-migrate/migrate)

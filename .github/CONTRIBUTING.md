@@ -22,7 +22,7 @@ workspaces + Turborepo. All configuration lives in the single root `.env`
 
 ## Getting started
 
-Requirements: Docker + Docker Compose, Make. (Go 1.26+ and [Bun](https://bun.sh)
+Requirements: Docker + Docker Compose, Make. (Go 1.27.0 and [Bun](https://bun.sh)
 are only needed for host-side development — see below.)
 
 ```bash
