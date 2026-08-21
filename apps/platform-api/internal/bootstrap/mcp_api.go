@@ -110,6 +110,7 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		StateTTL:          shared.CredentialOAuth.StateTTL,
 		OAuth2RedirectURL: shared.CredentialOAuth.OAuth2RedirectURL,
 
+		CredentialService:           credentialsModule.CredentialService,
 		NodeEngineCredentialService: nodeEngineModule.CredentialService,
 		PlatformCredentialService:   platformModule.PlatformCredentialService,
 	})
