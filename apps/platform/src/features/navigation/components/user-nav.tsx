@@ -30,9 +30,7 @@ import {
 import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { ModeToggle } from '@/features/theme/components/mode-toggle'
-import tokenManager from '@/lib/token-manager'
-import { authService } from '@/features/auth'
-import { useOrganizationStore } from '@/stores/organization'
+import { logoutAndRedirect } from '@/features/auth'
 import { useUserNotificationsCount } from '@/features/notifications'
 
 const NavUser = ({ linkedAccounts, alone }) => {
@@ -58,16 +56,6 @@ const NavUser = ({ linkedAccounts, alone }) => {
   const address = primaryAccount?.identifier || ''
   const displayName = address ? address.slice(0, 10) + '...' : ''
 
-  const doLogOut = async () => {
-    try {
-      await authService.logout()
-    } catch {
-      // proceed with local logout even if backend call fails
-    }
-    tokenManager.clearTokens()
-    useOrganizationStore.getState().reset()
-    window.location.href = '/auth/login'
-  }
   const [copied, setCopied] = useState(false)
   const copyClipboard = () => {
     navigator.clipboard.writeText(address)
@@ -166,7 +154,7 @@ const NavUser = ({ linkedAccounts, alone }) => {
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={doLogOut}>
+        <DropdownMenuItem variant="destructive" onClick={logoutAndRedirect}>
           <LogOut size={16} />
           {t('ui.text.logOut')}
         </DropdownMenuItem>

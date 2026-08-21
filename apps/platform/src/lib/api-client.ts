@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 import tokenManager from '@/lib/token-manager'
+import { buildLoginUrl, LOGIN_PATH } from '@/lib/auth-redirect'
 import { config } from '@/lib/config'
 
 export interface ApiPaginationMetaResponse {
@@ -89,17 +90,13 @@ const attemptTokenRefresh = async (): Promise<boolean> => {
 
 const redirectToLogin = () => {
   tokenManager.clearTokens()
-  const currentPath = window.location.pathname + window.location.search
-  if (
-    currentPath &&
-    currentPath !== '/' &&
-    !currentPath.startsWith('/auth/login')
-  ) {
-    const returnUrl = encodeURIComponent(currentPath)
-    window.location.href = `/auth/login?returnUrl=${returnUrl}`
-  } else {
-    window.location.href = '/auth/login'
+  const { pathname, search } = window.location
+
+  if (pathname.startsWith(LOGIN_PATH)) {
+    return
   }
+
+  window.location.href = buildLoginUrl(pathname + search)
 }
 
 export const createApiClient = (baseURL: string) => {

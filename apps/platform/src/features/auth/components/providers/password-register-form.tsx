@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { authService } from '@/features/auth'
 import tokenManager from '@/lib/token-manager'
+import { getReturnUrl } from '@/lib/auth-redirect'
+import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -21,6 +23,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const redirectAfterAuth = useAuthRedirect()
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validate = () => {
@@ -52,10 +55,7 @@ const PasswordRegisterForm = ({ onSubmitted }: Props) => {
       const tokens = response.data
       if (tokens?.accessToken) {
         tokenManager.setTokens(tokens.accessToken, tokens.refreshToken)
-        const returnUrl = new URLSearchParams(window.location.search).get(
-          'returnUrl',
-        )
-        window.location.href = returnUrl || '/'
+        await redirectAfterAuth(getReturnUrl())
         return
       }
       onSubmitted?.(email)

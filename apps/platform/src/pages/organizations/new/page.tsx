@@ -15,8 +15,7 @@ import { ModeToggle } from '@/features/theme/components/mode-toggle'
 import { CreateOrganizationForm } from '@/features/organizations/components/create-organization-form'
 import { useOrganizations } from '@/features/organizations'
 import { useOrganizationStore } from '@/stores/organization'
-import { authService } from '@/features/auth'
-import tokenManager from '@/lib/token-manager'
+import { logoutAndRedirect } from '@/features/auth'
 
 const OrganizationCreatePage = () => {
   const { t } = useTranslation()
@@ -29,17 +28,6 @@ const OrganizationCreatePage = () => {
   const handleCreated = (organization) => {
     setOrganizationId(organization.id)
     navigate(`/organizations/${organization.id}`, { replace: true })
-  }
-
-  const handleLogout = async () => {
-    try {
-      await authService.logout()
-    } catch {
-      // proceed with local logout even if backend call fails
-    }
-    tokenManager.clearTokens()
-    useOrganizationStore.getState().reset()
-    window.location.href = '/auth/login'
   }
 
   if (isLoading) {
@@ -81,7 +69,7 @@ const OrganizationCreatePage = () => {
                 <Button
                   variant="link"
                   className="text-muted-foreground"
-                  onClick={handleLogout}
+                  onClick={logoutAndRedirect}
                 >
                   {t('ui.text.logOut')}
                 </Button>

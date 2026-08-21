@@ -2,18 +2,15 @@ import { ethers } from 'ethers'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import tokenManager from '@/lib/token-manager'
+import { getReturnUrl } from '@/lib/auth-redirect'
 import { ProviderIcon } from '@/features/auth/components/provider-icon'
+import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 
 const MetaMaskLoginButton = ({ mode = 'login', authActions }) => {
   const { t } = useTranslation()
 
   const isInstalled = typeof window.ethereum !== 'undefined'
-
-  const redirect = () => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const returnUrl = urlParams.get('returnUrl')
-    window.location.href = returnUrl || '/'
-  }
+  const redirectAfterAuth = useAuthRedirect()
 
   const handleMetaMaskLogin = async () => {
     try {
@@ -50,7 +47,7 @@ const MetaMaskLoginButton = ({ mode = 'login', authActions }) => {
         })
         const tokens = tokenResponse.data
         tokenManager.setTokens(tokens.accessToken, tokens.refreshToken)
-        redirect()
+        await redirectAfterAuth(getReturnUrl())
       }
     } catch (error) {
       console.error('MetaMask login error:', error)
