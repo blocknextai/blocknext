@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Loading } from '@/components/shared/loading'
-import { authService } from '@/features/auth'
+import { authService, useAuthRedirect } from '@/features/auth'
 import tokenManager from '@/lib/token-manager'
+import { getReturnUrl } from '@/lib/auth-redirect'
 
 type Status = 'pending' | 'error'
 
@@ -14,6 +15,7 @@ function AuthVerifyEmailPage() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   const [status, setStatus] = useState<Status>('pending')
+  const redirectAfterAuth = useAuthRedirect()
 
   useEffect(() => {
     if (!token) {
@@ -23,7 +25,7 @@ function AuthVerifyEmailPage() {
     let cancelled = false
     authService
       .verifyEmail({ token })
-      .then((response) => {
+      .then(async (response) => {
         if (cancelled) {
           return
         }
@@ -33,9 +35,7 @@ function AuthVerifyEmailPage() {
           return
         }
         tokenManager.setTokens(tokens.accessToken, tokens.refreshToken)
-        const urlParams = new URLSearchParams(window.location.search)
-        const returnUrl = urlParams.get('returnUrl')
-        window.location.href = returnUrl || '/preferences/profile'
+        await redirectAfterAuth(getReturnUrl('/preferences/profile'))
       })
       .catch(() => {
         if (!cancelled) {
@@ -45,7 +45,7 @@ function AuthVerifyEmailPage() {
     return () => {
       cancelled = true
     }
-  }, [token])
+  }, [token, redirectAfterAuth])
 
   return (
     <>

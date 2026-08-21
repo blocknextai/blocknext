@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams, useParams, Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import toast from '@/lib/toast'
-import { authService } from '@/features/auth'
+import { authService, useAuthRedirect } from '@/features/auth'
 import { getProviderName } from '@/features/auth/components/provider-utils'
 import { ProviderIcon } from '@/features/auth/components/provider-icon'
 import { Button } from '@/components/ui/button'
 import { Loading } from '@/components/shared/loading'
 import tokenManager from '@/lib/token-manager'
+import { sanitizeReturnUrl } from '@/lib/auth-redirect'
 
 function AuthLoginCallbackPage() {
   const { t } = useTranslation()
@@ -17,6 +18,7 @@ function AuthLoginCallbackPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [mode, setMode] = useState('login')
+  const redirectAfterAuth = useAuthRedirect()
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -40,7 +42,7 @@ function AuthLoginCallbackPage() {
             const stateObj = JSON.parse(atob(encodedState))
             currentMode = stateObj.mode || 'login'
             originalState = stateObj.state || ''
-            returnUrl = stateObj.returnUrl || ''
+            returnUrl = sanitizeReturnUrl(stateObj.returnUrl) ?? ''
           } catch (error) {
             console.error('Failed to decode state:', error)
             toast.error(t('ui.text.invalidStateParameter'))
@@ -108,7 +110,7 @@ function AuthLoginCallbackPage() {
           )
 
           // Redirect to returnUrl from state or dashboard
-          navigate(returnUrl || '/')
+          await redirectAfterAuth(returnUrl || '/')
         }
       } catch (error) {
         console.error(
@@ -121,7 +123,7 @@ function AuthLoginCallbackPage() {
     }
 
     handleCallback()
-  }, [searchParams, navigate, provider])
+  }, [searchParams, navigate, provider, redirectAfterAuth])
 
   const getActionText = () => {
     const isLinkedAccounts = mode === 'linked_accounts'

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff, Loader2, MailCheck } from 'lucide-react'
-import { authService, useAuthMethods } from '@/features/auth'
+import { authService, useAuthMethods, useAuthRedirect } from '@/features/auth'
 import { BackToSignInLink } from '@/features/auth/components/back-to-sign-in-link'
 import { ProviderLoginButton } from '@/features/auth/components/provider-login-button'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loading } from '@/components/shared/loading'
 import tokenManager from '@/lib/token-manager'
+import { getReturnUrl } from '@/lib/auth-redirect'
 import { useOrganizationStore } from '@/stores/organization'
 
 const Divider = ({ label }: { label: string }) => (
@@ -50,16 +51,11 @@ function AuthLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
   const [sendingMagicLink, setSendingMagicLink] = useState(false)
+  const redirectAfterAuth = useAuthRedirect()
 
   useEffect(() => {
     useOrganizationStore.getState().reset()
   }, [])
-
-  const redirect = () => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const returnUrl = urlParams.get('returnUrl')
-    window.location.href = returnUrl || '/'
-  }
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,7 +78,7 @@ function AuthLoginPage() {
         return
       }
       tokenManager.setTokens(tokens.accessToken, tokens.refreshToken)
-      redirect()
+      await redirectAfterAuth(getReturnUrl())
     } catch (error) {
       console.error('Password login error:', error)
     } finally {
