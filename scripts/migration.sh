@@ -10,7 +10,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MIGRATION_RUN="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.local.yml run --rm --build platform-api-migration"
+MIGRATION_RUN="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.dev.yml run --rm --build platform-api-migration"
 
 # Function to display usage
 usage() {

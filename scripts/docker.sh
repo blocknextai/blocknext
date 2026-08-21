@@ -5,7 +5,7 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.prod.yml"
 ALL_PROFILES='COMPOSE_PROFILES=*' 
-COMPOSE_LOCAL="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.local.yml"
+COMPOSE_DEV="docker compose --project-directory $REPO_ROOT -f $REPO_ROOT/docker-compose.dev.yml"
 
 usage() {
     echo "Usage: $0 <command>"
@@ -18,13 +18,13 @@ usage() {
     echo "  ps            List service status"
     echo "  clean         Remove services and volumes"
     echo ""
-    echo "Local (builds from ./docker):"
-    echo "  local-build   Build all service images"
-    echo "  local-up      Start services in the background"
-    echo "  local-down    Stop services"
-    echo "  local-logs    Follow service logs"
-    echo "  local-ps      List service status"
-    echo "  local-clean   Remove services and volumes"
+    echo "Dev (builds from ./docker):"
+    echo "  dev-build     Build all service images"
+    echo "  dev-up        Start services in the background"
+    echo "  dev-down      Stop services"
+    echo "  dev-logs      Follow service logs"
+    echo "  dev-ps        List service status"
+    echo "  dev-clean     Remove services and volumes"
     echo ""
     exit 1
 }
@@ -48,23 +48,23 @@ case $1 in
     clean)
         env "$ALL_PROFILES" $COMPOSE down -v --remove-orphans
         ;;
-    local-build)
-        DOCKER_BUILDKIT=1 $COMPOSE_LOCAL build
+    dev-build)
+        DOCKER_BUILDKIT=1 $COMPOSE_DEV build
         ;;
-    local-up)
-        DOCKER_BUILDKIT=1 $COMPOSE_LOCAL up -d --build
+    dev-up)
+        DOCKER_BUILDKIT=1 $COMPOSE_DEV up -d --build
         ;;
-    local-down)
-        env "$ALL_PROFILES" $COMPOSE_LOCAL down
+    dev-down)
+        env "$ALL_PROFILES" $COMPOSE_DEV down
         ;;
-    local-logs)
-        $COMPOSE_LOCAL logs -f
+    dev-logs)
+        $COMPOSE_DEV logs -f
         ;;
-    local-ps)
-        $COMPOSE_LOCAL ps
+    dev-ps)
+        $COMPOSE_DEV ps
         ;;
-    local-clean)
-        env "$ALL_PROFILES" $COMPOSE_LOCAL down -v --remove-orphans
+    dev-clean)
+        env "$ALL_PROFILES" $COMPOSE_DEV down -v --remove-orphans
         ;;
     *)
         usage

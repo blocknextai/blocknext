@@ -16,6 +16,10 @@ setup: ## create .env with generated secrets (all you need to run the stack)
 setup-dev: ## setup + install Go and Bun dependencies for local development
 	@./scripts/setup-dev.sh
 
+.PHONY: dev
+dev: ## run the UI dev server on the host (turbo run dev)
+	@bun run dev
+
 ##@ go
 
 .PHONY: go-fmt
@@ -86,28 +90,28 @@ docker-ps: ## list service status
 docker-clean: ## remove services and volumes
 	@./scripts/docker.sh clean
 
-##@ local docker (builds from ./docker)
+##@ docker-dev (builds from ./docker)
 
-.PHONY: local-docker-build
-local-docker-build: ## build all service images
-	@./scripts/docker.sh local-build
+.PHONY: docker-dev-build
+docker-dev-build: ## build all service images
+	@./scripts/docker.sh dev-build
 
-.PHONY: local-docker-up
-local-docker-up: ## start services in the background
-	@./scripts/docker.sh local-up
+.PHONY: docker-dev-up
+docker-dev-up: ## start services in the background
+	@./scripts/docker.sh dev-up
 
-.PHONY: local-docker-down
-local-docker-down: ## stop services
-	@./scripts/docker.sh local-down
+.PHONY: docker-dev-down
+docker-dev-down: ## stop services
+	@./scripts/docker.sh dev-down
 
-.PHONY: local-docker-logs
-local-docker-logs: ## follow service logs
-	@./scripts/docker.sh local-logs
+.PHONY: docker-dev-logs
+docker-dev-logs: ## follow service logs
+	@./scripts/docker.sh dev-logs
 
-.PHONY: local-docker-ps
-local-docker-ps: ## list service status
-	@./scripts/docker.sh local-ps
+.PHONY: docker-dev-ps
+docker-dev-ps: ## list service status
+	@./scripts/docker.sh dev-ps
 
-.PHONY: local-docker-clean
-local-docker-clean: ## remove services and volumes
-	@./scripts/docker.sh local-clean
+.PHONY: docker-dev-clean
+docker-dev-clean: ## remove services and volumes
+	@./scripts/docker.sh dev-clean

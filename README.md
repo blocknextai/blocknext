@@ -73,7 +73,7 @@ SMTP, Resend or SendGrid when you have credentials.
 
 To build and run everything from source instead, see
 [CONTRIBUTING.md](.github/CONTRIBUTING.md) — the development workflow uses
-`make local-docker-up`.
+`make docker-dev-up`.
 
 ## Upgrading
 
