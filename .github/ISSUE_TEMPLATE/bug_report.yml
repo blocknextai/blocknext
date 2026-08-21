@@ -52,7 +52,7 @@ body:
       label: How are you running BlockNext?
       options:
         - make docker-up (published images)
-        - make local-docker-up (built from source)
+        - make docker-dev-up (built from source)
         - other (describe below)
     validations:
       required: true
@@ -67,5 +67,5 @@ body:
     id: logs
     attributes:
       label: Relevant logs
-      description: Output of `make docker-logs` / `make local-docker-logs` for the failing service. Redact secrets.
+      description: Output of `make docker-logs` / `make docker-dev-logs` for the failing service. Redact secrets.
       render: shell

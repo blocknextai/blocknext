@@ -59,7 +59,7 @@ packages/
 docker/                 # Per-app Dockerfiles (api / worker / migration / nginx)
 scripts/                # Everything the Makefile proxies to
 docker-compose.prod.yml # Pulls published images (make docker-up)
-docker-compose.local.yml# Builds from source (make local-docker-up)
+docker-compose.dev.yml  # Builds from source (make docker-dev-up)
 .env.example            # Single root env file for the whole stack
 ```
 

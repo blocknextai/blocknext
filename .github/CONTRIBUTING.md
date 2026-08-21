@@ -27,7 +27,7 @@ are only needed for host-side development — see below.)
 
 ```bash
 make setup            # creates .env with generated secrets
-make local-docker-up  # builds and starts the full stack from source
+make docker-dev-up    # builds and starts the full stack from source
 ```
 
 The UI is served on http://localhost:4000; APIs on 3000 (platform),
@@ -45,7 +45,7 @@ For a faster UI feedback loop, stop the `platform` container and run the dev
 server on the host:
 
 ```bash
-cd apps/platform && bun run dev
+make dev              # turbo run dev
 ```
 
 ## Making changes
