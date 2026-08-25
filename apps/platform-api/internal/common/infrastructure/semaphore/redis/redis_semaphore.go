@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/blocknextai/go-packages/redisclient"
-	taskRunnerDomainTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/domain/taskrunner"
-	"github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore"
+	commonDomainSemaphore "github.com/blocknextai/platform-api/internal/common/domain/semaphore"
+	"github.com/blocknextai/platform-api/internal/common/infrastructure/semaphore/token"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
@@ -24,7 +24,7 @@ type RedisSemaphore struct {
 	heartbeatScript *redis.Script
 }
 
-func NewRedisSemaphore(addr string, password string, db int, poolOptions redisclient.PoolOptions, ttl time.Duration) (taskRunnerDomainTaskRunner.SemaphoreManager, error) {
+func NewRedisSemaphore(addr string, password string, db int, poolOptions redisclient.PoolOptions, ttl time.Duration) (commonDomainSemaphore.SemaphoreManager, error) {
 	client, err := redisclient.New(addr, password, db, poolOptions)
 	if err != nil {
 		return nil, err
@@ -101,18 +101,18 @@ func (sm *RedisSemaphore) Ping(ctx context.Context) error {
 	return sm.client.Ping(ctx).Err()
 }
 
-func (sm *RedisSemaphore) AcquireSemaphore(ctx context.Context, organizationID uuid.UUID, taskID uuid.UUID, maxConcurrentExecutions int64) (chan struct{}, error) {
+func (sm *RedisSemaphore) AcquireSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID, maxConcurrentExecutions int64) (chan struct{}, error) {
 	key := sm.buildSemaphoreKey(organizationID)
 
-	return semaphore.AcquireWithBackoff(ctx, func(ctx context.Context) (bool, error) {
-		return sm.tryAcquire(ctx, key, taskID, maxConcurrentExecutions)
+	return token.AcquireWithBackoff(ctx, func(ctx context.Context) (bool, error) {
+		return sm.tryAcquire(ctx, key, holderID, maxConcurrentExecutions)
 	})
 }
 
-func (sm *RedisSemaphore) tryAcquire(ctx context.Context, key string, taskID uuid.UUID, max int64) (bool, error) {
+func (sm *RedisSemaphore) tryAcquire(ctx context.Context, key string, holderID uuid.UUID, max int64) (bool, error) {
 	result, err := sm.acquireScript.Run(ctx, sm.client,
 		[]string{key},
-		taskID.String(),
+		holderID.String(),
 		max,
 		int(sm.ttl.Seconds()),
 	).Int()
@@ -122,19 +122,19 @@ func (sm *RedisSemaphore) tryAcquire(ctx context.Context, key string, taskID uui
 	return result == 1, nil
 }
 
-func (sm *RedisSemaphore) ReleaseSemaphore(ctx context.Context, organizationID uuid.UUID, taskID uuid.UUID, token chan struct{}) error {
-	semaphore.Drain(token)
+func (sm *RedisSemaphore) ReleaseSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID, semaphore chan struct{}) error {
+	token.Drain(semaphore)
 
 	key := sm.buildSemaphoreKey(organizationID)
-	_, err := sm.releaseScript.Run(ctx, sm.client, []string{key}, taskID.String()).Result()
+	_, err := sm.releaseScript.Run(ctx, sm.client, []string{key}, holderID.String()).Result()
 	return err
 }
 
-func (sm *RedisSemaphore) HeartbeatSemaphore(ctx context.Context, organizationID uuid.UUID, taskID uuid.UUID) error {
+func (sm *RedisSemaphore) HeartbeatSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID) error {
 	key := sm.buildSemaphoreKey(organizationID)
 	_, err := sm.heartbeatScript.Run(ctx, sm.client,
 		[]string{key},
-		taskID.String(),
+		holderID.String(),
 		int(sm.ttl.Seconds()),
 	).Result()
 	return err

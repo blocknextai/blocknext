@@ -15,7 +15,6 @@ const (
 	CredentialScope  = "credential"
 	CredentialPrefix = CredentialScope + ":"
 
-	UserCredentialScope         Scope = "user"
 	OrganizationCredentialScope Scope = "organization"
 
 	CredentialMaskValue = "__BLOCKNEXT_CREDENTIAL_VALUE_1121a730-5165-4c9b-af0e-29759f08b65c__"
@@ -23,7 +22,6 @@ const (
 
 var (
 	CredentialScopes = map[Scope]struct{}{
-		UserCredentialScope:         {},
 		OrganizationCredentialScope: {},
 	}
 )
@@ -39,8 +37,6 @@ func (s Scope) IsValid() bool {
 
 func BuildUIKey(ownerType string, id string) string {
 	switch ownerType {
-	case UserCredentialScope.String():
-		return CredentialPrefix + UserCredentialScope.String() + ":" + id
 	case OrganizationCredentialScope.String():
 		return CredentialPrefix + OrganizationCredentialScope.String() + ":" + id
 	default:

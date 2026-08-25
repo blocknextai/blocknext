@@ -25,6 +25,7 @@ type SharedConfig struct {
 	MCP             MCPOptions             `envPrefix:"MCP_"`
 	Auth            AuthOptions            `envPrefix:"AUTH_"`
 	EmailSender     EmailSenderOptions     `envPrefix:"EMAIL_SENDER_"`
+	Semaphore       SemaphoreOptions       `envPrefix:"SEMAPHORE_"`
 }
 
 func LoadShared() (*SharedConfig, error) {

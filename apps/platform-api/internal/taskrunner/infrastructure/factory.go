@@ -11,16 +11,13 @@ import (
 	taskRunnerDomainTaskRunner "github.com/blocknextai/platform-api/internal/taskrunner/domain/taskrunner"
 	taskRunnerInfrastructureLeaderMemory "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/leader/memory"
 	taskRunnerInfrastructureLeaderRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/leader/redis"
-	taskRunnerInfrastructureSemaphoreMemory "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore/memory"
-	taskRunnerInfrastructureSemaphoreRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore/redis"
 	taskRunnerInfrastructureTaskQueueRedis "github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/taskqueue/redis"
 )
 
 var (
-	ErrInvalidTaskQueueProvider     = apperror.Internal("invalid task queue provider")
-	ErrInvalidTaskLockProvider      = apperror.Internal("invalid task lock provider")
-	ErrInvalidTaskSemaphoreProvider = apperror.Internal("invalid task semaphore provider")
-	ErrInvalidTaskRunnerMode        = apperror.Internal("invalid task runner mode")
+	ErrInvalidTaskQueueProvider = apperror.Internal("invalid task queue provider")
+	ErrInvalidTaskLockProvider  = apperror.Internal("invalid task lock provider")
+	ErrInvalidTaskRunnerMode    = apperror.Internal("invalid task runner mode")
 )
 
 func NewTaskQueue(queueOptions config.TaskRunnerQueueOptions, consumerName string) (taskqueue.TaskQueue, error) {
@@ -48,31 +45,6 @@ func NewTaskQueue(queueOptions config.TaskRunnerQueueOptions, consumerName strin
 	}
 
 	return nil, ErrInvalidTaskQueueProvider
-}
-
-func NewSemaphore(semaphoreOptions config.TaskRunnerSemaphoreOptions) (taskRunnerDomainTaskRunner.SemaphoreManager, error) {
-	if semaphoreOptions.Provider == config.TaskSemaphoreProviderMemory {
-		return taskRunnerInfrastructureSemaphoreMemory.New(semaphoreOptions.TTL), nil
-	}
-
-	if semaphoreOptions.Provider == config.TaskSemaphoreProviderRedis {
-		return taskRunnerInfrastructureSemaphoreRedis.NewRedisSemaphore(
-			semaphoreOptions.Redis.Address,
-			semaphoreOptions.Redis.Password,
-			semaphoreOptions.Redis.DB,
-			redisclient.PoolOptions{
-				PoolSize:        semaphoreOptions.Redis.PoolSize,
-				MinIdleConns:    semaphoreOptions.Redis.MinIdleConns,
-				MaxIdleConns:    semaphoreOptions.Redis.MaxIdleConns,
-				PoolTimeout:     semaphoreOptions.Redis.PoolTimeout,
-				ConnMaxIdleTime: semaphoreOptions.Redis.ConnMaxIdleTime,
-				ConnMaxLifetime: semaphoreOptions.Redis.ConnMaxLifetime,
-			},
-			semaphoreOptions.TTL,
-		)
-	}
-
-	return nil, ErrInvalidTaskSemaphoreProvider
 }
 
 func NewDispatcher(

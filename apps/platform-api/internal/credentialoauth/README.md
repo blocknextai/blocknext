@@ -40,7 +40,6 @@ This context owns the interactive OAuth2 connect flow for credentials: it builds
 - **`regenerate.OAuthTokenRegenerateService`** — `RegenerateTokenIfNeeded` refreshes an OAuth2 token when needed, guarded by a Redis semaphore lock (`oauth:oauth2:refresh:`) to handle refresh-token rotation; consumed by the taskrunner context.
 
 ## HTTP API
-- `POST /users/me/oauth/auth` — build auth URL (`Authenticate()` + `RequireUserPermission(UpdateUserCredentialsPermission)`).
 - `POST /organizations/:organizationId/oauth/auth` — build auth URL (`Authenticate()` + `RequireOrganizationPermission(UpdateOrganizationCredentialsPermission)`).
 - `GET /oauth2/callback` — exchange `code`+`state` for tokens (no auth; the provider redirects here).
 

@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	executionsDomainToolInvocations "github.com/blocknextai/platform-api/internal/executions/domain/toolinvocations"
 	"sync"
 
 	"github.com/blocknextai/platform-api/internal/realtime/events"
@@ -39,6 +40,17 @@ func (b *memoryBroadcaster) PublishTaskEvent(_ context.Context, event *taskRunne
 
 func (b *memoryBroadcaster) PublishNodeEvent(_ context.Context, event *taskRunnerDomainNode.NodeEvent) error {
 	payload, err := events.MarshalNode(event)
+	if err != nil {
+		return err
+	}
+
+	b.publish(event.OrganizationID, payload)
+
+	return nil
+}
+
+func (b *memoryBroadcaster) PublishToolInvocationEvent(_ context.Context, event *executionsDomainToolInvocations.ToolInvocationEvent) error {
+	payload, err := events.MarshalToolInvocation(event)
 	if err != nil {
 		return err
 	}

@@ -98,10 +98,6 @@ function Routes() {
                         element={<Pages.PreferencesSessionsPage />}
                       />
                       <Route
-                        path="credentials"
-                        element={<Pages.PreferencesCredentialsPage />}
-                      />
-                      <Route
                         path="notifications"
                         element={<Pages.PreferencesNotificationsPage />}
                       />

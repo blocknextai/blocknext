@@ -14,7 +14,6 @@ import { CredentialFormDialog } from '@/features/credentials/components/credenti
 import { CredentialPopover } from '@/features/credentials/components/credential-popover'
 
 const CredentialTab = ({
-  isUserMode = false,
   loading,
   secrets,
   credentialsArray,
@@ -126,9 +125,7 @@ const CredentialTab = ({
 
   const saveCredentials = async () => {
     if (!hasAccess) {
-      console.error(
-        isUserMode ? 'User mode error' : 'Organization not available',
-      )
+      console.error('Organization not available')
       return
     }
 
@@ -175,9 +172,7 @@ const CredentialTab = ({
 
   const authorizeOAuth2 = async () => {
     if (!hasAccess) {
-      console.error(
-        isUserMode ? 'User mode error' : 'Organization not available',
-      )
+      console.error('Organization not available')
       return
     }
 
@@ -237,7 +232,6 @@ const CredentialTab = ({
             secrets={secrets}
             getSecrets={getSecrets}
             onSelect={selectSecret}
-            isUserMode={isUserMode}
           >
             <Button size={'sm'}>
               <Plus />
@@ -277,7 +271,6 @@ const CredentialTab = ({
                 secrets={secrets}
                 getSecrets={getSecrets}
                 onSelect={selectSecret}
-                isUserMode={isUserMode}
               >
                 <Button variant={'outline'} className="size-10">
                   <Plus />

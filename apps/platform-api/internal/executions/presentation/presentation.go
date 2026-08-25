@@ -7,6 +7,7 @@ import (
 	commonPresentationAuth "github.com/blocknextai/platform-api/internal/common/presentation/auth"
 	executionsInfrastructure "github.com/blocknextai/platform-api/internal/executions/infrastructure"
 	executionsPresentationTaskExecutions "github.com/blocknextai/platform-api/internal/executions/presentation/taskexecutions"
+	executionsPresentationToolInvocations "github.com/blocknextai/platform-api/internal/executions/presentation/toolinvocations"
 )
 
 func RegisterPresentation(
@@ -43,5 +44,20 @@ func RegisterPresentation(
 		authMiddleware.Authenticate(),
 		authMiddleware.RequireOrganizationPermission(rbac.DeleteTaskExecutionPermission),
 		executionsPresentationTaskExecutions.NewDeleteExecutionHandler(handlers.DeleteTaskExecution),
+	)
+
+	toolInvocationsRouterGroup := organizationRouterGroup.Group("/tool-invocations")
+	toolInvocationsRouterGroup.Get(
+		"/",
+		authMiddleware.Authenticate(),
+		authMiddleware.RequireOrganizationPermission(rbac.ReadTaskExecutionPermission),
+		executionsPresentationToolInvocations.NewGetAllToolInvocationsHandler(handlers.GetAllToolInvocations),
+	)
+
+	toolInvocationsRouterGroup.Get(
+		"/:toolInvocationId",
+		authMiddleware.Authenticate(),
+		authMiddleware.RequireOrganizationPermission(rbac.ReadTaskExecutionPermission),
+		executionsPresentationToolInvocations.NewGetToolInvocationByIDHandler(handlers.GetToolInvocationByID),
 	)
 }

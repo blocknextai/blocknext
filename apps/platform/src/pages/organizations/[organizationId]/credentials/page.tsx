@@ -7,7 +7,7 @@ import { credentialOAuthService } from '@/features/credentials'
 const CredentialPage = () => {
   const { organizationId } = useParams()
 
-  const credentialData = useCredentials(organizationId, false)
+  const credentialData = useCredentials(organizationId)
 
   const handleCredentialSave = async (payload) => {
     try {
@@ -81,7 +81,6 @@ const CredentialPage = () => {
 
   return (
     <CredentialTab
-      isUserMode={false}
       loading={credentialData.loading}
       secrets={credentialData.secrets}
       credentialsArray={credentialData.credentialsArray}

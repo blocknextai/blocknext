@@ -1,9 +1,9 @@
 # Credentials
 
-> Owns user- and organization-scoped third-party integration secrets (API keys, OAuth data) used by workflow nodes.
+> Owns organization-scoped third-party integration secrets (API keys, OAuth data) used by workflow nodes.
 
 ## Responsibility
-This bounded context stores, encrypts, and retrieves the credentials that workflow nodes need to call external services. It owns the persistence and at-rest encryption (via `SecretManager`) of credential data, the owner scoping (user vs. organization), and the distinction between owner-provided and host-provided platform credentials. It does not define which credential schemas exist — that vocabulary lives in `nodeengine` — nor does it execute nodes.
+This bounded context stores, encrypts, and retrieves the credentials that workflow nodes need to call external services. It owns the persistence and at-rest encryption (via `SecretManager`) of credential data, the organization ownership of every credential, and the distinction between owner-provided and host-provided platform credentials. It does not define which credential schemas exist — that vocabulary lives in `nodeengine` — nor does it execute nodes.
 
 ## Domain
 - **Aggregates / key types:**
@@ -39,7 +39,7 @@ This bounded context stores, encrypts, and retrieves the credentials that workfl
 The exported `CredentialService` adds `GetByIDForOwner` (returns decrypted `CredentialInfo`) and `SaveCredentialForOwner` for cross-context consumers (e.g. OAuth token refresh).
 
 ## HTTP API
-User-scoped (`/users/me/credentials`) and organization-scoped (`/organizations/:organizationId/credentials`) variants, all behind `Authenticate()` plus the matching user/organization RBAC permission:
+All under `/organizations/:organizationId/credentials`, behind `Authenticate()` plus the matching organization RBAC permission:
 
 - `GET    /…/credentials` — list credentials (Read permission).
 - `GET    /…/credentials/by-nodes` — credentials filtered by node IDs (Read permission).

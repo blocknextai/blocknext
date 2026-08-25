@@ -24,10 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  credentialsService,
-  credentialOAuthService,
-} from '@/features/credentials'
+import { credentialOAuthService } from '@/features/credentials'
 import { organizationsService } from '@/features/organizations'
 import { taskRunnerService, workflowsService } from '@/features/workflows'
 import { FlowIcon } from '@/components/shared/custom-icons'
@@ -52,12 +49,10 @@ function OrganizationRunPage() {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [schemas, setSchemas] = useState([])
-  const [userSecrets, setUserSecrets] = useState([])
   const [orgSecrets, setOrgSecrets] = useState([])
   const [flow, setFlow] = useState()
   const [currentStep, setCurrentStep] = useState(0)
   const [triggerType, setTriggerType] = useState('manual')
-  const [runType, setRunType] = useState()
   const [credentials, setCredentials] = useState()
   const [prompt, setPrompt] = useState()
   const [cronString, setCronString] = useState('')
@@ -70,9 +65,6 @@ function OrganizationRunPage() {
     const flows = flowsResponse.data
     const creds = flows.credentialSchemas
     const nodeIds = (flows.nodes ?? []).map((node) => node.nodeId)
-    const userSecretsResponse =
-      await credentialsService.getUserCredentialsByNodes(nodeIds)
-    const userSecrets = userSecretsResponse.data
     const orgSecretsResponse =
       await organizationsService.getOrganizationCredentialsByNodes(
         organizationId,
@@ -81,37 +73,29 @@ function OrganizationRunPage() {
     const organizationSecrets = orgSecretsResponse.data
 
     setSchemas(creds)
-    setUserSecrets(userSecrets)
     setOrgSecrets(organizationSecrets)
     setFlow(flows)
     setLoading(false)
   }
 
   const saveFlowCredential = async (payload) => {
-    const isUserEndpoint = runType !== 'member'
-    const resResponse = isUserEndpoint
-      ? await credentialsService.createUserCredential(payload)
-      : await organizationsService.createOrganizationCredential(
-          organizationId,
-          payload,
-        )
+    const resResponse = await organizationsService.createOrganizationCredential(
+      organizationId,
+      payload,
+    )
     return resResponse.data
   }
 
   const authorizeFlowOAuth2 = async (payload) => {
-    const isUserEndpoint = runType !== 'member'
-    const resResponse = isUserEndpoint
-      ? await credentialsService.createUserCredential(payload)
-      : await organizationsService.createOrganizationCredential(
-          organizationId,
-          payload,
-        )
+    const resResponse = await organizationsService.createOrganizationCredential(
+      organizationId,
+      payload,
+    )
     const res = resResponse.data
-    const authUrlResponse = isUserEndpoint
-      ? await credentialOAuthService.authorizeUser({ credentialId: res.id })
-      : await credentialOAuthService.authorizeOrganization(organizationId, {
-          credentialId: res.id,
-        })
+    const authUrlResponse = await credentialOAuthService.authorizeOrganization(
+      organizationId,
+      { credentialId: res.id },
+    )
     const authUrl = authUrlResponse.data
     const popupWindow = window.open('', '_blank')
     if (popupWindow) {
@@ -124,8 +108,7 @@ function OrganizationRunPage() {
     setCurrentStep(1)
   }
 
-  const handleRunAsSubmit = (selectedRunType, promptData) => {
-    setRunType(selectedRunType)
+  const handleRunAsSubmit = (promptData) => {
     setPrompt(promptData)
     setCurrentStep(2)
   }
@@ -289,7 +272,7 @@ function OrganizationRunPage() {
               cred: credentials,
               use: setCredentials,
             }}
-            secrets={runType === 'member' ? orgSecrets : userSecrets}
+            secrets={orgSecrets}
             onSaveCredential={saveFlowCredential}
             onAuthorizeOAuth2={authorizeFlowOAuth2}
           />

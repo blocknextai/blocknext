@@ -10,33 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserAuthRequest struct {
-	CredentialID uuid.UUID `json:"credentialId"`
-}
-
-func NewUserAuthHandler(handler cqrs.Handler[*authurl.AuthURLCommand, *authurl.AuthURLResponse]) fiber.Handler {
-	return func(c fiber.Ctx) error {
-		request := new(UserAuthRequest)
-		if err := c.Bind().All(request); err != nil {
-			return commonHTTP.ErrInvalidRequest
-		}
-
-		userID := commonHTTP.GetUserID(c)
-
-		result, err := handler.Handle(c.RequestCtx(), &authurl.AuthURLCommand{
-			OwnerType:    commonDomain.OwnerTypeUser,
-			OwnerID:      userID,
-			CredentialID: request.CredentialID,
-		})
-
-		if err != nil {
-			return err
-		}
-
-		return c.Status(fiber.StatusCreated).JSON(resultPkg.Ok(result, resultPkg.WithMessage("oauth url created")))
-	}
-}
-
 type OrganizationAuthRequest struct {
 	OrganizationID uuid.UUID `uri:"organizationId"`
 	CredentialID   uuid.UUID `json:"credentialId"`

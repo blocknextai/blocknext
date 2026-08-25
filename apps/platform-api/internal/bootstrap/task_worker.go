@@ -152,14 +152,11 @@ func NewTaskWorker(core *Core, cfg *config.TaskWorkerConfig) (*TaskWorker, error
 		return nil, err
 	}
 
-	executionsModule := executions.NewModule(executions.Dependencies{
+	executionServices := executions.NewServices(executions.ServicesDependencies{
 		DB:                 core.DB,
 		TransactionManager: core.TransactionManager,
 
 		OrganizationUserService: organizationsModule.OrganizationUserService,
-		WorkflowService:         workflowsModule.WorkflowService,
-		UserService:             accountModule.UserService,
-		LinkedAccountService:    accountModule.LinkedAccountService,
 	})
 
 	triggersModule := triggers.NewModule(triggers.Dependencies{
@@ -175,13 +172,14 @@ func NewTaskWorker(core *Core, cfg *config.TaskWorkerConfig) (*TaskWorker, error
 		Broadcaster:  broadcaster,
 
 		TaskRunnerOptions: cfg.TaskRunner,
+		SemaphoreOptions:  shared.Semaphore,
 
 		FunctionCallingService:                llmModule.FunctionCallingService,
 		CredentialOAuthTokenRegenerateService: credentialOAuthModule.CredentialOAuthTokenRegenerateService,
 		WorkflowService:                       workflowsModule.WorkflowService,
-		TaskExecutionService:                  executionsModule.TaskExecutionService,
-		TaskClaimService:                      executionsModule.TaskClaimService,
-		NodeExecutionService:                  executionsModule.NodeExecutionService,
+		TaskExecutionService:                  executionServices.TaskExecutionService,
+		TaskClaimService:                      executionServices.TaskClaimService,
+		NodeExecutionService:                  executionServices.NodeExecutionService,
 		TriggerService:                        triggersModule.TriggerService,
 		WebhookResolver:                       triggersModule.WebhookResolver,
 	})

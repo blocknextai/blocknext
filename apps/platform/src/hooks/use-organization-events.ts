@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import wsManager, { type OrganizationEvent } from '@/lib/ws-manager'
 
 type EventFilter = {
-  type?: 'task' | 'node'
+  type?: 'task' | 'node' | 'tool_invocation'
   executionId?: string
 }
 

@@ -27,7 +27,7 @@ require (
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/fasthttp/websocket v1.5.12 // indirect
 	github.com/gofiber/schema v1.8.4 // indirect
-	github.com/gofiber/utils/v2 v2.4.1 // indirect
+	github.com/gofiber/utils/v2 v2.4.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/holiman/uint256 v1.3.2 // indirect
 	github.com/klauspost/compress v1.19.2 // indirect

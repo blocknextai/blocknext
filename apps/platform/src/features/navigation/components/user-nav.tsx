@@ -7,7 +7,6 @@ import {
   Check,
   ChevronRight,
   ChevronDown,
-  KeyRound,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Avatar } from '@/components/ui/avatar'
@@ -144,12 +143,6 @@ const NavUser = ({ linkedAccounts, alone }) => {
                   {unseenCount > 99 ? '99+' : unseenCount}
                 </span>
               )}
-            </DropdownMenuItem>
-          </Link>
-          <Link to="/preferences/credentials">
-            <DropdownMenuItem>
-              <KeyRound size={16} />
-              {t('ui.text.credentials')}
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>

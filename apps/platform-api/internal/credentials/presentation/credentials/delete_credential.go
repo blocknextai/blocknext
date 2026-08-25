@@ -10,33 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type DeleteUserCredentialRequest struct {
-	CredentialID uuid.UUID `uri:"credentialId"`
-}
-
-func NewDeleteUserCredentialHandler(handler cqrs.Handler[*deletecredential.DeleteCredentialCommand, *deletecredential.DeleteCredentialResponse]) fiber.Handler {
-	return func(c fiber.Ctx) error {
-		userID := commonHTTP.GetUserID(c)
-
-		request := new(DeleteUserCredentialRequest)
-		if err := c.Bind().All(request); err != nil {
-			return commonHTTP.ErrInvalidRequest
-		}
-
-		result, err := handler.Handle(c.RequestCtx(), &deletecredential.DeleteCredentialCommand{
-			OwnerType:    commonDomain.OwnerTypeUser,
-			OwnerID:      userID,
-			CredentialID: request.CredentialID,
-		})
-
-		if err != nil {
-			return err
-		}
-
-		return c.Status(fiber.StatusOK).JSON(resultPkg.Ok(result, resultPkg.WithMessage("credential deleted")))
-	}
-}
-
 type DeleteOrganizationCredentialRequest struct {
 	OrganizationID uuid.UUID `uri:"organizationId"`
 	CredentialID   uuid.UUID `uri:"credentialId"`

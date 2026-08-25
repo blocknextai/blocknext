@@ -20,6 +20,7 @@ type Dependencies struct {
 
 type Module struct {
 	APIKeyValidator apiKeysApplicationAPIKeys.APIKeyValidator
+	APIKeyService   apiKeysApplicationAPIKeys.APIKeyService
 
 	handlers *apiKeysInfrastructure.Handlers
 }
@@ -27,6 +28,7 @@ type Module struct {
 func NewModule(deps Dependencies) *Module {
 	repository := apiKeysInfrastructureAPIKeys.NewAPIKeyRepository(deps.DB)
 	apiKeyValidator := apiKeysApplicationAPIKeys.NewAPIKeyValidator(repository)
+	apiKeyService := apiKeysApplicationAPIKeys.NewAPIKeyService(repository)
 	handlers := apiKeysInfrastructure.RegisterInfrastructure(apiKeysInfrastructure.RegisterInfrastructureDeps{
 		TransactionManager: deps.TransactionManager,
 
@@ -34,6 +36,7 @@ func NewModule(deps Dependencies) *Module {
 	})
 	return &Module{
 		APIKeyValidator: apiKeyValidator,
+		APIKeyService:   apiKeyService,
 		handlers:        handlers,
 	}
 }

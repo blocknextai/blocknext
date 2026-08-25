@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blocknextai/platform-api/internal/taskrunner/infrastructure/semaphore"
+	"github.com/blocknextai/platform-api/internal/common/infrastructure/semaphore/token"
 	"github.com/google/uuid"
 )
 
@@ -26,20 +26,20 @@ func (sm *MemorySemaphore) Ping(_ context.Context) error {
 	return nil
 }
 
-func (sm *MemorySemaphore) AcquireSemaphore(ctx context.Context, organizationID uuid.UUID, taskID uuid.UUID, maxConcurrentExecutions int64) (chan struct{}, error) {
-	return semaphore.AcquireWithBackoff(ctx, func(_ context.Context) (bool, error) {
-		return sm.tryAcquire(organizationID, taskID, maxConcurrentExecutions), nil
+func (sm *MemorySemaphore) AcquireSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID, maxConcurrentExecutions int64) (chan struct{}, error) {
+	return token.AcquireWithBackoff(ctx, func(_ context.Context) (bool, error) {
+		return sm.tryAcquire(organizationID, holderID, maxConcurrentExecutions), nil
 	})
 }
 
-func (sm *MemorySemaphore) tryAcquire(organizationID uuid.UUID, taskID uuid.UUID, maxConcurrentExecutions int64) bool {
+func (sm *MemorySemaphore) tryAcquire(organizationID uuid.UUID, holderID uuid.UUID, maxConcurrentExecutions int64) bool {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	room := sm.pruneExpired(organizationID)
 
-	if _, held := room[taskID]; held {
-		room[taskID] = time.Now().Add(sm.ttl)
+	if _, held := room[holderID]; held {
+		room[holderID] = time.Now().Add(sm.ttl)
 		return true
 	}
 
@@ -47,14 +47,14 @@ func (sm *MemorySemaphore) tryAcquire(organizationID uuid.UUID, taskID uuid.UUID
 		return false
 	}
 
-	room[taskID] = time.Now().Add(sm.ttl)
+	room[holderID] = time.Now().Add(sm.ttl)
 	sm.holders[organizationID] = room
 
 	return true
 }
 
-func (sm *MemorySemaphore) ReleaseSemaphore(_ context.Context, organizationID uuid.UUID, taskID uuid.UUID, token chan struct{}) error {
-	semaphore.Drain(token)
+func (sm *MemorySemaphore) ReleaseSemaphore(_ context.Context, organizationID uuid.UUID, holderID uuid.UUID, semaphore chan struct{}) error {
+	token.Drain(semaphore)
 
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
@@ -64,7 +64,7 @@ func (sm *MemorySemaphore) ReleaseSemaphore(_ context.Context, organizationID uu
 		return nil
 	}
 
-	delete(room, taskID)
+	delete(room, holderID)
 	if len(room) == 0 {
 		delete(sm.holders, organizationID)
 	}
@@ -72,16 +72,16 @@ func (sm *MemorySemaphore) ReleaseSemaphore(_ context.Context, organizationID uu
 	return nil
 }
 
-func (sm *MemorySemaphore) HeartbeatSemaphore(_ context.Context, organizationID uuid.UUID, taskID uuid.UUID) error {
+func (sm *MemorySemaphore) HeartbeatSemaphore(_ context.Context, organizationID uuid.UUID, holderID uuid.UUID) error {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	room := sm.pruneExpired(organizationID)
-	if _, held := room[taskID]; !held {
+	if _, held := room[holderID]; !held {
 		return nil
 	}
 
-	room[taskID] = time.Now().Add(sm.ttl)
+	room[holderID] = time.Now().Add(sm.ttl)
 	sm.holders[organizationID] = room
 
 	return nil
@@ -94,9 +94,9 @@ func (sm *MemorySemaphore) pruneExpired(organizationID uuid.UUID) map[uuid.UUID]
 	}
 
 	now := time.Now()
-	for taskID, expiresAt := range room {
+	for holderID, expiresAt := range room {
 		if now.After(expiresAt) {
-			delete(room, taskID)
+			delete(room, holderID)
 		}
 	}
 

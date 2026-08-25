@@ -8,21 +8,6 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func RegisterUserCredentialOAuthPresentation(
-	router fiber.Router,
-	authMiddleware *commonPresentationAuth.AuthMiddleware,
-	handlers *credentialOAuthInfrastructure.Handlers,
-) {
-	credentialOAuthRouterGroup := router.Group("/users/me/credential-oauth/oauth2")
-
-	credentialOAuthRouterGroup.Post(
-		"/auth",
-		authMiddleware.Authenticate(),
-		authMiddleware.RequireUserPermission(rbac.UpdateUserCredentialsPermission),
-		oauth2.NewUserAuthHandler(handlers.AuthURL),
-	)
-}
-
 func RegisterOrganizationCredentialOAuthPresentation(
 	router fiber.Router,
 	authMiddleware *commonPresentationAuth.AuthMiddleware,
@@ -55,7 +40,6 @@ func RegisterPresentation(
 	authMiddleware *commonPresentationAuth.AuthMiddleware,
 	handlers *credentialOAuthInfrastructure.Handlers,
 ) {
-	RegisterUserCredentialOAuthPresentation(router, authMiddleware, handlers)
 	RegisterOrganizationCredentialOAuthPresentation(router, authMiddleware, handlers)
 	RegisterCallbackPresentation(router, handlers)
 }
