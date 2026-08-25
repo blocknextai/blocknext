@@ -18,7 +18,6 @@ import (
 	"github.com/blocknextai/platform-api/internal/realtime"
 	"github.com/blocknextai/platform-api/internal/taskrunner"
 	"github.com/blocknextai/platform-api/internal/triggers"
-	"github.com/blocknextai/platform-api/internal/web3"
 	"github.com/blocknextai/platform-api/internal/webhooks"
 	"github.com/blocknextai/platform-api/internal/workflows"
 )
@@ -29,7 +28,6 @@ type WebhookAPI struct {
 
 	Broadcaster           realtime.Broadcaster
 	CommonModule          *common.Module
-	Web3Module            *web3.Module
 	AccountModule         *account.Module
 	OrganizationsModule   *organizations.Module
 	NodeEngineModule      *nodeengine.Module
@@ -68,13 +66,6 @@ func NewWebhookAPI(core *Core, cfg *config.WebhookAPIConfig) (*WebhookAPI, error
 		BcryptCost:         shared.Auth.Password.BcryptCost,
 	})
 
-	web3Module, err := web3.NewModule(web3.Dependencies{
-		LoginMessage: shared.Auth.Metamask.LoginMessage,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	accountModule, err := account.NewModule(account.Dependencies{
 		DB:                       core.DB,
 		TransactionManager:       core.TransactionManager,
@@ -87,10 +78,9 @@ func NewWebhookAPI(core *Core, cfg *config.WebhookAPIConfig) (*WebhookAPI, error
 		AuthOptions:               shared.Auth,
 		PlatformUIBaseURL:         shared.PlatformUI.BaseURL,
 
-		JWTService:        jwtService,
-		EmailSender:       commonModule.EmailSender,
-		PasswordHasher:    commonModule.PasswordHasher,
-		SignatureVerifier: web3Module.SignatureVerifier,
+		JWTService:     jwtService,
+		EmailSender:    commonModule.EmailSender,
+		PasswordHasher: commonModule.PasswordHasher,
 	})
 	if err != nil {
 		return nil, err
@@ -210,7 +200,6 @@ func NewWebhookAPI(core *Core, cfg *config.WebhookAPIConfig) (*WebhookAPI, error
 		Config:                cfg,
 		Broadcaster:           broadcaster,
 		CommonModule:          commonModule,
-		Web3Module:            web3Module,
 		AccountModule:         accountModule,
 		OrganizationsModule:   organizationsModule,
 		NodeEngineModule:      nodeEngineModule,

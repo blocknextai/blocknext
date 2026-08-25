@@ -30,7 +30,6 @@ import (
 	"github.com/blocknextai/platform-api/internal/eventbus"
 	"github.com/blocknextai/platform-api/internal/eventbus/application/idempotency"
 	"github.com/blocknextai/platform-api/internal/eventbus/application/publishing"
-	web3DomainCrypto "github.com/blocknextai/platform-api/internal/web3/domain/crypto"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -46,10 +45,9 @@ type Dependencies struct {
 	AuthOptions               config.AuthOptions
 	PlatformUIBaseURL         string
 
-	JWTService        jwt.AuthJWTService
-	EmailSender       pkgEmail.EmailSender
-	PasswordHasher    hashing.Hasher
-	SignatureVerifier web3DomainCrypto.SignatureVerifier
+	JWTService     jwt.AuthJWTService
+	EmailSender    pkgEmail.EmailSender
+	PasswordHasher hashing.Hasher
 }
 
 type Module struct {
@@ -76,7 +74,7 @@ func NewModule(deps Dependencies) (*Module, error) {
 	linkedAccountService := accountApplicationLinkedAccounts.NewLinkedAccountService(linkedAccountRepository)
 	userPermissionChecker := accountApplicationAuth.NewUserPermissionChecker(userRepository, deps.CacheService)
 
-	authProviderRegistry, err := accountInfrastructure.NewAuthProviderRegistry(deps.AuthOptions, deps.SignatureVerifier, userNonceRepository)
+	authProviderRegistry, err := accountInfrastructure.NewAuthProviderRegistry(deps.AuthOptions, userNonceRepository)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.31 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.38 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.39 // indirect
-	github.com/aws/smithy-go v1.27.9 // indirect
+	github.com/aws/smithy-go v1.27.10 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/gofiber/schema v1.8.4 // indirect

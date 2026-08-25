@@ -15,7 +15,7 @@ This context owns the `User` aggregate and everything that authenticates a perso
   - `VerificationToken` — one-time, hash-only token with a purpose (`email_verify`, `password_reset`, `email_change`, `magic_link`).
   - `UserPreference` — theme/language settings.
   - `UserSocial` — ordered social-media links.
-  - Provider taxonomy: `AuthProviderType` (`metamask`, `google`, `x`, `facebook`, `github`, `email`, `password`) and `AuthProviderCategory` (`crypto`, `oauth`, `email`, `password`).
+  - Provider taxonomy: `AuthProviderType` (`google`, `x`, `facebook`, `github`, `email`, `password`) and `AuthProviderCategory` (`crypto`, `oauth`, `email`, `password`).
 - **Key rules / invariants:**
   - Tokens and password hashes are stored hashed only; plaintext is never persisted.
   - Verification tokens and nonces are expiry-checked and soft-deleted on consume.
@@ -29,9 +29,8 @@ This context owns the `User` aggregate and everything that authenticates a perso
 | Email + password | Register → email verification → login; forgot/reset and change flows |
 | Magic link | One-time emailed link (`request` → `consume`), no password required |
 | OAuth 2.0 | Google, GitHub, X, Facebook — authorization-code flow with PKCE + server-side nonce |
-| Crypto wallet | MetaMask — server-issued nonce message, wallet signature verified server-side |
 
-Which methods are active is env-driven and exposed at `GET /auth/methods`; the UI renders only the enabled ones. A user can hold multiple linked identities (one primary) and add a password later on top of an OAuth/wallet account.
+Which methods are active is env-driven and exposed at `GET /auth/methods`; the UI renders only the enabled ones. A user can hold multiple linked identities (one primary) and add a password later on top of an OAuth account.
 
 ## Security model
 
@@ -101,7 +100,7 @@ Which methods are active is env-driven and exposed at `GET /auth/methods`; the U
 
 ## Dependencies
 - **Bounded contexts:** None consumed via service interfaces. Exposes `SessionService`, `UserService`, `LinkedAccountService`, and the `UserPermissionChecker` for other modules/middleware.
-- **Infrastructure:** Postgres tables in schema `account` — `users`, `linked_accounts`, `nonces`, `socials`, `user_preferences`, `sessions`, `password_credentials`, `verification_tokens`. OAuth providers (Google, GitHub, X, Facebook) and Metamask crypto-signature verification (`web3` `SignatureVerifier`). JWT service, email sender, password hasher, cache, and the eventbus (publish + inbox idempotency).
+- **Infrastructure:** Postgres tables in schema `account` — `users`, `linked_accounts`, `nonces`, `socials`, `user_preferences`, `sessions`, `password_credentials`, `verification_tokens`. OAuth providers (Google, GitHub, X, Facebook). JWT service, email sender, password hasher, cache, and the eventbus (publish + inbox idempotency).
 
 ## Layout
 Standard DDD layers: `domain/` (aggregates + rules), `application/` (CQRS handlers + event handlers), `infrastructure/` (persistence + auth-provider adapters), `presentation/` (HTTP). Wired in `module.go`.

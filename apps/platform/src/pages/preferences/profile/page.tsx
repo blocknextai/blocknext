@@ -29,15 +29,6 @@ const PreferencesProfilePage = () => {
     [authMethods],
   )
 
-  const authActions = useMemo(
-    () => ({
-      getNonce: (data: unknown) => authService.getNonce(data as never),
-      getToken: (data: unknown) => authService.getToken(data as never),
-      linkAccount: (data: unknown) => authService.linkAccount(data as never),
-    }),
-    [],
-  )
-
   const linkedProviderNames = useMemo(
     () => linkedAccounts.map((account: any) => account.authProvider),
     [linkedAccounts],
@@ -85,7 +76,6 @@ const PreferencesProfilePage = () => {
       deleteLinkedAccount={deleteLinkedAccount}
       getUnlinkedProviders={getUnlinkedProviders}
       handleAccountLinked={handleAccountLinked}
-      authActions={authActions}
       passwordEnabled={authMethods.password === true}
       resendingEmail={resendingEmail}
       onResendVerification={handleResendVerification}

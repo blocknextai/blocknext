@@ -6,19 +6,10 @@ import (
 
 	accountDomain "github.com/blocknextai/platform-api/internal/account/domain"
 	accountDomainUserNonces "github.com/blocknextai/platform-api/internal/account/domain/usernonces"
-	web3DomainCrypto "github.com/blocknextai/platform-api/internal/web3/domain/crypto"
 )
 
-func NewAuthProviderRegistry(options config.AuthOptions, signatureVerifier web3DomainCrypto.SignatureVerifier, userNonceRepository accountDomainUserNonces.UserNonceRepository) (*authproviders.AuthProviderRegistry, error) {
+func NewAuthProviderRegistry(options config.AuthOptions, userNonceRepository accountDomainUserNonces.UserNonceRepository) (*authproviders.AuthProviderRegistry, error) {
 	authProviderRegistry := authproviders.NewAuthProviderRegistry()
-
-	if options.Metamask.Enabled {
-		metamaskProvider := authproviders.NewMetamaskAuthProvider(
-			signatureVerifier,
-			userNonceRepository,
-		)
-		authProviderRegistry.Register(accountDomain.AuthProviderMetamask, metamaskProvider)
-	}
 
 	if options.Google.Enabled {
 		googleProvider := authproviders.NewGoogleAuthProvider(

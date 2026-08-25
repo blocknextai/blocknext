@@ -37,13 +37,6 @@ export default defineConfig(() => ({
           if (id.includes('node_modules/d3-')) {
             return 'd3'
           }
-          if (
-            id.includes('node_modules/ethers/') ||
-            id.includes('node_modules/@adraffy/') ||
-            id.includes('node_modules/@noble/')
-          ) {
-            return 'web3'
-          }
           if (id.includes('node_modules/@dicebear/')) {
             return 'dicebear'
           }

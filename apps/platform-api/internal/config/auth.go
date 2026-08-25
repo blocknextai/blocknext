@@ -5,18 +5,12 @@ import (
 )
 
 type AuthOptions struct {
-	Metamask  AuthMetamaskOptions  `envPrefix:"METAMASK_"`
 	Google    AuthGoogleOptions    `envPrefix:"GOOGLE_"`
 	Github    AuthGithubOptions    `envPrefix:"GITHUB_"`
 	X         AuthXOptions         `envPrefix:"X_"`
 	Facebook  AuthFacebookOptions  `envPrefix:"FACEBOOK_"`
 	Password  AuthPasswordOptions  `envPrefix:"PASSWORD_"`
 	MagicLink AuthMagicLinkOptions `envPrefix:"MAGIC_LINK_"`
-}
-
-type AuthMetamaskOptions struct {
-	Enabled      bool   `env:"ENABLED"`
-	LoginMessage string `env:"LOGIN_MESSAGE"`
 }
 
 type AuthGoogleOptions struct {

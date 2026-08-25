@@ -14,7 +14,7 @@ Provides a small interface for uploading and downloading files through an extern
 - `ErrDownloadFailed`, `ErrReadFailed` (`apperror.Internal`).
 
 ## Used by
-`bootstrap.NewCore` constructs it (`config.FileGatewayOptions`) as `Core.FileGateway`; passed into modules that handle files — `web3` and `nodeengine` (which forwards it to executors needing file IO).
+`bootstrap.NewCore` constructs it (`config.FileGatewayOptions`) as `Core.FileGateway`; passed into `nodeengine` (which forwards it to executors needing file IO).
 
 ## Notes
 - Uses `go-packages/httpclient`, not `net/http`, per project convention.

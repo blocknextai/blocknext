@@ -659,7 +659,7 @@ Wiring is split across **two files**:
 })
 ```
 
-If `NewModule` returns an error (some modules do — e.g., `account`, `web3`, `llm`, `workflows`), use the early-return pattern (`NewPlatformAPI` returns `(*PlatformAPI, error)`):
+If `NewModule` returns an error (some modules do — e.g., `account`, `llm`, `workflows`), use the early-return pattern (`NewPlatformAPI` returns `(*PlatformAPI, error)`):
 
 ```go
 <module>Module, err := <module>.NewModule(<module>.Dependencies{...})

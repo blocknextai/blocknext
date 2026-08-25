@@ -11,10 +11,6 @@ export const inviteMemberSchema = z.discriminatedUnion('provider', [
     identifier: walletAddressSchema,
   }),
   z.object({
-    provider: z.literal('metamask'),
-    identifier: walletAddressSchema,
-  }),
-  z.object({
     provider: z.literal('email'),
     identifier: emailSchema,
   }),

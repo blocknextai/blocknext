@@ -16,7 +16,6 @@ import (
 	"github.com/blocknextai/platform-api/internal/organizations"
 	"github.com/blocknextai/platform-api/internal/platform"
 	"github.com/blocknextai/platform-api/internal/realtime"
-	"github.com/blocknextai/platform-api/internal/web3"
 )
 
 type MCPAPI struct {
@@ -24,7 +23,6 @@ type MCPAPI struct {
 	Config *config.MCPAPIConfig
 
 	CommonModule          *common.Module
-	Web3Module            *web3.Module
 	AccountModule         *account.Module
 	OrganizationsModule   *organizations.Module
 	APIKeysModule         *apikeys.Module
@@ -60,13 +58,6 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		BcryptCost:         shared.Auth.Password.BcryptCost,
 	})
 
-	web3Module, err := web3.NewModule(web3.Dependencies{
-		LoginMessage: shared.Auth.Metamask.LoginMessage,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	accountModule, err := account.NewModule(account.Dependencies{
 		DB:                       core.DB,
 		TransactionManager:       core.TransactionManager,
@@ -79,10 +70,9 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		AuthOptions:               shared.Auth,
 		PlatformUIBaseURL:         shared.PlatformUI.BaseURL,
 
-		JWTService:        jwtService,
-		EmailSender:       commonModule.EmailSender,
-		PasswordHasher:    commonModule.PasswordHasher,
-		SignatureVerifier: web3Module.SignatureVerifier,
+		JWTService:     jwtService,
+		EmailSender:    commonModule.EmailSender,
+		PasswordHasher: commonModule.PasswordHasher,
 	})
 	if err != nil {
 		return nil, err
@@ -164,7 +154,6 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		Core:                  core,
 		Config:                cfg,
 		CommonModule:          commonModule,
-		Web3Module:            web3Module,
 		AccountModule:         accountModule,
 		OrganizationsModule:   organizationsModule,
 		APIKeysModule:         apiKeysModule,

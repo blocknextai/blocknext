@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { MailCheck } from 'lucide-react'
-import { authService, useAuthMethods } from '@/features/auth'
+import { useAuthMethods } from '@/features/auth'
 import { ProviderLoginButton } from '@/features/auth/components/provider-login-button'
 import { PasswordRegisterForm } from '@/features/auth/components/providers/password-register-form'
 import { Button } from '@/components/ui/button'
@@ -22,15 +22,6 @@ const Divider = ({ label }: { label: string }) => (
 function AuthRegisterPage() {
   const { t } = useTranslation()
   const { methods, isLoading } = useAuthMethods()
-
-  const authActions = useMemo(
-    () => ({
-      getNonce: (data) => authService.getNonce(data),
-      getToken: (data) => authService.getToken(data),
-      linkAccount: (data) => authService.linkAccount(data),
-    }),
-    [],
-  )
 
   const providers = useMemo(
     () => [...(methods.oauth ?? []), ...(methods.crypto ?? [])],
@@ -101,7 +92,6 @@ function AuthRegisterPage() {
                     key={provider}
                     provider={provider}
                     mode="register"
-                    authActions={authActions}
                   />
                 ))}
               </div>
