@@ -11,7 +11,7 @@ Loads the task-worker config and exits early unless `TASK_RUNNER_MODE=queue`. Ot
 - **Runs as:** background worker loop (no HTTP server).
 
 ## Bounded contexts activated
-- common, account, organizations, web3, credentialoauth
+- common, account, organizations, credentialoauth
 - nodeengine, platform, credentials, llm
 - workflows, executions, triggers
 - taskrunner

@@ -33,7 +33,7 @@ internal/
 
 ### Modules
 
-`account`, `apikeys`, `bootstrap`, `cache`, `common`, `config`, `credentialoauth`, `credentials`, `eventbus`, `executions`, `filegateway`, `llm`, `mcp`, `nodeengine`, `notifications`, `organizations`, `platform`, `realtime`, `taskrunner`, `triggers`, `web3`, `webhooks`, `workflows`, `ws`.
+`account`, `apikeys`, `bootstrap`, `cache`, `common`, `config`, `credentialoauth`, `credentials`, `eventbus`, `executions`, `filegateway`, `llm`, `mcp`, `nodeengine`, `notifications`, `organizations`, `platform`, `realtime`, `taskrunner`, `triggers`, `webhooks`, `workflows`, `ws`.
 
 ### Binaries
 

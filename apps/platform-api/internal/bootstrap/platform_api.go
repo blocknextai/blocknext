@@ -20,7 +20,6 @@ import (
 	"github.com/blocknextai/platform-api/internal/realtime"
 	"github.com/blocknextai/platform-api/internal/taskrunner"
 	"github.com/blocknextai/platform-api/internal/triggers"
-	"github.com/blocknextai/platform-api/internal/web3"
 	"github.com/blocknextai/platform-api/internal/webhooks"
 	"github.com/blocknextai/platform-api/internal/workflows"
 	"github.com/blocknextai/platform-api/internal/ws"
@@ -34,7 +33,6 @@ type PlatformAPI struct {
 	Broadcaster realtime.Broadcaster
 
 	CommonModule          *common.Module
-	Web3Module            *web3.Module
 	AccountModule         *account.Module
 	NodeEngineModule      *nodeengine.Module
 	PlatformModule        *platform.Module
@@ -77,13 +75,6 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 		BcryptCost:         shared.Auth.Password.BcryptCost,
 	})
 
-	web3Module, err := web3.NewModule(web3.Dependencies{
-		LoginMessage: shared.Auth.Metamask.LoginMessage,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	accountModule, err := account.NewModule(account.Dependencies{
 		DB:                       core.DB,
 		TransactionManager:       core.TransactionManager,
@@ -96,10 +87,9 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 		AuthOptions:               shared.Auth,
 		PlatformUIBaseURL:         shared.PlatformUI.BaseURL,
 
-		JWTService:        jwtService,
-		EmailSender:       commonModule.EmailSender,
-		PasswordHasher:    commonModule.PasswordHasher,
-		SignatureVerifier: web3Module.SignatureVerifier,
+		JWTService:     jwtService,
+		EmailSender:    commonModule.EmailSender,
+		PasswordHasher: commonModule.PasswordHasher,
 	})
 	if err != nil {
 		return nil, err
@@ -247,7 +237,6 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 		JWTService:            jwtService,
 		Broadcaster:           broadcaster,
 		CommonModule:          commonModule,
-		Web3Module:            web3Module,
 		AccountModule:         accountModule,
 		NodeEngineModule:      nodeEngineModule,
 		PlatformModule:        platformModule,

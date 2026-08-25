@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"strings"
 
 	"github.com/caarlos0/env/v11"
 )
@@ -48,10 +47,6 @@ func LoadShared() (*SharedConfig, error) {
 			return nil, err
 		}
 		cfg.Workflows.Generation.SystemInstruction = instruction
-	}
-
-	if cfg.Auth.Metamask.LoginMessage != "" {
-		cfg.Auth.Metamask.LoginMessage = strings.ReplaceAll(cfg.Auth.Metamask.LoginMessage, `\\n`, "\n")
 	}
 
 	return cfg, nil

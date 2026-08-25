@@ -56,15 +56,6 @@ function AuthLoginCallbackPage() {
         setMode(currentMode)
         const isLinkedAccounts = currentMode === 'linked_accounts'
 
-        if (provider === 'metamask') {
-          // MetaMask doesn't use OAuth, so we don't expect code/state
-          // This would be handled differently if needed
-          toast.error(t('ui.text.metamaskCallbackNotSupported'))
-          setHasError(true)
-          setIsLoading(false)
-          return
-        }
-
         // For OAuth providers (Google, GitHub)
         const code = searchParams.get('code')
 

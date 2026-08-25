@@ -33,7 +33,6 @@ its detailed scope.
 | Context | Scope |
 | --- | --- |
 | [`mcp`](mcp/README.md) | Model Context Protocol server exposing `nodeengine` nodes as MCP tools (HTTP adapter, no domain). |
-| [`web3`](web3/README.md) | Ethereum signature verification backing the crypto-wallet (MetaMask) login. |
 | [`notifications`](notifications/README.md) | Event-driven in-app inbox; fans out domain events from other contexts. |
 | [`webhooks`](webhooks/README.md) | Inbound HTTP edge — receives external webhook calls (triggers) and routes to the owning processor. |
 | [`ws`](ws/README.md) | Per-org WebSocket fan-out gateway pushing realtime messages to clients. |
@@ -74,7 +73,6 @@ flowchart TB
     end
     subgraph channels[Channels]
         mcp
-        web3
         notifications
         ws
         webhooks
@@ -84,7 +82,6 @@ flowchart TB
     account -. domain events .-> notifications
     organizations -. domain events .-> notifications
 
-    account --> web3
     workflows --> nodeengine
     taskrunner --> nodeengine
     taskrunner --> executions

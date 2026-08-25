@@ -11,7 +11,7 @@ Loads the webhook API config and bootstraps a near-full module graph via `bootst
 - **Runs as:** HTTP server on `HTTP_SERVER_*` address.
 
 ## Bounded contexts activated
-- common, account, organizations, web3, credentialoauth
+- common, account, organizations, credentialoauth
 - nodeengine, platform, credentials, llm
 - workflows, executions, triggers
 - taskrunner, webhooks

@@ -3,7 +3,6 @@ const providerNames = {
   github: 'GitHub',
   x: 'X',
   facebook: 'Facebook',
-  metamask: 'MetaMask',
   email: 'Email',
   password: 'Password',
 }

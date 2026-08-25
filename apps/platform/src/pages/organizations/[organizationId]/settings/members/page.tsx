@@ -136,16 +136,6 @@ function MembersPage() {
           /^[a-zA-Z0-9-]+$/.test(value) && value.length >= 1,
         errorMessage: t('ui.text.invalidGithub'),
       },
-      metamask: {
-        id: 'metamask',
-        name: t('ui.text.metamaskAccount'),
-        icon: <ProviderIcon provider="metamask" className="w-4 h-4" />,
-        placeholder: t('ui.text.metamaskPlaceholder'),
-        description: t('ui.text.metamaskDescription'),
-        validation: (value: string) =>
-          value.startsWith('0x') && value.length >= 42,
-        errorMessage: t('ui.text.invalidWallet'),
-      },
     }
     return configs[providerId]
   }

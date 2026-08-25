@@ -3,7 +3,6 @@ package domain
 type AuthProvider string
 
 const (
-	AuthProviderMetamask AuthProvider = "metamask"
 	AuthProviderGoogle   AuthProvider = "google"
 	AuthProviderX        AuthProvider = "x"
 	AuthProviderFacebook AuthProvider = "facebook"
@@ -14,7 +13,6 @@ const (
 
 var (
 	AuthProviders = map[AuthProvider]AuthProviderCategory{
-		AuthProviderMetamask: AuthProviderCategoryCrypto,
 		AuthProviderGoogle:   AuthProviderCategoryOAuth,
 		AuthProviderX:        AuthProviderCategoryOAuth,
 		AuthProviderFacebook: AuthProviderCategoryOAuth,

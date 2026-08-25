@@ -29,15 +29,6 @@ function AuthLoginPage() {
   const { t } = useTranslation()
   const { methods, isLoading } = useAuthMethods()
 
-  const authActions = useMemo(
-    () => ({
-      getNonce: (data) => authService.getNonce(data),
-      getToken: (data) => authService.getToken(data),
-      linkAccount: (data) => authService.linkAccount(data),
-    }),
-    [],
-  )
-
   const providers = useMemo(
     () => [...(methods.oauth ?? []), ...(methods.crypto ?? [])],
     [methods],
@@ -129,11 +120,7 @@ function AuthLoginPage() {
           {providers.length > 0 && step === 'email' && (
             <div className="flex flex-col space-y-3">
               {providers.map((provider) => (
-                <ProviderLoginButton
-                  key={provider}
-                  provider={provider}
-                  authActions={authActions}
-                />
+                <ProviderLoginButton key={provider} provider={provider} />
               ))}
             </div>
           )}

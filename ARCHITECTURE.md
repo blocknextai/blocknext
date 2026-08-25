@@ -78,7 +78,7 @@ One codebase, six entry points. Each binary assembles only the modules it needs 
 | `event-relay-worker` | Drains the transactional outbox out-of-process |
 | `platform-api-migration` | One-shot migration runner |
 
-**Bounded contexts.** `internal/` holds ~24 modules (workflows, nodeengine, taskrunner, triggers, executions, credentials, account, organizations, ...), each with DDD layering (`application/`, `domain/`, `infrastructure/`, `presentation/`). The full module map with a dependency diagram lives in [`apps/platform-api/internal/README.md`](apps/platform-api/internal/README.md).
+**Bounded contexts.** `internal/` holds ~23 modules (workflows, nodeengine, taskrunner, triggers, executions, credentials, account, organizations, ...), each with DDD layering (`application/`, `domain/`, `infrastructure/`, `presentation/`). The full module map with a dependency diagram lives in [`apps/platform-api/internal/README.md`](apps/platform-api/internal/README.md).
 
 Two boundary rules keep the monolith modular:
 - Modules never share repositories — cross-module access goes through **service interfaces** injected in `bootstrap`.

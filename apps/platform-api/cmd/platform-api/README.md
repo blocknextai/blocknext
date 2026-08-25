@@ -11,7 +11,7 @@ Loads the platform configuration, bootstraps `Core` (DB, cache, secret manager, 
 - **Runs as:** HTTP server on `HTTP_SERVER_*` address (Fiber).
 
 ## Bounded contexts activated
-- common, account, organizations, web3, credentialoauth
+- common, account, organizations, credentialoauth
 - nodeengine, platform, credentials, llm
 - workflows, executions, triggers
 - taskrunner, apikeys, notifications, ws, webhooks

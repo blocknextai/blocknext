@@ -47,7 +47,6 @@ const ProfileSection = ({
   deleteLinkedAccount,
   getUnlinkedProviders,
   handleAccountLinked,
-  authActions,
   passwordEnabled,
   resendingEmail,
   onResendVerification,
@@ -304,7 +303,6 @@ const ProfileSection = ({
                     <ProviderLoginButton
                       provider={provider}
                       mode="linked_accounts"
-                      authActions={authActions}
                     />
                   </div>
                 ))}

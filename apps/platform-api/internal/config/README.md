@@ -6,7 +6,7 @@
 Defines all configuration as nested Go structs tagged with `env` / `envPrefix`, and loads them from the environment via `caarlos0/env`. Each process entrypoint has its own top-level config that embeds the shared config. Config is intentionally the single options layer the composition root depends on — modules receive plain option values, never the config package.
 
 ## What it provides
-- `SharedConfig` + `LoadShared()` — infra common to every process: `Database`, `Cache`, `Broker`, `EventBus`, `SecretManager`, `FileGateway`, `JWT`, `PlatformUI`, `Platform`, `Webhook`, `Workflows`, `FunctionCalling`, `CredentialOAuth`, `MCP`, `Auth`, `EmailSender`, plus `AppEnv`. `LoadShared` also post-processes file-backed fields (system-instruction files) and the Metamask login message.
+- `SharedConfig` + `LoadShared()` — infra common to every process: `Database`, `Cache`, `Broker`, `EventBus`, `SecretManager`, `FileGateway`, `JWT`, `PlatformUI`, `Platform`, `Webhook`, `Workflows`, `FunctionCalling`, `CredentialOAuth`, `MCP`, `Auth`, `EmailSender`, plus `AppEnv`. `LoadShared` also post-processes file-backed fields (system-instruction files).
 - Per-entrypoint configs, each embedding `*SharedConfig` (tagged `env:"-"`) plus its own options and a `Load*()` constructor:
   - `PlatformAPIConfig` / `LoadPlatformAPI` — `HTTPServer` (`PLATFORM_API_`), `WebSocket`, `TaskRunner`.
   - `MCPAPIConfig` / `LoadMCPAPI` — `HTTPServer` (`MCP_API_`), `MCP`.
