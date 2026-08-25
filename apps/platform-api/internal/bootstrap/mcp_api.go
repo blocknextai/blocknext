@@ -10,10 +10,12 @@ import (
 	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/blocknextai/platform-api/internal/credentialoauth"
 	"github.com/blocknextai/platform-api/internal/credentials"
+	"github.com/blocknextai/platform-api/internal/executions"
 	"github.com/blocknextai/platform-api/internal/mcp"
 	"github.com/blocknextai/platform-api/internal/nodeengine"
 	"github.com/blocknextai/platform-api/internal/organizations"
 	"github.com/blocknextai/platform-api/internal/platform"
+	"github.com/blocknextai/platform-api/internal/realtime"
 	"github.com/blocknextai/platform-api/internal/web3"
 )
 
@@ -44,6 +46,11 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		shared.JWT.RefreshTokenExpirationTime,
 		shared.JWT.Leeway,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	broadcaster, err := realtime.New(shared.Broker)
 	if err != nil {
 		return nil, err
 	}
@@ -130,12 +137,24 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		TransactionManager: core.TransactionManager,
 	})
 
+	executionServices := executions.NewServices(executions.ServicesDependencies{
+		DB:                 core.DB,
+		TransactionManager: core.TransactionManager,
+
+		OrganizationUserService: organizationsModule.OrganizationUserService,
+	})
+
 	mcpModule, err := mcp.NewModule(mcp.Dependencies{
 		ServerURLTemplate: cfg.MCP.Server.URLTemplate,
+		MaxExecutionTime:  cfg.MCP.MaxExecutionTime,
+
+		SemaphoreOptions: shared.Semaphore,
 
 		ServerService:                         nodeEngineModule.MCPServerService,
 		ExecutorService:                       nodeEngineModule.ExecutorService,
 		CredentialOAuthTokenRegenerateService: credentialOAuthModule.CredentialOAuthTokenRegenerateService,
+		ToolInvocationService:                 executionServices.ToolInvocationService,
+		Broadcaster:                           broadcaster,
 	})
 	if err != nil {
 		return nil, err

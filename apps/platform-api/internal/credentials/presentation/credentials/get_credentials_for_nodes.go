@@ -10,32 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type GetUserCredentialsForNodesRequest struct {
-	NodeIDs []string `query:"nodeIds"`
-}
-
-func NewGetUserCredentialsForNodesHandler(handler cqrs.Handler[*getcredentialsfornodes.GetCredentialsForNodesQuery, *getcredentialsfornodes.GetCredentialsForNodesResponse]) fiber.Handler {
-	return func(c fiber.Ctx) error {
-		request := new(GetUserCredentialsForNodesRequest)
-		if err := c.Bind().All(request); err != nil {
-			return commonHTTP.ErrInvalidRequest
-		}
-
-		userID := commonHTTP.GetUserID(c)
-
-		result, err := handler.Handle(c.RequestCtx(), &getcredentialsfornodes.GetCredentialsForNodesQuery{
-			OwnerType: commonDomain.OwnerTypeUser,
-			OwnerID:   userID,
-			NodeIDs:   request.NodeIDs,
-		})
-		if err != nil {
-			return err
-		}
-
-		return c.Status(fiber.StatusOK).JSON(resultPkg.Ok(result))
-	}
-}
-
 type GetOrganizationCredentialsForNodesRequest struct {
 	OrganizationID uuid.UUID `uri:"organizationId"`
 	NodeIDs        []string  `query:"nodeIds"`

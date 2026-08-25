@@ -1,9 +1,5 @@
 import platformApi from '@/lib/platform-api'
 
-const authorizeUser = async (data: { credentialId: string }) => {
-  return await platformApi.post('/users/me/credential-oauth/oauth2/auth', data)
-}
-
 const authorizeOrganization = async (
   organizationId: string,
   data: { credentialId: string },
@@ -21,7 +17,6 @@ const callback = async (queryString) => {
 }
 
 export default {
-  authorizeUser,
   authorizeOrganization,
   callback,
 }

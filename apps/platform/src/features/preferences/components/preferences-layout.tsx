@@ -1,7 +1,6 @@
-import { User, Palette, ShieldCheck, KeyRound, Bell } from 'lucide-react'
+import { User, Palette, ShieldCheck, Bell } from 'lucide-react'
 import { Outlet, useLocation, Link } from 'react-router'
 import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { useTranslation } from 'react-i18next'
 
 type Tab = {
@@ -9,7 +8,6 @@ type Tab = {
   label: string
   icon: React.ComponentType<{ className?: string }>
   path: string
-  group: 'account' | 'workspace'
 }
 
 const tabs: Tab[] = [
@@ -18,35 +16,24 @@ const tabs: Tab[] = [
     label: 'ui.text.profile',
     icon: User,
     path: '/preferences/profile',
-    group: 'account',
   },
   {
     id: 'notifications',
     label: 'ui.text.notifications',
     icon: Bell,
     path: '/preferences/notifications',
-    group: 'account',
   },
   {
     id: 'appearance',
     label: 'ui.text.appearance',
     icon: Palette,
     path: '/preferences/appearance',
-    group: 'account',
   },
   {
     id: 'sessions',
     label: 'ui.text.sessions',
     icon: ShieldCheck,
     path: '/preferences/sessions',
-    group: 'account',
-  },
-  {
-    id: 'credentials',
-    label: 'ui.text.credentials',
-    icon: KeyRound,
-    path: '/preferences/credentials',
-    group: 'workspace',
   },
 ]
 
@@ -80,19 +67,12 @@ const PreferencesLayout = () => {
     )
   }
 
-  const accountTabs = tabs.filter((tab) => tab.group === 'account')
-  const workspaceTabs = tabs.filter((tab) => tab.group === 'workspace')
-
   return (
     <div className="p-6">
       <div className="flex gap-8">
         <div className="w-64 shrink-0">
           <Card className="border-0 bg-card p-0">
-            <nav className="p-3 flex flex-col gap-3">
-              {accountTabs.map(renderTab)}
-              <Separator className="my-1" />
-              {workspaceTabs.map(renderTab)}
-            </nav>
+            <nav className="p-3 flex flex-col gap-3">{tabs.map(renderTab)}</nav>
           </Card>
         </div>
 

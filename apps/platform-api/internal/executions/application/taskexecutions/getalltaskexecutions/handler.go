@@ -2,26 +2,24 @@ package getalltaskexecutions
 
 import (
 	"context"
-	"log/slog"
 
-	commonDomain "github.com/blocknextai/platform-api/internal/common/domain"
+	"github.com/blocknextai/platform-api/internal/executions/application/taskexecutions/workflowresolver"
 	"github.com/blocknextai/platform-api/internal/executions/domain/taskexecutions"
-	workflowsApplicationWorkflows "github.com/blocknextai/platform-api/internal/workflows/application/workflows"
 	"github.com/google/uuid"
 )
 
 type Handler struct {
 	taskExecutionRepository taskexecutions.TaskExecutionRepository
-	workflowService         workflowsApplicationWorkflows.WorkflowService
+	workflowResolver        workflowresolver.Resolver
 }
 
 func New(
 	taskExecutionRepository taskexecutions.TaskExecutionRepository,
-	workflowService workflowsApplicationWorkflows.WorkflowService,
+	workflowResolver workflowresolver.Resolver,
 ) *Handler {
 	return &Handler{
 		taskExecutionRepository: taskExecutionRepository,
-		workflowService:         workflowService,
+		workflowResolver:        workflowResolver,
 	}
 }
 
@@ -39,37 +37,12 @@ func (h *Handler) Handle(ctx context.Context, request *GetAllTaskExecutionsQuery
 
 	workflowsByID := make(map[uuid.UUID]Workflow, len(taskExecutions))
 	for _, taskExecution := range taskExecutions {
-		workflowsByID[taskExecution.ID] = h.resolveWorkflow(ctx, taskExecution.ExecutionContext, taskExecution.ContextItemID, taskExecution.OrganizationID)
+		resolved := h.workflowResolver.Resolve(ctx, taskExecution.ExecutionContext, taskExecution.ContextItemID, taskExecution.OrganizationID)
+		workflowsByID[taskExecution.ID] = Workflow{ID: resolved.ID, Title: resolved.Title}
 	}
 
 	return &GetAllTaskExecutionsResponse{
 		Items:      MapGetAllTaskExecutionsQueryToGetAllTaskExecutionsResponse(taskExecutions, workflowsByID),
 		TotalCount: totalCount,
 	}, nil
-}
-
-func (h *Handler) resolveWorkflow(
-	ctx context.Context,
-	executionContext commonDomain.ExecutionContext,
-	contextItemID uuid.UUID,
-	organizationID uuid.UUID,
-) Workflow {
-	switch executionContext {
-	case commonDomain.ExecutionContextWorkflow:
-		workflow, err := h.workflowService.GetWorkflow(ctx, organizationID, contextItemID)
-		if err != nil {
-			slog.WarnContext(ctx, "Failed to resolve workflow info for task execution",
-				"component", "getalltaskexecutions",
-				"organization_id", organizationID,
-				"context_item_id", contextItemID,
-				"error", err)
-			return Workflow{Title: "[deleted]"}
-		}
-		return Workflow{
-			ID:    workflow.ID,
-			Title: workflow.Title,
-		}
-	default:
-		return Workflow{Title: "[deleted]"}
-	}
 }

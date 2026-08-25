@@ -178,12 +178,18 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 		return nil, err
 	}
 
+	apiKeysModule := apikeys.NewModule(apikeys.Dependencies{
+		DB:                 core.DB,
+		TransactionManager: core.TransactionManager,
+	})
+
 	executionsModule := executions.NewModule(executions.Dependencies{
 		DB:                 core.DB,
 		TransactionManager: core.TransactionManager,
 
 		OrganizationUserService: organizationsModule.OrganizationUserService,
 		WorkflowService:         workflowsModule.WorkflowService,
+		APIKeyService:           apiKeysModule.APIKeyService,
 		UserService:             accountModule.UserService,
 		LinkedAccountService:    accountModule.LinkedAccountService,
 	})
@@ -201,6 +207,7 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 		Broadcaster:  broadcaster,
 
 		TaskRunnerOptions: cfg.TaskRunner,
+		SemaphoreOptions:  shared.Semaphore,
 
 		FunctionCallingService:                llmModule.FunctionCallingService,
 		CredentialOAuthTokenRegenerateService: credentialOAuthModule.CredentialOAuthTokenRegenerateService,
@@ -214,11 +221,6 @@ func NewPlatformAPI(core *Core, cfg *config.PlatformAPIConfig) (*PlatformAPI, er
 	if err != nil {
 		return nil, err
 	}
-
-	apiKeysModule := apikeys.NewModule(apikeys.Dependencies{
-		DB:                 core.DB,
-		TransactionManager: core.TransactionManager,
-	})
 
 	notificationsModule := notifications.NewModule(notifications.Dependencies{
 		DB:                   core.DB,

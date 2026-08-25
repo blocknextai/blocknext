@@ -67,7 +67,7 @@ func (e *NodeExecutor) ExecuteNode(ctx context.Context, task *taskRunnerDomainTa
 	if len(node.Credentials) > 0 {
 		var credErr error
 		processedCredentials, credErr = e.credentialProcessor.ProcessCredentials(
-			ctx, task.OrganizationID, task.TriggeredByUserID, node.NodeID, node.Credentials,
+			ctx, task.OrganizationID, node.NodeID, node.Credentials,
 		)
 		if credErr != nil {
 			e.finalizeNode(ctx, task, node, nil, nil, credErr, startTime, taskRunnerDomain.StatusFailed)

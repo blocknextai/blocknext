@@ -2,6 +2,8 @@ package taskrunner
 
 import (
 	"context"
+	commonDomainSemaphore "github.com/blocknextai/platform-api/internal/common/domain/semaphore"
+	commonInfrastructureSemaphore "github.com/blocknextai/platform-api/internal/common/infrastructure/semaphore"
 	"log/slog"
 	"os"
 	"strings"
@@ -38,6 +40,7 @@ type Dependencies struct {
 	Broadcaster  realtime.Broadcaster
 
 	TaskRunnerOptions config.TaskRunnerOptions
+	SemaphoreOptions  config.SemaphoreOptions
 
 	FunctionCallingService                functioncalling.FunctionCallingService
 	CredentialOAuthTokenRegenerateService credentialOAuthApplicationRegenerate.CredentialOAuthTokenRegenerateService
@@ -59,7 +62,7 @@ type Module struct {
 	workerPool          taskRunnerDomainTaskRunner.WorkerPool
 	cronService         taskRunnerDomainTaskRunner.CronService
 	taskRecoveryService *taskRunnerApplicationTaskRunner.TaskRecoveryService
-	semaphoreManager    taskRunnerDomainTaskRunner.SemaphoreManager
+	semaphoreManager    commonDomainSemaphore.SemaphoreManager
 	leaderRunner        taskRunnerDomainTaskRunner.LeaderRunner
 
 	handlers *taskRunnerInfrastructure.Handlers
@@ -100,14 +103,12 @@ func NewModule(deps Dependencies) (*Module, error) {
 		deps.WorkflowService,
 	)
 	concurrencyLimitResolver := taskRunnerApplicationTaskRunner.NewConcurrencyLimitResolver(
-		deps.TaskRunnerOptions.MaxConcurrentTasks,
+		deps.SemaphoreOptions.MaxConcurrentExecutions,
 	)
 
 	workerID := resolveWorkerID(deps.TaskRunnerOptions.Queue.Redis.ConsumerName)
 
-	semaphoreManager, err := taskRunnerInfrastructure.NewSemaphore(
-		deps.TaskRunnerOptions.Semaphore,
-	)
+	semaphoreManager, err := commonInfrastructureSemaphore.New(deps.SemaphoreOptions)
 	if err != nil {
 		return nil, err
 	}

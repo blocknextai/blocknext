@@ -9,12 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { KeyRound } from 'lucide-react'
 import { SearchInput } from '@/components/shared/search-input'
 
-const CredentialPopover = ({
-  children,
-  secrets,
-  onSelect,
-  isUserMode = false,
-}) => {
+const CredentialPopover = ({ children, secrets, onSelect }) => {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
@@ -67,7 +62,7 @@ const CredentialPopover = ({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="p-0" asChild>
-        <div className={`flex flex-col w-80 ${isUserMode ? 'pb-1' : ''}`}>
+        <div className="flex flex-col w-80">
           <div className="p-2 border-b">
             <SearchInput
               placeholder={t('ui.text.searchCredentials')}

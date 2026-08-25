@@ -13,6 +13,7 @@ import (
 
 const (
 	APIKeyHeader    = "X-API-Key"
+	APIKeyIDHeader  = "X-Auth-API-Key-ID"
 	OwnerTypeHeader = "X-Auth-Owner-Type"
 	OwnerIDHeader   = "X-Auth-Owner-ID"
 
@@ -48,6 +49,7 @@ func (m *APIKeyMiddleware) Authenticate() fiber.Handler {
 			return ErrInvalidAPIKey.WithCause(err)
 		}
 
+		c.Request().Header.Set(APIKeyIDHeader, authenticated.ID.String())
 		c.Request().Header.Set(OwnerTypeHeader, authenticated.OwnerType.String())
 		c.Request().Header.Set(OwnerIDHeader, authenticated.OwnerID.String())
 

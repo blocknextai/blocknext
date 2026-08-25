@@ -8,20 +8,18 @@ import (
 	accountApplicationUsers "github.com/blocknextai/platform-api/internal/account/application/users"
 	accountDomainLinkedAccounts "github.com/blocknextai/platform-api/internal/account/domain/linkedaccounts"
 	accountDomainUsers "github.com/blocknextai/platform-api/internal/account/domain/users"
-	commonDomain "github.com/blocknextai/platform-api/internal/common/domain"
 	executionsApplicationNodeExecutions "github.com/blocknextai/platform-api/internal/executions/application/nodeexecutions"
+	"github.com/blocknextai/platform-api/internal/executions/application/taskexecutions/workflowresolver"
 	executionsDomainNodeExecutions "github.com/blocknextai/platform-api/internal/executions/domain/nodeexecutions"
 	"github.com/blocknextai/platform-api/internal/executions/domain/taskexecutions"
 	organizationsApplicationOrganizationUsers "github.com/blocknextai/platform-api/internal/organizations/application/organizationusers"
 	organizationsDomainOrganizationUsers "github.com/blocknextai/platform-api/internal/organizations/domain/organizationusers"
-	workflowsApplicationWorkflows "github.com/blocknextai/platform-api/internal/workflows/application/workflows"
-	"github.com/google/uuid"
 )
 
 type Handler struct {
 	taskExecutionRepository taskexecutions.TaskExecutionRepository
 	nodeExecutionService    executionsApplicationNodeExecutions.NodeExecutionService
-	workflowService         workflowsApplicationWorkflows.WorkflowService
+	workflowResolver        workflowresolver.Resolver
 	organizationUserService organizationsApplicationOrganizationUsers.OrganizationUserService
 	userService             accountApplicationUsers.UserService
 	linkedAccountService    accountApplicationLinkedAccounts.LinkedAccountService
@@ -30,7 +28,7 @@ type Handler struct {
 func New(
 	taskExecutionRepository taskexecutions.TaskExecutionRepository,
 	nodeExecutionService executionsApplicationNodeExecutions.NodeExecutionService,
-	workflowService workflowsApplicationWorkflows.WorkflowService,
+	workflowResolver workflowresolver.Resolver,
 	organizationUserService organizationsApplicationOrganizationUsers.OrganizationUserService,
 	userService accountApplicationUsers.UserService,
 	linkedAccountService accountApplicationLinkedAccounts.LinkedAccountService,
@@ -38,7 +36,7 @@ func New(
 	return &Handler{
 		taskExecutionRepository: taskExecutionRepository,
 		nodeExecutionService:    nodeExecutionService,
-		workflowService:         workflowService,
+		workflowResolver:        workflowResolver,
 		organizationUserService: organizationUserService,
 		userService:             userService,
 		linkedAccountService:    linkedAccountService,
@@ -51,7 +49,8 @@ func (h *Handler) Handle(ctx context.Context, request *GetTaskExecutionByIDQuery
 		return nil, err
 	}
 
-	workflow := h.resolveWorkflow(ctx, taskExecution.ExecutionContext, taskExecution.ContextItemID, taskExecution.OrganizationID)
+	resolved := h.workflowResolver.Resolve(ctx, taskExecution.ExecutionContext, taskExecution.ContextItemID, taskExecution.OrganizationID)
+	workflow := Workflow{ID: resolved.ID, Title: resolved.Title}
 
 	var organizationUser *organizationsDomainOrganizationUsers.OrganizationUser
 	if taskExecution.TriggeredByUserID != nil {
@@ -103,30 +102,4 @@ func (h *Handler) Handle(ctx context.Context, request *GetTaskExecutionByIDQuery
 		linkedAccounts,
 		nodeExecutions,
 	), nil
-}
-
-func (h *Handler) resolveWorkflow(
-	ctx context.Context,
-	executionContext commonDomain.ExecutionContext,
-	contextItemID uuid.UUID,
-	organizationID uuid.UUID,
-) Workflow {
-	switch executionContext {
-	case commonDomain.ExecutionContextWorkflow:
-		workflow, err := h.workflowService.GetWorkflow(ctx, organizationID, contextItemID)
-		if err != nil {
-			slog.WarnContext(ctx, "Failed to resolve workflow for task execution",
-				"component", "gettaskexecutionbyid",
-				"organization_id", organizationID,
-				"context_item_id", contextItemID,
-				"error", err)
-			return Workflow{Title: "[deleted]"}
-		}
-		return Workflow{
-			ID:    workflow.ID,
-			Title: workflow.Title,
-		}
-	default:
-		return Workflow{Title: "[deleted]"}
-	}
 }

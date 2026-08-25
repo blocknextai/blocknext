@@ -3,10 +3,10 @@ import { config } from '@/lib/config'
 
 export interface OrganizationEvent {
   id: string
-  type: 'task' | 'node'
+  type: 'task' | 'node' | 'tool_invocation'
   organizationId: string
-  executionContext: 'workflow'
-  contextItemId: string
+  executionContext?: 'workflow' | 'library'
+  contextItemId?: string
   status:
     | 'pending'
     | 'scheduled'
@@ -21,6 +21,9 @@ export interface OrganizationEvent {
   nodeId?: string
   nodeType?: string
   output?: Record<string, any>[]
+  // tool-invocation-specific fields
+  source?: string
+  toolId?: string
 }
 
 type EventListener = (event: OrganizationEvent) => void

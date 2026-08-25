@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	executionsDomainToolInvocations "github.com/blocknextai/platform-api/internal/executions/domain/toolinvocations"
 	"log/slog"
 	"strings"
 
@@ -17,8 +18,9 @@ import (
 const organizationKeyPrefix = "organization:"
 
 var (
-	ErrFailedToPublishTaskEvent = apperror.Internal("failed to publish task event")
-	ErrFailedToPublishNodeEvent = apperror.Internal("failed to publish node event")
+	ErrFailedToPublishTaskEvent           = apperror.Internal("failed to publish task event")
+	ErrFailedToPublishNodeEvent           = apperror.Internal("failed to publish node event")
+	ErrFailedToPublishToolInvocationEvent = apperror.Internal("failed to publish tool invocation event")
 )
 
 type redisBroadcaster struct {
@@ -68,6 +70,19 @@ func (b *redisBroadcaster) PublishNodeEvent(ctx context.Context, event *taskRunn
 	err = b.client.Publish(ctx, buildOrganizationKey(event.OrganizationID), payload).Err()
 	if err != nil {
 		return ErrFailedToPublishNodeEvent
+	}
+
+	return nil
+}
+
+func (b *redisBroadcaster) PublishToolInvocationEvent(ctx context.Context, event *executionsDomainToolInvocations.ToolInvocationEvent) error {
+	payload, err := events.MarshalToolInvocation(event)
+	if err != nil {
+		return err
+	}
+
+	if err := b.client.Publish(ctx, buildOrganizationKey(event.OrganizationID), payload).Err(); err != nil {
+		return ErrFailedToPublishToolInvocationEvent
 	}
 
 	return nil

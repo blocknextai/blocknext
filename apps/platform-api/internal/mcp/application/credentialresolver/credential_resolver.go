@@ -78,12 +78,6 @@ func (r *credentialResolver) Resolve(
 }
 
 func scopeMatchesOwner(scope commonDomainCredential.Scope, ownerType commonDomain.OwnerType) bool {
-	switch scope {
-	case commonDomainCredential.OrganizationCredentialScope:
-		return ownerType == commonDomain.OwnerTypeOrganization
-	case commonDomainCredential.UserCredentialScope:
-		return ownerType == commonDomain.OwnerTypeUser
-	default:
-		return false
-	}
+	return scope == commonDomainCredential.OrganizationCredentialScope &&
+		ownerType == commonDomain.OwnerTypeOrganization
 }

@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
 import useSWR, { useSWRConfig } from 'swr'
-import credentialsService from '@/features/credentials/services/credentials'
 import { organizationsService } from '@/features/organizations'
 import { nodeEngineService } from '@/features/flow-editor'
 import { useIconResolver } from '@/features/flow-editor/icons'
@@ -40,11 +39,8 @@ const defaultPagination = {
 
 type Pagination = { offset?: number; limit?: number; query?: string }
 
-export function useCredentials(
-  organizationId: string | null,
-  isUserMode: boolean,
-) {
-  const hasAccess = isUserMode || !!organizationId
+export function useCredentials(organizationId: string | null) {
+  const hasAccess = !!organizationId
   const resolveIcon = useIconResolver()
 
   const [pagination, setPagination] = useState<Pagination>({
@@ -58,22 +54,15 @@ export function useCredentials(
     () => unwrap(nodeEngineService.getCredentials()),
   )
 
-  const savedKey = !hasAccess
-    ? null
-    : isUserMode
-      ? [
-          'user-credentials',
-          pagination.offset,
-          pagination.limit,
-          pagination.query ?? '',
-        ]
-      : [
-          'organization-credentials',
-          organizationId,
-          pagination.offset,
-          pagination.limit,
-          pagination.query ?? '',
-        ]
+  const savedKey = hasAccess
+    ? [
+        'organization-credentials',
+        organizationId,
+        pagination.offset,
+        pagination.limit,
+        pagination.query ?? '',
+      ]
+    : null
 
   const {
     data: savedResponse,
@@ -82,12 +71,10 @@ export function useCredentials(
   } = useSWR(
     savedKey,
     () =>
-      isUserMode
-        ? credentialsService.getUserCredentials(pagination)
-        : organizationsService.getOrganizationCredentials(
-            organizationId,
-            pagination,
-          ),
+      organizationsService.getOrganizationCredentials(
+        organizationId,
+        pagination,
+      ),
     { keepPreviousData: true },
   )
 
@@ -138,19 +125,18 @@ export function useCredentials(
         return null
       }
       try {
-        const response = isUserMode
-          ? await credentialsService.getUserCredentialById(secretId)
-          : await organizationsService.getOrganizationCredentialById(
-              organizationId,
-              secretId,
-            )
+        const response =
+          await organizationsService.getOrganizationCredentialById(
+            organizationId,
+            secretId,
+          )
         return response.data
       } catch (error) {
         console.error('Error fetching secret details:', error)
         return null
       }
     },
-    [hasAccess, isUserMode, organizationId],
+    [hasAccess, organizationId],
   )
 
   return {
@@ -168,17 +154,10 @@ export function useCredentials(
 export function useCredentialsRevalidate() {
   const { mutate } = useSWRConfig()
   return useCallback(() => {
-    return Promise.all([
-      mutate(
-        (k) => Array.isArray(k) && k[0] === 'user-credentials',
-        undefined,
-        { revalidate: true },
-      ),
-      mutate(
-        (k) => Array.isArray(k) && k[0] === 'organization-credentials',
-        undefined,
-        { revalidate: true },
-      ),
-    ])
+    return mutate(
+      (k) => Array.isArray(k) && k[0] === 'organization-credentials',
+      undefined,
+      { revalidate: true },
+    )
   }, [mutate])
 }

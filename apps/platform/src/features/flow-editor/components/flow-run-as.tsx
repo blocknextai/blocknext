@@ -34,7 +34,6 @@ const FlowRunAs = ({
   triggerType,
 }) => {
   const { t } = useTranslation()
-  const [runAs, setRunAs] = useState('member')
   const [prompt, setPrompt] = useState(defaultValue)
   const [open, setOpen] = useState(false)
   const [cron, setCron] = useState(cronString)
@@ -75,19 +74,6 @@ const FlowRunAs = ({
               className="size-7 rounded-sm"
               style={{ backgroundImage: `${flowAvatar}` }}
             ></div>
-            <div className="bg-transparent text-muted-foreground p-0 flex items-center">
-              <Select onValueChange={setRunAs}>
-                <SelectTrigger className="bg-transparent! rounded-lg!">
-                  <SelectValue placeholder={t('ui.text.runAs')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">{t('ui.text.user')}</SelectItem>
-                  <SelectItem value="member">
-                    {t('ui.text.organization')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             {triggerType === 'schedule' && (
               <Button
                 className="rounded-lg"
@@ -119,7 +105,7 @@ const FlowRunAs = ({
             <Button
               className="rounded-lg"
               size={'icon'}
-              onClick={() => onClick(runAs, prompt)}
+              onClick={() => onClick(prompt)}
             >
               <SendHorizontal />
             </Button>
@@ -128,12 +114,7 @@ const FlowRunAs = ({
       </div>
       {toggleAdvanced && (
         <div ref={contentRef} className="absolute w-full mt-4">
-          <FlowRun
-            flow={flow}
-            credentials={credentials}
-            runType={runAs}
-            setFlow={setFlow}
-          />
+          <FlowRun flow={flow} credentials={credentials} setFlow={setFlow} />
         </div>
       )}
       <Dialog open={open} onOpenChange={setOpen}>

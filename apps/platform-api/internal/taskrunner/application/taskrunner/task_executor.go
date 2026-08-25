@@ -3,6 +3,7 @@ package taskrunner
 import (
 	"context"
 	"errors"
+	commonDomainSemaphore "github.com/blocknextai/platform-api/internal/common/domain/semaphore"
 	"log/slog"
 	"time"
 
@@ -22,7 +23,7 @@ type TaskExecutor struct {
 	nodeExecutionService     executionsApplicationNodeExecutions.NodeExecutionService
 	executionCoordinator     taskRunnerDomainTaskRunner.TaskExecutionCoordinator
 	lifecycleManager         taskRunnerDomainTaskRunner.TaskLifecycleManager
-	semaphoreManager         taskRunnerDomainTaskRunner.SemaphoreManager
+	semaphoreManager         commonDomainSemaphore.SemaphoreManager
 	contextManager           taskRunnerDomainTaskRunner.ContextManager
 	concurrencyLimitResolver taskRunnerDomainTaskRunner.ConcurrencyLimitResolver
 	workerID                 string
@@ -36,7 +37,7 @@ func NewTaskExecutor(
 	nodeExecutionService executionsApplicationNodeExecutions.NodeExecutionService,
 	executionCoordinator taskRunnerDomainTaskRunner.TaskExecutionCoordinator,
 	lifecycleManager taskRunnerDomainTaskRunner.TaskLifecycleManager,
-	semaphoreManager taskRunnerDomainTaskRunner.SemaphoreManager,
+	semaphoreManager commonDomainSemaphore.SemaphoreManager,
 	contextManager taskRunnerDomainTaskRunner.ContextManager,
 	concurrencyLimitResolver taskRunnerDomainTaskRunner.ConcurrencyLimitResolver,
 	workerID string,

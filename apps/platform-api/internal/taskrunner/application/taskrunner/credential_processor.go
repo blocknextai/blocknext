@@ -27,7 +27,6 @@ func NewCredentialProcessor(
 func (p *CredentialProcessor) ProcessCredentials(
 	ctx context.Context,
 	organizationID uuid.UUID,
-	triggeredByUserID *uuid.UUID,
 	nodeType string,
 	credentials map[string]any,
 ) (map[string]any, error) {
@@ -35,7 +34,7 @@ func (p *CredentialProcessor) ProcessCredentials(
 
 	for k, v := range credentials {
 		if value, ok := v.(string); ok && strings.HasPrefix(value, commonDomainCredential.CredentialPrefix) {
-			resolved, err := p.processCredentialValue(ctx, organizationID, triggeredByUserID, nodeType, value)
+			resolved, err := p.processCredentialValue(ctx, organizationID, nodeType, value)
 			if err != nil {
 				return nil, err
 			}
@@ -51,11 +50,10 @@ func (p *CredentialProcessor) ProcessCredentials(
 func (p *CredentialProcessor) processCredentialValue(
 	ctx context.Context,
 	organizationID uuid.UUID,
-	triggeredByUserID *uuid.UUID,
 	nodeType string,
 	value string,
 ) (any, error) {
-	scope, credentialID, err := commonDomainCredential.ParseReference(value)
+	_, credentialID, err := commonDomainCredential.ParseReference(value)
 	if err != nil {
 		slog.WarnContext(ctx, "failed to parse credential reference",
 			"component", "taskrunner_credential_processor",
@@ -65,23 +63,9 @@ func (p *CredentialProcessor) processCredentialValue(
 		return value, nil
 	}
 
-	var ownerType commonDomain.OwnerType
-	var ownerID uuid.UUID
-	switch scope {
-	case commonDomainCredential.OrganizationCredentialScope:
-		ownerType = commonDomain.OwnerTypeOrganization
-		ownerID = organizationID
-	case commonDomainCredential.UserCredentialScope:
-		if triggeredByUserID == nil {
-			return value, nil
-		}
-		ownerType = commonDomain.OwnerTypeUser
-		ownerID = *triggeredByUserID
-	default:
-		return value, nil
-	}
+	ownerType := commonDomain.OwnerTypeOrganization
 
-	updatedCredentialData, err := p.tokenRegenerateService.RegenerateTokenIfNeeded(ctx, ownerType, ownerID, credentialID)
+	updatedCredentialData, err := p.tokenRegenerateService.RegenerateTokenIfNeeded(ctx, ownerType, organizationID, credentialID)
 	if err != nil {
 		if errors.Is(err, credentialOAuthApplicationRegenerate.ErrRefreshTokenInvalid) {
 			slog.WarnContext(ctx, "credential needs re-authentication",

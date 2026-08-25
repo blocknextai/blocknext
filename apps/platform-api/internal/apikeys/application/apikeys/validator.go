@@ -21,6 +21,7 @@ var (
 )
 
 type AuthenticatedAPIKey struct {
+	ID        uuid.UUID
 	OwnerType commonDomain.OwnerType
 	OwnerID   uuid.UUID
 	Scopes    apiKeysDomain.Scopes
@@ -63,6 +64,7 @@ func (v *apiKeyValidator) Validate(ctx context.Context, rawKey string) (*Authent
 	}
 
 	return &AuthenticatedAPIKey{
+		ID:        apiKey.ID,
 		OwnerType: apiKey.OwnerType,
 		OwnerID:   apiKey.OwnerID,
 		Scopes:    apiKey.Scopes,

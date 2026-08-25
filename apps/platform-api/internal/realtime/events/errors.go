@@ -5,6 +5,7 @@ import (
 )
 
 var (
-	ErrFailedToMarshalTaskEvent = apperror.Internal("failed to marshal task event")
-	ErrFailedToMarshalNodeEvent = apperror.Internal("failed to marshal node event")
+	ErrFailedToMarshalTaskEvent           = apperror.Internal("failed to marshal task event")
+	ErrFailedToMarshalNodeEvent           = apperror.Internal("failed to marshal node event")
+	ErrFailedToMarshalToolInvocationEvent = apperror.Internal("failed to marshal tool invocation event")
 )

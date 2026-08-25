@@ -73,9 +73,6 @@ export const PreferencesAppearancePage = lazy(
 export const PreferencesSessionsPage = lazy(
   () => import('@/pages/preferences/sessions/page'),
 )
-export const PreferencesCredentialsPage = lazy(
-  () => import('@/pages/preferences/credentials/page'),
-)
 export const PreferencesNotificationsPage = lazy(
   () => import('@/pages/preferences/notifications/page'),
 )

@@ -11,44 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type CreateUserCredentialRequest struct {
-	SourceType credentialsDomainCredentials.SourceType `json:"sourceType"`
-	Key        string                                  `json:"key"`
-	Title      string                                  `json:"title"`
-	Data       map[string]any                          `json:"data"`
-}
-
-func NewCreateUserCredentialHandler(handler cqrs.Handler[*createcredential.CreateCredentialCommand, *createcredential.CreateCredentialResponse]) fiber.Handler {
-	return func(c fiber.Ctx) error {
-		request := new(CreateUserCredentialRequest)
-		if err := c.Bind().All(request); err != nil {
-			return commonHTTP.ErrInvalidRequest
-		}
-
-		sourceType := request.SourceType
-		if sourceType == "" {
-			sourceType = credentialsDomainCredentials.SourceTypeOwner
-		}
-
-		userID := commonHTTP.GetUserID(c)
-
-		result, err := handler.Handle(c.RequestCtx(), &createcredential.CreateCredentialCommand{
-			OwnerType:  commonDomain.OwnerTypeUser,
-			OwnerID:    userID,
-			SourceType: sourceType,
-			Key:        request.Key,
-			Title:      request.Title,
-			Data:       request.Data,
-		})
-
-		if err != nil {
-			return err
-		}
-
-		return c.Status(fiber.StatusCreated).JSON(resultPkg.Ok(result, resultPkg.WithMessage("credential created")))
-	}
-}
-
 type CreateOrganizationCredentialRequest struct {
 	OrganizationID uuid.UUID                               `uri:"organizationId"`
 	SourceType     credentialsDomainCredentials.SourceType `json:"sourceType"`
