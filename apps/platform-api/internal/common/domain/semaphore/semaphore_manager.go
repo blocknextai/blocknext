@@ -1,0 +1,14 @@
+package semaphore
+
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
+
+type SemaphoreManager interface {
+	Ping(ctx context.Context) error
+	AcquireSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID, maxConcurrentExecutions int64) (chan struct{}, error)
+	ReleaseSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID, semaphore chan struct{}) error
+	HeartbeatSemaphore(ctx context.Context, organizationID uuid.UUID, holderID uuid.UUID) error
+}
