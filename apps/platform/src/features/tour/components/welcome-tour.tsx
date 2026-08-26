@@ -13,42 +13,59 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useOrganizationStore } from '@/stores/organization'
 import TourComponent from '@/features/tour/components/tour-component'
+import {
+  hasSeenOnboardingTour,
+  markOnboardingTourSeen,
+} from '@/features/tour/storage'
+import { ONBOARDING_DEMO } from '@/features/tour/demo-flow'
 
-const WelcomeTour = ({ sidebarOpen, setSidebarOpen, nextStep }) => {
+const WelcomeTour = ({
+  sidebarOpen,
+  setSidebarOpen,
+  addNodeById,
+  selectGroupForNode,
+  connectNodes,
+  focusCanvas,
+  openNodeSettings,
+  getFlowState,
+  nextStep,
+}) => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
   const [isFirstVisit, setIsFirstVisit] = useState(false)
-  const [openWelcome, setOpenWelcome] = useState(
-    () => !localStorage.getItem('hasVisited'),
-  )
+  const [openWelcome, setOpenWelcome] = useState(() => !hasSeenOnboardingTour())
   const [shouldStartTour, setShouldStartTour] = useState(false)
   const organizationId = useOrganizationStore((s) => s.organizationId)
   const { state } = location
+  const createPath = `/organizations/${organizationId}/create`
+  const demoPath = `${createPath}?demo=${ONBOARDING_DEMO}`
+
   useEffect(() => {
-    const hasVisited = localStorage.getItem('hasVisited')
-    if (!hasVisited && state?.popup !== false) {
+    if (!hasSeenOnboardingTour() && state?.popup !== false) {
       setIsFirstVisit(true)
-    }
-    if (state?.tour) {
-      setShouldStartTour(true)
     }
   }, [])
 
+  useEffect(() => {
+    if (state?.tour) {
+      setShouldStartTour(true)
+    }
+  }, [state?.tour])
+
   const handleSkip = () => {
-    localStorage.setItem('hasVisited', 'true')
+    markOnboardingTourSeen()
     setIsFirstVisit(false)
     setOpenWelcome(false)
     setShouldStartTour(false)
-    if (location.pathname === `/organizations/${organizationId}/welcome`) {
-      navigate(`/organizations/${organizationId}/create`)
-    }
   }
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
+    markOnboardingTourSeen()
     setIsFirstVisit(false)
     setOpenWelcome(false)
-    navigate(`/organizations/${organizationId}/welcome`, {
+    navigate(demoPath, {
+      replace: true,
       state: { popup: false, tour: true },
     })
   }
@@ -64,6 +81,12 @@ const WelcomeTour = ({ sidebarOpen, setSidebarOpen, nextStep }) => {
         onTourSkip={handleTourSkip}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        addNodeById={addNodeById}
+        selectGroupForNode={selectGroupForNode}
+        connectNodes={connectNodes}
+        focusCanvas={focusCanvas}
+        openNodeSettings={openNodeSettings}
+        getFlowState={getFlowState}
         onNextStep={nextStep}
       />
       {isFirstVisit && (

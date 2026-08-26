@@ -154,13 +154,14 @@ const FlowCanvas = ({
     previewMode,
   })
 
-  const { dragging, previewPos, previewData, startDrag } = useFlowDrag({
-    apiNodes,
-    setNodes,
-    preSave,
-    getId,
-    nextStep: () => nextStepRef.current?.(),
-  })
+  const { dragging, previewPos, previewData, startDrag, addNodeById } =
+    useFlowDrag({
+      apiNodes,
+      setNodes,
+      preSave,
+      getId,
+      nextStep: () => nextStepRef.current?.(),
+    })
 
   // Search handler
   const handleSearch = useCallback(
@@ -325,6 +326,106 @@ const FlowCanvas = ({
       current.map((n) => ({ ...n, data: { ...n.data, ...buildNodeData(n) } })),
     )
   }, [initialFlow, apiNodes])
+
+  const focusCanvas = useCallback(
+    (nodeId?: string) => {
+      if (!nodeId) {
+        reactFlow.fitView({ padding: 0.2, duration: 300 })
+        return
+      }
+
+      const node = reactFlow.getNode(nodeId)
+      const element = document.querySelector(
+        `.react-flow__node[data-id="${nodeId}"]`,
+      )
+      const pane = document.querySelector('.react-flow')
+      if (!node || !element || !pane) {
+        return
+      }
+
+      const nodeRect = element.getBoundingClientRect()
+      const paneRect = pane.getBoundingClientRect()
+      const margin = 48
+      const isVisible =
+        nodeRect.top >= paneRect.top + margin &&
+        nodeRect.left >= paneRect.left + margin &&
+        nodeRect.bottom <= paneRect.bottom - margin &&
+        nodeRect.right <= paneRect.right - margin
+
+      if (isVisible) {
+        return
+      }
+
+      reactFlow.setCenter(
+        node.position.x,
+        node.position.y + (node.measured?.height ?? 0) / 2,
+        { zoom: reactFlow.getZoom(), duration: 300 },
+      )
+    },
+    [reactFlow],
+  )
+
+  const getFlowState = useCallback(
+    () => ({ nodes: reactFlow.getNodes(), edges: reactFlow.getEdges() }),
+    [reactFlow],
+  )
+
+  const openNodeSettings = useCallback((nodeId: string) => {
+    setSelectedNodeId(nodeId)
+    setChatOpen(false)
+  }, [])
+
+  const connectNodes = useCallback(
+    (sourceId: string, targetId: string) => {
+      const fromNode = reactFlow.getNode(sourceId)
+      const toNode = reactFlow.getNode(targetId)
+      if (!fromNode || !toNode) {
+        return false
+      }
+
+      const sourceHandle = (fromNode.data as any)?.outputs?.[0]?.key ?? 'out'
+      const targetHandle = (toNode.data as any)?.inputs?.[0]?.key ?? 'in'
+
+      onConnect({
+        source: sourceId,
+        target: targetId,
+        sourceHandle,
+        targetHandle,
+      })
+      setNodes((current) =>
+        current.map((n) =>
+          n.id === targetId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  contextMenu: createContextNode(n, undefined, fromNode),
+                },
+              }
+            : n,
+        ),
+      )
+
+      return true
+    },
+    [reactFlow, onConnect, setNodes, createContextNode],
+  )
+
+  const selectGroupForNode = useCallback(
+    (nodeId: string) => {
+      const provider = providerList.find((group: any) =>
+        group.nodes?.some((node: any) => node.id === nodeId),
+      )
+      if (!provider) {
+        return false
+      }
+
+      setSidebarOpen(true)
+      setSelectedCategory({ label: provider.label, nodes: provider.nodes })
+      return true
+    },
+    [providerList, setSidebarOpen, setSelectedCategory],
+  )
 
   const revertFlow = useCallback(() => {
     if (initialFlow) {
@@ -545,6 +646,12 @@ const FlowCanvas = ({
             <WelcomeTour
               sidebarOpen={sidebarOpen}
               setSidebarOpen={setSidebarOpen}
+              addNodeById={addNodeById}
+              selectGroupForNode={selectGroupForNode}
+              connectNodes={connectNodes}
+              focusCanvas={focusCanvas}
+              openNodeSettings={openNodeSettings}
+              getFlowState={getFlowState}
               nextStep={nextStepInit}
             />
           )}

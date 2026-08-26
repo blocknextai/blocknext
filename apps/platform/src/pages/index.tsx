@@ -60,10 +60,6 @@ export const OrganizationNotificationsPage = lazy(
 export const OrganizationRunPage = lazy(
   () => import('@/pages/organizations/[organizationId]/run/[id]/page'),
 )
-export const WelcomePage = lazy(
-  () => import('@/pages/organizations/[organizationId]/welcome/page'),
-)
-
 export const PreferencesProfilePage = lazy(
   () => import('@/pages/preferences/profile/page'),
 )

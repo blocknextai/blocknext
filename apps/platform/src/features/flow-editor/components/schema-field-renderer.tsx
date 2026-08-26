@@ -425,7 +425,7 @@ export function SchemaFieldRenderer({
   }
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2" data-field-key={field.key}>
       <div className="flex items-center justify-between">
         <Label
           htmlFor={field.key}
