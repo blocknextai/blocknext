@@ -1,5 +1,16 @@
 # BlockNext
 
+[![release](https://img.shields.io/github/v/release/blocknextai/blocknext?style=flat-square&color=blue)](https://github.com/blocknextai/blocknext/releases)
+[![lint](https://img.shields.io/github/actions/workflow/status/blocknextai/blocknext/lint.yml?branch=main&style=flat-square&label=lint)](https://github.com/blocknextai/blocknext/actions/workflows/lint.yml)
+[![license](https://img.shields.io/github/license/blocknextai/blocknext?style=flat-square&color=blue)](LICENSE)
+
+[![go](https://img.shields.io/github/go-mod/go-version/blocknextai/blocknext?filename=apps%2Fplatform-api%2Fgo.mod&style=flat-square&logo=go&logoColor=white&label=go&color=00ADD8)](apps/platform-api/go.mod)
+[![react](https://img.shields.io/github/package-json/dependency-version/blocknextai/blocknext/react?filename=apps%2Fplatform%2Fpackage.json&style=flat-square&logo=react&logoColor=white&label=react&color=61DAFB)](apps/platform/package.json)
+[![typescript](https://img.shields.io/github/package-json/dependency-version/blocknextai/blocknext/dev/typescript?filename=apps%2Fplatform%2Fpackage.json&style=flat-square&logo=typescript&logoColor=white&label=typescript&color=3178C6)](apps/platform/package.json)
+[![bun](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fblocknextai%2Fblocknext%2Fmain%2Fpackage.json&query=%24.packageManager&style=flat-square&logo=bun&logoColor=black&label=&color=FBF0DF)](package.json)
+[![postgresql](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)](docker-compose.prod.yml)
+[![docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://github.com/orgs/blocknextai/packages?repo_name=blocknext)
+
 BlockNext is a no-code platform for building and running AI-powered workflows. Design flows on a drag-and-drop canvas, connect AI models and third-party services, and let your automations run — no code required.
 
 It is built for end users, not just developers: flows stay simple, readable and predictable by design.
