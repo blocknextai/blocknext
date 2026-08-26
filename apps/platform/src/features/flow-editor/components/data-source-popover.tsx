@@ -33,6 +33,7 @@ export function DataSourcePopover({
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          data-tour="data-source"
           variant="ghost"
           size="icon-sm"
           className="shrink-0"

@@ -174,7 +174,6 @@ function Routes() {
                         path="edit/:id"
                         element={<Pages.FlowsEditPage />}
                       />
-                      <Route path="welcome" element={<Pages.WelcomePage />} />
                     </Route>
                   </Route>
                 </Route>

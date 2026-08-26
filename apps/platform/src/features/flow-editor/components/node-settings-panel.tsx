@@ -125,6 +125,7 @@ export function NodeSettingsPanel({
 
   return (
     <div
+      data-tour="node-settings-panel"
       className="absolute right-4 top-4 bottom-4 w-[400px] z-[4] bg-background border border-border rounded-xl shadow-lg flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
       onClick={(e) => e.stopPropagation()}
     >
@@ -162,7 +163,11 @@ export function NodeSettingsPanel({
               </TabsTrigger>
             )}
             {showAdvancedTab && (
-              <TabsTrigger value="advanced" className="flex-1">
+              <TabsTrigger
+                value="advanced"
+                className="flex-1"
+                data-tour="node-settings-advanced"
+              >
                 {t('ui.text.advanced')}
               </TabsTrigger>
             )}
@@ -314,7 +319,7 @@ export function NodeSettingsPanel({
         <Button variant="outline" size="sm" onClick={onCancel}>
           {t('ui.text.cancel')}
         </Button>
-        <Button size="sm" onClick={handleApply}>
+        <Button size="sm" onClick={handleApply} data-tour="node-settings-apply">
           {t('ui.text.apply')}
         </Button>
       </div>

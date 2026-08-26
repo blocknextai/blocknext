@@ -49,6 +49,7 @@ const FlowSidebar = ({
       <div
         key={key}
         data-tour="node-item"
+        data-node-id={item.id}
         style={{ borderColor: prefs.color }}
         className={`bg-card hover:bg-accent flex w-full items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${cursorClass} ${isDisabled ? 'opacity-50' : ''}`}
         onMouseDown={(e) => !isDisabled && startDrag(e, item.id)}

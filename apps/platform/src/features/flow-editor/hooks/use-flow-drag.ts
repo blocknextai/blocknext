@@ -76,48 +76,71 @@ export function useFlowDrag({
       y: e.clientY,
     })
 
-    if (dragData.current.kind === 'note') {
-      const noteNode = {
-        id,
-        data: {
-          id,
-          note: '',
-          category: dragData.current.category,
-        },
-        parameters: {},
-        nodeId: dragData.current.id,
-        type: 'annotation',
-        position,
-      }
-      setNodes((nds: FlowNode[]) =>
-        preSave(nds.concat(noteNode as FlowNode), true),
-      )
-      return
+    appendNode(dragData.current, id, position)
+    nextStep()
+  }
+
+  const appendNode = (
+    item: DragItem,
+    id: string,
+    position: { x: number; y: number },
+  ) => {
+    const node =
+      item.kind === 'note'
+        ? {
+            id,
+            data: { id, note: '', category: item.category },
+            parameters: {},
+            nodeId: item.id,
+            type: 'annotation',
+            position,
+          }
+        : {
+            id,
+            data: {
+              id,
+              description: item.description,
+              tags: item.tags,
+              title: item.name,
+              category: item.category,
+              icon: item.icon,
+              inputs: item.inputs,
+              outputs: item.outputs,
+            },
+            instruction: undefined,
+            parameters: {},
+            origin: [0.5, 0.0],
+            nodeId: item.id,
+            type: 'core',
+            position,
+          }
+
+    setNodes((nds: FlowNode[]) => preSave(nds.concat(node as FlowNode), true))
+  }
+
+  const addNodeById = (
+    nodeId: string,
+    flowPosition?: { x: number; y: number },
+  ) => {
+    const item = apiNodes.find((node) => node.id === nodeId)
+    if (!item || item.isComingSoon) {
+      return false
     }
 
-    const newNode = {
-      id,
-      data: {
-        id,
-        description: dragData.current.description,
-        tags: dragData.current.tags,
-        title: dragData.current.name,
-        category: dragData.current.category,
-        icon: dragData.current.icon,
-        inputs: dragData.current.inputs,
-        outputs: dragData.current.outputs,
-      },
-      instruction: undefined,
-      parameters: {},
-      origin: [0.5, 0.0],
-      nodeId: dragData.current.id,
-      type: 'core',
-      position,
+    if (flowPosition) {
+      appendNode(item, getId(), flowPosition)
+      return true
     }
-    setNodes((nds: FlowNode[]) =>
-      preSave(nds.concat(newNode as FlowNode), true),
-    )
-    nextStep()
+
+    const pane = document.querySelector('.react-flow') as HTMLElement | null
+    const rect = pane?.getBoundingClientRect()
+    const position = screenToFlowPosition({
+      x: rect ? rect.left + rect.width / 2 : window.innerWidth / 2,
+      y: rect ? rect.top + rect.height / 2 : window.innerHeight / 2,
+    })
+
+    appendNode(item, getId(), position)
+    return true
   }
 
   const startDrag = (e: React.MouseEvent, id: string) => {
@@ -149,5 +172,6 @@ export function useFlowDrag({
     previewPos,
     previewData,
     startDrag,
+    addNodeById,
   }
 }
