@@ -101,6 +101,7 @@ const AIChatSheet = ({ organizationId, isOpen, onClose, onApplyWorkflow }) => {
   return (
     <>
       <div
+        data-tour="ai-chat"
         className="absolute right-4 top-4 bottom-4 w-[420px] max-w-[90vw] z-[4] bg-background border border-border rounded-xl shadow-lg flex flex-col overflow-hidden animate-in slide-in-from-right duration-200"
         onClick={(e) => e.stopPropagation()}
       >

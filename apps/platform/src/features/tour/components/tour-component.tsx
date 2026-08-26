@@ -16,6 +16,7 @@ const TARGET_POLL_INTERVAL = 60
 const TARGET_WAIT_TIMEOUT = 900
 const OPTIONAL_TARGET_WAIT_TIMEOUT = 240
 const COMPLETION_POLL_INTERVAL = 350
+const LOST_TARGET_TIMEOUT = 3000
 const CANVAS_TARGET = /^\[data-id="([^"]+)"\]$/
 const STEP_TRANSITION_DELAY = 200
 
@@ -39,6 +40,13 @@ const canvasBounds = () => {
     right: rect.right,
     bottom: rect.bottom,
   }
+}
+
+const activate = (element: HTMLElement) => {
+  const options = { bubbles: true, cancelable: true, button: 0 }
+  element.dispatchEvent(new MouseEvent('mousedown', options))
+  element.dispatchEvent(new MouseEvent('mouseup', options))
+  element.click()
 }
 
 const writeControlledValue = (element: HTMLElement, value: string) => {
@@ -74,6 +82,7 @@ const TourComponent = ({
   focusCanvas,
   openNodeSettings,
   getFlowState,
+  setChatOpen,
   onNextStep,
 }) => {
   const [currentStep, setCurrentStep] = useState(0)
@@ -81,6 +90,7 @@ const TourComponent = ({
     useState<HighlightPosition>(EMPTY_HIGHLIGHT)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const advancingRef = useRef(false)
+  const selfActingRef = useRef(false)
   const alreadyCompleteRef = useRef(false)
 
   const goToStep = (index: number) => {
@@ -99,6 +109,10 @@ const TourComponent = ({
   }
 
   const applyStepSideEffects = (step: any) => {
+    if (typeof step?.chat === 'boolean' && typeof setChatOpen === 'function') {
+      setChatOpen(step.chat)
+    }
+
     if (step?.opensSidebar) {
       setSidebarOpen(true)
     }
@@ -107,8 +121,15 @@ const TourComponent = ({
       selectGroupForNode(step.opensNodeGroup)
     }
 
-    if (step?.clicksTarget) {
-      targetElement?.click()
+    if (step?.clicksTarget && targetElement) {
+      activate(targetElement)
+    }
+
+    if (step?.clicks) {
+      const element = document.querySelector(step.clicks) as HTMLElement | null
+      if (element) {
+        activate(element)
+      }
     }
 
     if (step?.opensNodeSettings && typeof openNodeSettings === 'function') {
@@ -160,7 +181,11 @@ const TourComponent = ({
     if (advancingRef.current) {
       return
     }
+    selfActingRef.current = true
     applyStepSideEffects(steps[currentStep])
+    setTimeout(() => {
+      selfActingRef.current = false
+    }, STEP_TRANSITION_DELAY * 2)
     advance()
   }
 
@@ -175,6 +200,38 @@ const TourComponent = ({
       onNextStep(advance)
     }
   })
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    const handleClick = (event: MouseEvent) => {
+      if (selfActingRef.current || advancingRef.current) {
+        return
+      }
+
+      const clicked = event.target as Element | null
+      if (!clicked?.closest || clicked.closest('[data-tour-tooltip]')) {
+        return
+      }
+
+      const index = steps.findIndex(
+        (candidate, position) =>
+          position !== currentStep &&
+          candidate.target &&
+          clicked.closest(candidate.target),
+      )
+
+      if (index >= 0) {
+        advancingRef.current = true
+        goToStep(index)
+      }
+    }
+
+    document.addEventListener('click', handleClick, true)
+    return () => document.removeEventListener('click', handleClick, true)
+  }, [isOpen, currentStep, steps])
 
   useEffect(() => {
     if (isOpen && typeof focusCanvas === 'function') {
@@ -219,7 +276,7 @@ const TourComponent = ({
 
     let cancelled = false
     let waited = 0
-    let recovered = false
+    let lost = 0
     let frame = 0
     let tracked: HTMLElement | null = null
 
@@ -233,26 +290,28 @@ const TourComponent = ({
           : { nodes: [], edges: [] },
       )
 
-    const recover = () => {
-      if (recovered || !step.recover) {
+    const prepare = () => {
+      if (!step.prepare) {
         return
       }
-      recovered = true
 
-      if (step.recover.sidebar) {
+      if (step.prepare.sidebar) {
         setSidebarOpen(true)
       }
-      if (step.recover.nodeGroup && typeof selectGroupForNode === 'function') {
-        selectGroupForNode(step.recover.nodeGroup)
+      if (step.prepare.nodeGroup && typeof selectGroupForNode === 'function') {
+        selectGroupForNode(step.prepare.nodeGroup)
       }
-      if (step.recover.nodeSettings && typeof openNodeSettings === 'function') {
-        openNodeSettings(step.recover.nodeSettings)
+      if (step.prepare.nodeSettings && typeof openNodeSettings === 'function') {
+        openNodeSettings(step.prepare.nodeSettings)
       }
-      if (step.recover.clicks) {
+      if (step.prepare.activates) {
         setTimeout(() => {
-          ;(
-            document.querySelector(step.recover.clicks) as HTMLElement | null
-          )?.click()
+          const element = document.querySelector(
+            step.prepare.activates,
+          ) as HTMLElement | null
+          if (element) {
+            activate(element)
+          }
         }, TARGET_POLL_INTERVAL)
       }
     }
@@ -264,6 +323,8 @@ const TourComponent = ({
 
       if (!tracked || !tracked.isConnected) {
         tracked = null
+        lost = 0
+        setTargetElement(null)
         reacquire()
         return
       }
@@ -294,6 +355,15 @@ const TourComponent = ({
 
       const element = document.querySelector(step.target) as HTMLElement | null
       if (!element) {
+        lost += TARGET_POLL_INTERVAL
+        if (lost >= LOST_TARGET_TIMEOUT) {
+          if (currentStep >= steps.length - 1) {
+            finish()
+          } else {
+            goToStep(currentStep + 1)
+          }
+          return
+        }
         setTimeout(reacquire, TARGET_POLL_INTERVAL)
         return
       }
@@ -309,7 +379,6 @@ const TourComponent = ({
       const element = document.querySelector(step.target) as HTMLElement | null
 
       if (!element) {
-        recover()
         waited += TARGET_POLL_INTERVAL
         if (waited >= timeout) {
           if (currentStep >= steps.length - 1) {
@@ -333,6 +402,7 @@ const TourComponent = ({
       attach(element)
     }
 
+    prepare()
     acquire()
 
     return () => {
@@ -369,10 +439,12 @@ const TourComp = ({
   focusCanvas,
   openNodeSettings,
   getFlowState,
+  setChatOpen,
   onNextStep,
 }) => {
   const { t } = useTranslation()
-  const { workflowsGenerationEnabled } = usePlatformFeatures()
+  const { workflowsGenerationEnabled, functionCallingEnabled } =
+    usePlatformFeatures()
   const [isTourOpen, setIsTourOpen] = useState(false)
 
   const tourSteps = useMemo(
@@ -383,6 +455,18 @@ const TourComp = ({
           title: t('ui.text.generation.aiFlowBuilder'),
           description: t('ui.text.aiFlowBuilderDescription'),
           position: 'bottom' as const,
+          requires: 'generation',
+          chat: true,
+          isComplete: () =>
+            document.querySelector('[data-tour="ai-chat"]') !== null,
+        },
+        {
+          target: '[data-tour="ai-chat"]',
+          title: t('ui.text.aiChatPanel'),
+          description: t('ui.text.aiChatPanelDescription'),
+          position: 'left' as const,
+          requires: 'generation',
+          chat: false,
         },
         {
           target: '[data-tour="sidebar-toggle"]',
@@ -401,7 +485,7 @@ const TourComp = ({
           position: 'right' as const,
           opensNodeGroup: MISSING_DEMO_NODE_ID,
           isComplete: () => document.querySelector('[data-node-id]') !== null,
-          recover: { sidebar: true },
+          prepare: { sidebar: true },
         },
         {
           target: `[data-node-id="${MISSING_DEMO_NODE_ID}"]`,
@@ -413,7 +497,7 @@ const TourComp = ({
           sampleNodePosition: MISSING_DEMO_NODE_POSITION,
           isComplete: ({ nodes }) =>
             nodes.some((node: any) => node.nodeId === MISSING_DEMO_NODE_ID),
-          recover: { sidebar: true, nodeGroup: MISSING_DEMO_NODE_ID },
+          prepare: { sidebar: true, nodeGroup: MISSING_DEMO_NODE_ID },
         },
         {
           target: `[data-id="${MISSING_DEMO_NODE_CANVAS_ID}"]`,
@@ -448,6 +532,34 @@ const TourComp = ({
             null,
         },
         {
+          target: '[data-tour="node-settings-basic"]',
+          title: t('ui.text.manageWithNaturalLanguage'),
+          description: t('ui.text.naturalLanguageTourDescription'),
+          position: 'left' as const,
+          requires: 'functionCalling',
+          clicks: '[data-tour="node-settings-advanced"]',
+          prepare: {
+            nodeSettings: MISSING_DEMO_NODE_CANVAS_ID,
+            activates: '[data-tour="node-settings-basic"]',
+          },
+          isComplete: () =>
+            document.querySelector('[data-field-key="videoUrl"]') !== null,
+        },
+        {
+          target: '[data-tour="node-settings-advanced"]',
+          title: t('ui.text.advanced'),
+          description: t('ui.text.advancedTabTourDescription'),
+          position: 'left' as const,
+          requires: 'functionCalling',
+          clicksTarget: true,
+          prepare: {
+            nodeSettings: MISSING_DEMO_NODE_CANVAS_ID,
+            activates: '[data-tour="node-settings-advanced"]',
+          },
+          isComplete: () =>
+            document.querySelector('[data-field-key="videoUrl"]') !== null,
+        },
+        {
           target: '[data-field-key="videoUrl"] [data-tour="data-source"]',
           title: t('ui.text.setVideoUrl'),
           description: t('ui.text.setVideoUrlDescription'),
@@ -458,9 +570,9 @@ const TourComp = ({
                 '[data-field-key="videoUrl"] input, [data-field-key="videoUrl"] textarea',
               ) as HTMLInputElement | null
             )?.value?.includes(`$veo_${DEMO_VEO_NODE_ID}.`) === true,
-          recover: {
+          prepare: {
             nodeSettings: MISSING_DEMO_NODE_CANVAS_ID,
-            clicks: '[data-tour="node-settings-advanced"]',
+            activates: '[data-tour="node-settings-advanced"]',
           },
           fillsField: {
             selector:
@@ -474,7 +586,10 @@ const TourComp = ({
           description: t('ui.text.applyNodeSettingsDescription'),
           position: 'left' as const,
           clicksTarget: true,
-          recover: { nodeSettings: MISSING_DEMO_NODE_CANVAS_ID },
+          prepare: {
+            nodeSettings: MISSING_DEMO_NODE_CANVAS_ID,
+            activates: '[data-tour="node-settings-advanced"]',
+          },
           isComplete: ({ nodes }) =>
             nodes
               .find((node: any) => node.nodeId === MISSING_DEMO_NODE_ID)
@@ -506,12 +621,16 @@ const TourComp = ({
           description: t('ui.text.tourCongratulationsDescription'),
           position: 'top' as const,
         },
-      ].filter(
-        (step) =>
-          step.target !== '[data-tour="ai-flow-builder"]' ||
-          workflowsGenerationEnabled,
-      ),
-    [t, workflowsGenerationEnabled],
+      ].filter((step) => {
+        if (step.requires === 'generation') {
+          return workflowsGenerationEnabled
+        }
+        if (step.requires === 'functionCalling') {
+          return functionCallingEnabled
+        }
+        return true
+      }),
+    [t, workflowsGenerationEnabled, functionCallingEnabled],
   )
 
   useEffect(() => {
@@ -545,6 +664,7 @@ const TourComp = ({
       focusCanvas={focusCanvas}
       openNodeSettings={openNodeSettings}
       getFlowState={getFlowState}
+      setChatOpen={setChatOpen}
       onNextStep={onNextStep}
     />
   )
