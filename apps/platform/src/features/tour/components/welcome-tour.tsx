@@ -28,6 +28,7 @@ const WelcomeTour = ({
   focusCanvas,
   openNodeSettings,
   getFlowState,
+  setChatOpen,
   nextStep,
 }) => {
   const { t } = useTranslation()
@@ -87,6 +88,7 @@ const WelcomeTour = ({
         focusCanvas={focusCanvas}
         openNodeSettings={openNodeSettings}
         getFlowState={getFlowState}
+        setChatOpen={setChatOpen}
         onNextStep={nextStep}
       />
       {isFirstVisit && (

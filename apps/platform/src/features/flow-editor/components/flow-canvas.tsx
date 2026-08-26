@@ -652,6 +652,7 @@ const FlowCanvas = ({
               focusCanvas={focusCanvas}
               openNodeSettings={openNodeSettings}
               getFlowState={getFlowState}
+              setChatOpen={handleSetChatOpen}
               nextStep={nextStepInit}
             />
           )}

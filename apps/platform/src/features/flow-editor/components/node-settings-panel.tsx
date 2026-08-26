@@ -158,7 +158,11 @@ export function NodeSettingsPanel({
         >
           <TabsList className="w-full">
             {showBasicTab && (
-              <TabsTrigger value="basic" className="flex-1">
+              <TabsTrigger
+                value="basic"
+                className="flex-1"
+                data-tour="node-settings-basic"
+              >
                 {t('ui.text.basic')}
               </TabsTrigger>
             )}

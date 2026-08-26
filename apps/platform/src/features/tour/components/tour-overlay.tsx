@@ -234,6 +234,7 @@ const TourOverlay = ({
 
       <div
         ref={tooltipRef}
+        data-tour-tooltip=""
         className="bg-card text-card-foreground rounded-lg shadow-xl p-4 w-80 max-w-[calc(100vw-2rem)] border border-primary/30 pointer-events-auto"
         style={{
           position: 'fixed',
