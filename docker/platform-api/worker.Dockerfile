@@ -34,7 +34,6 @@ ARG BINARY_NAME
 WORKDIR /app
 
 COPY --from=build /build/app .
-COPY --from=build /build/apps/platform-api/prompts ./prompts
 
 USER nonroot
 

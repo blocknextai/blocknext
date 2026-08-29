@@ -31,7 +31,7 @@ When function calling is enabled (`FUNCTION_CALLING_ENABLED`) and a node carries
 
 | # | Layer | Source | Sent as |
 | - | - | - | - |
-| 1 | **System instruction** | `FUNCTION_CALLING_SYSTEM_INSTRUCTION_FILE` (platform-owned, loaded once; Gemini provider serves it from content cache) | LLM `systemInstruction` role |
+| 1 | **System instruction** | platform-owned, embedded from `internal/prompts` and loaded once; Gemini provider serves it from content cache | LLM `systemInstruction` role |
 | 2 | **Node instruction** (`instruction`) | Authored on the node at design time in the flow editor | `NODE INSTRUCTION:` block in the user turn |
 | 3 | **Runtime instruction** (`runtimeInstruction`) | Supplied per node at run time (trigger `RuntimeConfig.Nodes` overlay) | `RUNTIME INSTRUCTION:` block in the user turn |
 | 4 | **Runtime prompt** (`runtimePrompt`) | The trigger's free-text prompt (`RuntimeConfig.RuntimePrompt`; also feeds `TriggerContext` for `$trigger.*` references) | `RUNTIME PROMPT (reference only):` block in the user turn |

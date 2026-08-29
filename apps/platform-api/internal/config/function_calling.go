@@ -12,10 +12,9 @@ const (
 )
 
 type FunctionCallingOptions struct {
-	Enabled               bool                    `env:"ENABLED"`
-	Provider              FunctionCallingProvider `env:"PROVIDER"`
-	SystemInstructionFile string                  `env:"SYSTEM_INSTRUCTION_FILE"`
-	SystemInstruction     string                  `env:"-"`
+	Enabled           bool                    `env:"ENABLED"`
+	Provider          FunctionCallingProvider `env:"PROVIDER"`
+	SystemInstruction string                  `env:"-"`
 
 	Gemini   GeminiFunctionCallingOptions   `envPrefix:"GEMINI_"`
 	LocalLLM LocalLLMFunctionCallingOptions `envPrefix:"LOCAL_"`
