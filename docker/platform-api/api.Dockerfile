@@ -35,7 +35,6 @@ ARG PORT=3000
 WORKDIR /app
 
 COPY --from=build /build/app .
-COPY --from=build /build/apps/platform-api/prompts ./prompts
 
 EXPOSE ${PORT}
 

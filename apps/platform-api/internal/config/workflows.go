@@ -16,12 +16,11 @@ const (
 )
 
 type WorkflowsGenerationOptions struct {
-	Enabled               bool                               `env:"ENABLED"`
-	Provider              WorkflowsGenerationProvider        `env:"PROVIDER"`
-	SystemInstructionFile string                             `env:"SYSTEM_INSTRUCTION_FILE"`
-	SystemInstruction     string                             `env:"-"`
-	Gemini                WorkflowsGenerationGeminiOptions   `envPrefix:"GEMINI_"`
-	LocalLLM              WorkflowsGenerationLocalLLMOptions `envPrefix:"LOCAL_"`
+	Enabled           bool                               `env:"ENABLED"`
+	Provider          WorkflowsGenerationProvider        `env:"PROVIDER"`
+	SystemInstruction string                             `env:"-"`
+	Gemini            WorkflowsGenerationGeminiOptions   `envPrefix:"GEMINI_"`
+	LocalLLM          WorkflowsGenerationLocalLLMOptions `envPrefix:"LOCAL_"`
 }
 
 type WorkflowsGenerationGeminiOptions struct {

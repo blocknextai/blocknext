@@ -1,8 +1,7 @@
 package config
 
 import (
-	"os"
-
+	"github.com/blocknextai/platform-api/internal/prompts"
 	"github.com/caarlos0/env/v11"
 )
 
@@ -33,29 +32,8 @@ func LoadShared() (*SharedConfig, error) {
 		return nil, err
 	}
 
-	if cfg.FunctionCalling.SystemInstructionFile != "" {
-		instruction, err := readFile(cfg.FunctionCalling.SystemInstructionFile)
-		if err != nil {
-			return nil, err
-		}
-		cfg.FunctionCalling.SystemInstruction = instruction
-	}
-
-	if cfg.Workflows.Generation.SystemInstructionFile != "" {
-		instruction, err := readFile(cfg.Workflows.Generation.SystemInstructionFile)
-		if err != nil {
-			return nil, err
-		}
-		cfg.Workflows.Generation.SystemInstruction = instruction
-	}
+	cfg.FunctionCalling.SystemInstruction = prompts.FunctionCallingSystemInstruction
+	cfg.Workflows.Generation.SystemInstruction = prompts.WorkflowGenerationSystemInstruction
 
 	return cfg, nil
-}
-
-func readFile(path string) (string, error) {
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
 }
