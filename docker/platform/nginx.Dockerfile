@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
 COPY apps/platform ./apps/platform
 RUN cd apps/platform && bun run build
 
-FROM nginxinc/nginx-unprivileged:1.31.3-alpine AS production
+FROM nginxinc/nginx-unprivileged:1.31.4-alpine AS production
 
 ENV PORT=4000
 
