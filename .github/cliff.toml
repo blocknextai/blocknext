@@ -1,0 +1,32 @@
+[changelog]
+header = "# Changelog\n"
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}](https://github.com/blocknextai/blocknext/releases/tag/{{ version }}) - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## Unreleased
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}\
+- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{% if commit.breaking %}**BREAKING:** {% endif %}{{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}](https://github.com/blocknextai/blocknext/commit/{{ commit.id }}))
+{% endfor %}\
+{% endfor %}
+"""
+trim = false
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+tag_pattern = "v[0-9].*"
+sort_commits = "newest"
+commit_parsers = [
+  { message = "^feat", group = "<!-- 0 -->Features" },
+  { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
+  { message = "^perf", group = "<!-- 2 -->Performance" },
+  { message = "^refactor", group = "<!-- 3 -->Refactoring" },
+  { message = "^docs", group = "<!-- 4 -->Documentation" },
+  { message = "^chore\\(deps\\)", skip = true },
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^(chore|ci|build|style|test)", group = "<!-- 5 -->Maintenance" },
+]
