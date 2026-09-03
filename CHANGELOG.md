@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.0.10](https://github.com/blocknextai/blocknext/releases/tag/v0.0.10) - 2026-09-03
 
 ### Features
 - **tour:** Cover the AI chat panel and follow the user's clicks ([dc081a6](https://github.com/blocknextai/blocknext/commit/dc081a676f69e57166b35509bf68edb7bf4d18e8))
@@ -11,6 +11,9 @@
 
 ### Documentation
 - Add badges to the README ([f7a3e63](https://github.com/blocknextai/blocknext/commit/f7a3e63d8e3d434e53243206c51057f22e16a765))
+
+### Maintenance
+- Generate CHANGELOG.md on release with git-cliff ([b86ed3c](https://github.com/blocknextai/blocknext/commit/b86ed3c15151dd26c89b87414b993023c58176a9))
 
 ## [0.0.9](https://github.com/blocknextai/blocknext/releases/tag/v0.0.9) - 2026-08-25
 
