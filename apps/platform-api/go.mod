@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	github.com/blocknextai/go-packages v0.0.0
 	github.com/caarlos0/env/v11 v11.4.1
-	github.com/gofiber/contrib/v3/websocket v1.2.3
+	github.com/gofiber/contrib/v3/websocket v1.2.5
 	github.com/gofiber/fiber/v3 v3.5.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/google/jsonschema-go v0.4.3
@@ -23,10 +23,10 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dlclark/regexp2 v1.12.0 // indirect
 	github.com/fasthttp/websocket v1.5.12 // indirect
-	github.com/gofiber/schema v1.8.4 // indirect
-	github.com/gofiber/utils/v2 v2.4.2 // indirect
+	github.com/gofiber/schema v1.8.5 // indirect
+	github.com/gofiber/utils/v2 v2.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
-	github.com/klauspost/compress v1.19.2 // indirect
+	github.com/klauspost/compress v1.20.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
@@ -40,7 +40,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.41.0 // indirect
 	go.opentelemetry.io/otel/trace v1.41.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
+	golang.org/x/crypto v0.56.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
