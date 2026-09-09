@@ -3,7 +3,7 @@ module github.com/blocknextai/platform-api
 go 1.27.0
 
 require (
-	github.com/blocknextai/go-packages v0.0.128
+	github.com/blocknextai/go-packages v0.0.0
 	github.com/caarlos0/env/v11 v11.4.1
 	github.com/gofiber/contrib/v3/websocket v1.2.5
 	github.com/gofiber/fiber/v3 v3.5.0
