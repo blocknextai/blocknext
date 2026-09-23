@@ -3,12 +3,14 @@ package toolinvocations
 type Source string
 
 const (
-	SourceMCP Source = "mcp"
+	SourceMCP      Source = "mcp"
+	SourcePlatform Source = "platform"
 )
 
 var (
 	Sources = map[Source]struct{}{
-		SourceMCP: {},
+		SourceMCP:      {},
+		SourcePlatform: {},
 	}
 )
 

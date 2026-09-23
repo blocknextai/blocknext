@@ -29,7 +29,7 @@ func (p *serverProvider) registerCredentialTools(server *mcpsdk.Server) {
 		Title:       "List credentials",
 		Description: "List the credentials connected to the organization the access token acts on. Secrets are never returned.",
 		Annotations: readOnly("List credentials"),
-	}, platformReadScope, p.listCredentials)
+	}, "folder", platformReadScope, p.listCredentials)
 }
 
 func (p *serverProvider) listCredentials(ctx context.Context, req *mcpsdk.CallToolRequest, input listInput) (*mcpsdk.CallToolResult, listCredentialsOutput, error) {

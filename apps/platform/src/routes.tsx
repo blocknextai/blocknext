@@ -62,6 +62,11 @@ function Routes() {
 
               <Route element={<ProtectedLayout />}>
                 <Route
+                  path="oauth/mcp/consent"
+                  element={<Pages.OAuthMcpConsentPage />}
+                />
+
+                <Route
                   path="organizations/new"
                   element={<Pages.OrganizationCreatePage />}
                 />

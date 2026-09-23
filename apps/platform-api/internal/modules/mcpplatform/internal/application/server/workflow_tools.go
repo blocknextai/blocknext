@@ -52,14 +52,14 @@ func (p *serverProvider) registerWorkflowTools(server *mcpsdk.Server) {
 		Title:       "List workflows",
 		Description: "List the workflows of the organization the access token acts on.",
 		Annotations: readOnly("List workflows"),
-	}, platformReadScope, p.listWorkflows)
+	}, "branch", platformReadScope, p.listWorkflows)
 
 	addTool(p, server, &mcpsdk.Tool{
 		Name:        serverID + "_get_workflow",
 		Title:       "Get workflow",
 		Description: "Return one workflow with the nodes on its canvas.",
 		Annotations: readOnly("Get workflow"),
-	}, platformReadScope, p.getWorkflow)
+	}, "search", platformReadScope, p.getWorkflow)
 }
 
 func (p *serverProvider) listWorkflows(ctx context.Context, req *mcpsdk.CallToolRequest, input listInput) (*mcpsdk.CallToolResult, listWorkflowsOutput, error) {

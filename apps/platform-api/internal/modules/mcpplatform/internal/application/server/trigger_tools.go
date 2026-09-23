@@ -41,14 +41,14 @@ func (p *serverProvider) registerTriggerTools(server *mcpsdk.Server) {
 		Title:       "List triggers",
 		Description: "List the schedule and webhook triggers of the organization the access token acts on.",
 		Annotations: readOnly("List triggers"),
-	}, platformReadScope, p.listTriggers)
+	}, "clock", platformReadScope, p.listTriggers)
 
 	addTool(p, server, &mcpsdk.Tool{
 		Name:        serverID + "_set_trigger_active",
 		Title:       "Activate or deactivate a trigger",
 		Description: "Turn a trigger on or off. An inactive trigger no longer starts runs of the item it points to.",
 		Annotations: mutating("Activate or deactivate a trigger"),
-	}, platformWriteScope, p.setTriggerActive)
+	}, "target", platformWriteScope, p.setTriggerActive)
 }
 
 func (p *serverProvider) listTriggers(ctx context.Context, req *mcpsdk.CallToolRequest, input listInput) (*mcpsdk.CallToolResult, listTriggersOutput, error) {

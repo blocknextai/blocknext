@@ -75,6 +75,10 @@ export const PreferencesNotificationsPage = lazy(
 
 export const McpPage = lazy(() => import('@/pages/mcp/page'))
 
+export const OAuthMcpConsentPage = lazy(
+  () => import('@/pages/oauth/mcp/consent/page'),
+)
+
 export const CredentialOAuth2CallbackPage = lazy(
   () => import('@/pages/credential-oauth/oauth2/callback/page'),
 )

@@ -34,7 +34,7 @@ func (p *serverProvider) registerAccountTools(server *mcpsdk.Server) {
 		Title:       "Get my account",
 		Description: "Return the signed-in user, the organization the access token acts on, and every organization the user belongs to.",
 		Annotations: readOnly("Get my account"),
-	}, platformReadScope, p.getMe)
+	}, "eye", platformReadScope, p.getMe)
 }
 
 func (p *serverProvider) getMe(ctx context.Context, req *mcpsdk.CallToolRequest, _ emptyInput) (*mcpsdk.CallToolResult, getMeOutput, error) {

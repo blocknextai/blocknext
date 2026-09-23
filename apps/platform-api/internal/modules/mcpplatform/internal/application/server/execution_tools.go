@@ -31,7 +31,7 @@ func (p *serverProvider) registerExecutionTools(server *mcpsdk.Server) {
 		Title:       "List executions",
 		Description: "List the workflow executions of the organization the access token acts on, newest first.",
 		Annotations: readOnly("List executions"),
-	}, platformReadScope, p.listExecutions)
+	}, "play", platformReadScope, p.listExecutions)
 }
 
 func (p *serverProvider) listExecutions(ctx context.Context, req *mcpsdk.CallToolRequest, input listInput) (*mcpsdk.CallToolResult, listExecutionsOutput, error) {
