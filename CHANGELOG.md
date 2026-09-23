@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.11](https://github.com/blocknextai/blocknext/releases/tag/v0.0.11) - 2026-09-23
+
+### Features
+- **mcp:** Port the OAuth consent UI and platform tool recording ([d15f4d3](https://github.com/blocknextai/blocknext/commit/d15f4d33761b695162f6eb18065fd080b70c1b77))
+
+### Bug Fixes
+- **config:** Drop quotes and spaces from CORS header env values ([a488aa3](https://github.com/blocknextai/blocknext/commit/a488aa3d68dbeec0f1c9be57e033b2d605af0d94))
+
+### Refactoring
+- **architecture:** Port the modules layout and MCP OAuth to the monorepo ([1e1b8d1](https://github.com/blocknextai/blocknext/commit/1e1b8d1875143b3e0c7ad7f58d3ac3b695173112))
+
+### Documentation
+- **changelog:** Update for v0.0.10 ([4f1fb92](https://github.com/blocknextai/blocknext/commit/4f1fb92a62d1348cab88359df7dacb6910031102))
+
 ## [0.0.10](https://github.com/blocknextai/blocknext/releases/tag/v0.0.10) - 2026-09-03
 
 ### Features
