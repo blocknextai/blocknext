@@ -28,10 +28,14 @@ export type McpTool = {
   inputSchema?: McpToolSchema
   outputSchema?: McpToolSchema
   supportedCredentials?: string[]
+  scopes?: string[]
 }
+
+export type McpAuthMethod = 'oauth' | 'apiKey'
 
 export type McpServer = {
   id: string
+  authMethods: McpAuthMethod[]
   name: string
   description?: string
   icon?: IconSource

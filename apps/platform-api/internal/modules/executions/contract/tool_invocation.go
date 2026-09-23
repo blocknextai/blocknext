@@ -6,6 +6,7 @@ import (
 )
 
 const SourceMCP = executionsDomainToolInvocations.SourceMCP
+const SourcePlatform = executionsDomainToolInvocations.SourcePlatform
 
 type Status = executionsDomainToolInvocations.Status
 

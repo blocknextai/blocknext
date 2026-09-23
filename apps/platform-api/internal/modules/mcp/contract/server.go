@@ -5,6 +5,7 @@ import (
 )
 
 type AuthMethod = mcpApplicationServers.AuthMethod
+type Icon = mcpApplicationServers.Icon
 
 const AuthMethodOAuth = mcpApplicationServers.AuthMethodOAuth
 

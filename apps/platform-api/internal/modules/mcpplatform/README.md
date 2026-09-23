@@ -3,7 +3,7 @@
 > The platform's own MCP server: exposes the caller's BlockNext account so an MCP client can read and manage the platform on the user's behalf. Runs inside `mcp-api`.
 
 ## Responsibility
-An HTTP adapter, not a bounded context with its own domain. It builds one MCP server whose tools read the signed-in user's profile and organizations, list workflows, triggers, executions and credentials, and turn triggers on or off. It always acts on the organization the access token was issued for and never returns credential secrets. It implements `mcp`'s `ServerProvider`, so `mcp` mounts, lists and protects it like every other MCP server. It owns no aggregates or tables.
+An HTTP adapter, not a bounded context with its own domain. It builds one MCP server whose tools read the signed-in user's profile and organizations, list workflows, triggers, executions and credentials, and turn triggers on or off. It always acts on the organization the access token was issued for and never returns credential secrets. It implements `mcp`'s `ServerProvider`, so `mcp` mounts, lists and protects it like every other MCP server. Every tool call is recorded through `executions`' `ToolInvocationService` with source `platform` (input, output, status, timing; no API key, no credentials); failures to record are logged, never surfaced. The server and its tools carry the `platform` brand icon (tools add a glyph each), which the UI expects under `public/assets/icons/brands/platform/{light,dark}.svg`. It owns no aggregates or tables.
 
 ## Tools
 | Tool | Scope | Purpose |

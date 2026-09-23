@@ -30,7 +30,7 @@ func (p *serverProvider) registerToolInvocationTools(server *mcpsdk.Server) {
 		Title:       "List MCP tool calls",
 		Description: "List the tool calls made through the MCP servers on behalf of the organization the access token acts on, newest first. Parameters and outputs are not included.",
 		Annotations: readOnly("List MCP tool calls"),
-	}, platformReadScope, p.listToolInvocations)
+	}, "record", platformReadScope, p.listToolInvocations)
 }
 
 func (p *serverProvider) listToolInvocations(ctx context.Context, req *mcpsdk.CallToolRequest, input listInput) (*mcpsdk.CallToolResult, listToolInvocationsOutput, error) {

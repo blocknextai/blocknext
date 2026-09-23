@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { KeyRound, Wrench } from 'lucide-react'
+import { KeyRound, ShieldCheck, Wrench } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
@@ -17,6 +17,20 @@ import type { IconSource } from '@/features/flow-editor/types'
 import type { McpServer } from '@/features/mcp/services/mcp'
 
 const API_KEY_PLACEHOLDER = 'YOUR_API_KEY'
+
+const oauthConfigSnippet = (name: string, url: string) =>
+  JSON.stringify(
+    {
+      mcpServers: {
+        [`blocknext-${name}`]: {
+          type: 'http',
+          url,
+        },
+      },
+    },
+    null,
+    2,
+  )
 
 const configSnippet = (name: string, url: string) =>
   JSON.stringify(
@@ -67,6 +81,7 @@ const McpServerDetailDialog = ({
   onOpenChange,
 }: McpServerDetailDialogProps) => {
   const { t } = useTranslation()
+  const supportsApiKey = server?.authMethods.includes('apiKey') ?? false
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -128,6 +143,16 @@ const McpServerDetailDialog = ({
                             </p>
                           )}
                           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            {tool.scopes?.map((scope) => (
+                              <Badge
+                                key={scope}
+                                variant="outline"
+                                className="gap-1 text-[10px] font-normal"
+                              >
+                                <ShieldCheck className="size-3 text-muted-foreground" />
+                                {scope}
+                              </Badge>
+                            ))}
                             {tool.supportedCredentials?.map((cred) => (
                               <Badge
                                 key={cred}
@@ -143,11 +168,11 @@ const McpServerDetailDialog = ({
                           <div className="flex flex-col gap-1.5 pt-1">
                             <McpToolSchemaSection
                               label={t('ui.text.inputs')}
-                              schema={tool.inputSchema}
+                              schema={tool.inputSchema ?? null}
                             />
                             <McpToolSchemaSection
                               label={t('ui.text.outputs')}
-                              schema={tool.outputSchema}
+                              schema={tool.outputSchema ?? null}
                             />
                           </div>
                         </div>
@@ -159,23 +184,51 @@ const McpServerDetailDialog = ({
 
               {server.url && (
                 <div className="flex shrink-0 flex-col gap-2 md:sticky md:top-0 md:w-96 md:self-start">
-                  <Tabs defaultValue="config" className="gap-3">
+                  <Tabs defaultValue="oauth" className="gap-3">
                     <TabsList>
-                      <TabsTrigger value="config">
-                        {t('ui.text.mcpClientConfig')}
-                      </TabsTrigger>
-                      <TabsTrigger value="curl">cURL</TabsTrigger>
+                      <TabsTrigger value="oauth">OAuth</TabsTrigger>
+                      {supportsApiKey && (
+                        <>
+                          <TabsTrigger value="config">
+                            {t('ui.text.apiKey')}
+                          </TabsTrigger>
+                          <TabsTrigger value="curl">cURL</TabsTrigger>
+                        </>
+                      )}
                     </TabsList>
-                    <TabsContent value="config">
-                      <CodeBlock code={configSnippet(server.id, server.url)} />
+                    <TabsContent value="oauth" className="flex flex-col gap-2">
+                      <CodeBlock
+                        code={oauthConfigSnippet(server.id, server.url)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {t('ui.text.mcpOAuthHint')}
+                      </p>
                     </TabsContent>
-                    <TabsContent value="curl">
-                      <CodeBlock code={curlSnippet(server.url)} />
-                    </TabsContent>
+                    {supportsApiKey && (
+                      <>
+                        <TabsContent
+                          value="config"
+                          className="flex flex-col gap-2"
+                        >
+                          <CodeBlock
+                            code={configSnippet(server.id, server.url)}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            {t('ui.text.mcpApiKeyHint')}
+                          </p>
+                        </TabsContent>
+                        <TabsContent
+                          value="curl"
+                          className="flex flex-col gap-2"
+                        >
+                          <CodeBlock code={curlSnippet(server.url)} />
+                          <p className="text-xs text-muted-foreground">
+                            {t('ui.text.mcpApiKeyHint')}
+                          </p>
+                        </TabsContent>
+                      </>
+                    )}
                   </Tabs>
-                  <p className="text-xs text-muted-foreground">
-                    {t('ui.text.mcpApiKeyHint')}
-                  </p>
                 </div>
               )}
             </div>
