@@ -4,23 +4,30 @@ import (
 	"context"
 
 	"github.com/blocknextai/go-packages/auth/jwt"
-	"github.com/blocknextai/platform-api/internal/account"
-	"github.com/blocknextai/platform-api/internal/apikeys"
 	"github.com/blocknextai/platform-api/internal/common"
 	"github.com/blocknextai/platform-api/internal/config"
-	"github.com/blocknextai/platform-api/internal/credentialoauth"
-	"github.com/blocknextai/platform-api/internal/credentials"
-	"github.com/blocknextai/platform-api/internal/executions"
-	"github.com/blocknextai/platform-api/internal/mcp"
-	"github.com/blocknextai/platform-api/internal/nodeengine"
-	"github.com/blocknextai/platform-api/internal/organizations"
-	"github.com/blocknextai/platform-api/internal/platform"
+	"github.com/blocknextai/platform-api/internal/modules/account"
+	"github.com/blocknextai/platform-api/internal/modules/apikeys"
+	"github.com/blocknextai/platform-api/internal/modules/credentialoauth"
+	"github.com/blocknextai/platform-api/internal/modules/credentials"
+	"github.com/blocknextai/platform-api/internal/modules/executions"
+	"github.com/blocknextai/platform-api/internal/modules/mcp"
+	mcpContract "github.com/blocknextai/platform-api/internal/modules/mcp/contract"
+	"github.com/blocknextai/platform-api/internal/modules/mcpoauth"
+	"github.com/blocknextai/platform-api/internal/modules/mcpplatform"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine"
+	"github.com/blocknextai/platform-api/internal/modules/organizations"
+	"github.com/blocknextai/platform-api/internal/modules/platform"
+	"github.com/blocknextai/platform-api/internal/modules/triggers"
+	"github.com/blocknextai/platform-api/internal/modules/workflows"
 	"github.com/blocknextai/platform-api/internal/realtime"
 )
 
 type MCPAPI struct {
 	Core   *Core
 	Config *config.MCPAPIConfig
+
+	JWTService jwt.AuthJWTService
 
 	CommonModule          *common.Module
 	AccountModule         *account.Module
@@ -30,6 +37,7 @@ type MCPAPI struct {
 	PlatformModule        *platform.Module
 	CredentialsModule     *credentials.Module
 	CredentialOAuthModule *credentialoauth.Module
+	MCPOAuthModule        *mcpoauth.Module
 	MCPModule             *mcp.Module
 }
 
@@ -130,21 +138,59 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 	executionServices := executions.NewServices(executions.ServicesDependencies{
 		DB:                 core.DB,
 		TransactionManager: core.TransactionManager,
+		Broadcaster:        broadcaster,
 
 		OrganizationUserService: organizationsModule.OrganizationUserService,
 	})
 
+	mcpOAuthModule, err := mcpoauth.NewModule(mcpoauth.Dependencies{
+		DB:                 core.DB,
+		TransactionManager: core.TransactionManager,
+		CacheService:       core.CacheService,
+
+		OAuthOptions: cfg.MCP.OAuth,
+
+		OrganizationUserService: organizationsModule.OrganizationUserService,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	workflowServices := workflows.NewServices(workflows.ServicesDependencies{
+		DB: core.DB,
+	})
+
+	triggerServices := triggers.NewServices(triggers.ServicesDependencies{
+		DB: core.DB,
+	})
+
+	mcpPlatformModule := mcpplatform.NewModule(mcpplatform.Dependencies{
+		UserService:             accountModule.UserService,
+		OrganizationService:     organizationsModule.OrganizationService,
+		OrganizationUserService: organizationsModule.OrganizationUserService,
+		WorkflowService:         workflowServices.WorkflowService,
+		TriggerService:          triggerServices.TriggerService,
+		TaskExecutionService:    executionServices.TaskExecutionService,
+		ToolInvocationService:   executionServices.ToolInvocationService,
+		CredentialService:       credentialsModule.CredentialService,
+	})
+
 	mcpModule, err := mcp.NewModule(mcp.Dependencies{
+		SemaphoreOptions: shared.Semaphore,
+
 		ServerURLTemplate: cfg.MCP.Server.URLTemplate,
 		MaxExecutionTime:  cfg.MCP.MaxExecutionTime,
 
-		SemaphoreOptions: shared.Semaphore,
+		ServerProviders: []mcpContract.ServerProvider{
+			mcpPlatformModule.ServerProvider,
+		},
 
 		ServerService:                         nodeEngineModule.MCPServerService,
 		ExecutorService:                       nodeEngineModule.ExecutorService,
+		CredentialService:                     credentialsModule.CredentialService,
 		CredentialOAuthTokenRegenerateService: credentialOAuthModule.CredentialOAuthTokenRegenerateService,
 		ToolInvocationService:                 executionServices.ToolInvocationService,
-		Broadcaster:                           broadcaster,
+		MCPOAuthMetadataService:               mcpOAuthModule.MetadataService,
 	})
 	if err != nil {
 		return nil, err
@@ -153,6 +199,7 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 	return &MCPAPI{
 		Core:                  core,
 		Config:                cfg,
+		JWTService:            jwtService,
 		CommonModule:          commonModule,
 		AccountModule:         accountModule,
 		OrganizationsModule:   organizationsModule,
@@ -161,6 +208,7 @@ func NewMCPAPI(core *Core, cfg *config.MCPAPIConfig) (*MCPAPI, error) {
 		PlatformModule:        platformModule,
 		CredentialsModule:     credentialsModule,
 		CredentialOAuthModule: credentialOAuthModule,
+		MCPOAuthModule:        mcpOAuthModule,
 		MCPModule:             mcpModule,
 	}, nil
 }

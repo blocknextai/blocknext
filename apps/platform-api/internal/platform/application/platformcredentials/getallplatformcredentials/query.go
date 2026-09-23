@@ -1,3 +1,0 @@
-package getallplatformcredentials
-
-type GetAllPlatformCredentialsQuery struct{}

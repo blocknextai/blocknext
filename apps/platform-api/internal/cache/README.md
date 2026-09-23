@@ -17,4 +17,4 @@ Selects and constructs a `cache.Service` (from `go-packages/cache`) based on `co
 - The returned `cache.Service` is the go-packages interface — this package adds no methods of its own.
 
 ## Layout
-- `infrastructure/factory.go` — the `NewCacheService` factory and `ErrInvalidCacheType`.
+- `factory.go` — the `NewCacheService` factory and `ErrInvalidCacheType`.

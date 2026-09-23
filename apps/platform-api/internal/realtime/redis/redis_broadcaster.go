@@ -2,17 +2,15 @@ package redis
 
 import (
 	"context"
-	executionsDomainToolInvocations "github.com/blocknextai/platform-api/internal/executions/domain/toolinvocations"
 	"log/slog"
 	"strings"
+
+	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/blocknextai/go-packages/apperror"
 	"github.com/blocknextai/go-packages/redisclient"
 	"github.com/blocknextai/platform-api/internal/realtime/events"
-	taskRunnerDomainNode "github.com/blocknextai/platform-api/internal/taskrunner/domain/node"
-	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
-	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
 )
 
 const organizationKeyPrefix = "organization:"
@@ -47,7 +45,7 @@ func (b *redisBroadcaster) Ping(ctx context.Context) error {
 	return b.client.Ping(ctx).Err()
 }
 
-func (b *redisBroadcaster) PublishTaskEvent(ctx context.Context, event *taskRunnerDomainTask.TaskEvent) error {
+func (b *redisBroadcaster) PublishTaskEvent(ctx context.Context, event *events.TaskEvent) error {
 	payload, err := events.MarshalTask(event)
 	if err != nil {
 		return err
@@ -61,7 +59,7 @@ func (b *redisBroadcaster) PublishTaskEvent(ctx context.Context, event *taskRunn
 	return nil
 }
 
-func (b *redisBroadcaster) PublishNodeEvent(ctx context.Context, event *taskRunnerDomainNode.NodeEvent) error {
+func (b *redisBroadcaster) PublishNodeEvent(ctx context.Context, event *events.NodeEvent) error {
 	payload, err := events.MarshalNode(event)
 	if err != nil {
 		return err
@@ -75,7 +73,7 @@ func (b *redisBroadcaster) PublishNodeEvent(ctx context.Context, event *taskRunn
 	return nil
 }
 
-func (b *redisBroadcaster) PublishToolInvocationEvent(ctx context.Context, event *executionsDomainToolInvocations.ToolInvocationEvent) error {
+func (b *redisBroadcaster) PublishToolInvocationEvent(ctx context.Context, event *events.ToolInvocationEvent) error {
 	payload, err := events.MarshalToolInvocation(event)
 	if err != nil {
 		return err

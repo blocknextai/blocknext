@@ -2,20 +2,24 @@ package bootstrap
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/blocknextai/go-packages/fiber/errorhandler"
-	loggingmiddleware "github.com/blocknextai/go-packages/fiber/middleware/logging"
-	"github.com/blocknextai/go-packages/fiber/middleware/recovery"
-	"github.com/blocknextai/go-packages/json"
-	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/helmet"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
+
+	"github.com/blocknextai/go-packages/apperror"
+	"github.com/blocknextai/go-packages/fiber/errorhandler"
+	loggingmiddleware "github.com/blocknextai/go-packages/fiber/middleware/logging"
+	"github.com/blocknextai/go-packages/fiber/middleware/recovery"
+	"github.com/blocknextai/go-packages/json"
+	"github.com/blocknextai/go-packages/result"
+	"github.com/blocknextai/platform-api/internal/config"
 )
 
 const (
@@ -37,7 +41,7 @@ func NewFiber(appName string, opts config.HTTPServerOptions, isProduction bool) 
 		TrustProxy:        opts.TrustProxyEnabled,
 		TrustProxyConfig:  buildTrustProxyConfig(opts.TrustProxies),
 		ProxyHeader:       opts.ProxyHeader,
-		ErrorHandler:      errorhandler.New(isProduction),
+		ErrorHandler:      newErrorHandler(isProduction),
 	})
 
 	/*var metricsMiddleware *metrics.Middleware
@@ -72,6 +76,19 @@ func NewFiber(appName string, opts config.HTTPServerOptions, isProduction bool) 
 	app.Use(recovery.New())
 
 	return app /*metricsMiddleware,*/, nil
+}
+
+func newErrorHandler(isProduction bool) fiber.ErrorHandler {
+	handler := errorhandler.New(isProduction)
+
+	return func(c fiber.Ctx, err error) error {
+		var fiberErr *fiber.Error
+		if _, isAppError := apperror.As(err); isAppError || !errors.As(err, &fiberErr) {
+			return handler(c, err)
+		}
+
+		return c.Status(fiberErr.Code).JSON(result.Fail[any](fiberErr))
+	}
 }
 
 func ListenAndWait(app *fiber.App, opts config.HTTPServerOptions, shutdownFns ...func() error) {

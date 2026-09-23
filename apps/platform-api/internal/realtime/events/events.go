@@ -1,15 +1,56 @@
 package events
 
 import (
+	"github.com/google/uuid"
+
 	"github.com/blocknextai/go-packages/json"
-	executionsDomainToolInvocations "github.com/blocknextai/platform-api/internal/executions/domain/toolinvocations"
-	taskRunnerDomainNode "github.com/blocknextai/platform-api/internal/taskrunner/domain/node"
-	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
+	commonDomain "github.com/blocknextai/platform-api/internal/common/domain"
 )
 
-const SubscriberBuffer = 64
+const (
+	SubscriberBuffer = 64
 
-func MarshalTask(event *taskRunnerDomainTask.TaskEvent) (string, error) {
+	TaskEventType           = "task"
+	NodeEventType           = "node"
+	ToolInvocationEventType = "tool_invocation"
+)
+
+type TaskEvent struct {
+	ID               uuid.UUID                     `json:"id,omitempty"`
+	Type             string                        `json:"type,omitempty"`
+	OrganizationID   uuid.UUID                     `json:"organizationId,omitempty"`
+	ExecutionContext commonDomain.ExecutionContext `json:"executionContext,omitempty"`
+	ContextItemID    uuid.UUID                     `json:"contextItemId,omitempty"`
+	Status           string                        `json:"status,omitempty"`
+	Error            string                        `json:"error,omitempty"`
+	Duration         int64                         `json:"duration,omitempty"`
+}
+
+type NodeEvent struct {
+	ID               uuid.UUID                     `json:"id,omitempty"`
+	Type             string                        `json:"type,omitempty"`
+	OrganizationID   uuid.UUID                     `json:"organizationId,omitempty"`
+	ExecutionContext commonDomain.ExecutionContext `json:"executionContext,omitempty"`
+	ContextItemID    uuid.UUID                     `json:"contextItemId,omitempty"`
+	NodeID           string                        `json:"nodeId,omitempty"`
+	NodeType         string                        `json:"nodeType,omitempty"`
+	Status           string                        `json:"status,omitempty"`
+	Outputs          []map[string]any              `json:"outputs,omitempty"`
+	Error            string                        `json:"error,omitempty"`
+	Duration         int64                         `json:"duration,omitempty"`
+}
+
+type ToolInvocationEvent struct {
+	ID             uuid.UUID `json:"id,omitempty"`
+	Type           string    `json:"type,omitempty"`
+	OrganizationID uuid.UUID `json:"organizationId,omitempty"`
+	Source         string    `json:"source,omitempty"`
+	ToolID         string    `json:"toolId,omitempty"`
+	Status         string    `json:"status,omitempty"`
+	Error          string    `json:"error,omitempty"`
+}
+
+func MarshalTask(event *TaskEvent) (string, error) {
 	payload, err := json.Marshal(event)
 	if err != nil {
 		return "", ErrFailedToMarshalTaskEvent
@@ -18,7 +59,7 @@ func MarshalTask(event *taskRunnerDomainTask.TaskEvent) (string, error) {
 	return string(payload), nil
 }
 
-func MarshalNode(event *taskRunnerDomainNode.NodeEvent) (string, error) {
+func MarshalNode(event *NodeEvent) (string, error) {
 	payload, err := json.Marshal(event)
 	if err != nil {
 		return "", ErrFailedToMarshalNodeEvent
@@ -27,7 +68,7 @@ func MarshalNode(event *taskRunnerDomainNode.NodeEvent) (string, error) {
 	return string(payload), nil
 }
 
-func MarshalToolInvocation(event *executionsDomainToolInvocations.ToolInvocationEvent) (string, error) {
+func MarshalToolInvocation(event *ToolInvocationEvent) (string, error) {
 	payload, err := json.Marshal(event)
 	if err != nil {
 		return "", ErrFailedToMarshalToolInvocationEvent

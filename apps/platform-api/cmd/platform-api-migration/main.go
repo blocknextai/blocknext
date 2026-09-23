@@ -10,13 +10,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/blocknextai/go-packages/cast"
-	"github.com/blocknextai/go-packages/database"
-	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/caarlos0/env/v11"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	"github.com/blocknextai/go-packages/cast"
+	"github.com/blocknextai/go-packages/database"
+	"github.com/blocknextai/platform-api/internal/config"
 )
 
 var modules = []string{
@@ -28,6 +29,7 @@ var modules = []string{
 	"triggers",
 	"credentials",
 	"apikeys",
+	"mcpoauth",
 	"notifications",
 	"eventbus",
 }
@@ -130,7 +132,10 @@ func getModuleMigrationPath(module string) (string, string) {
 		path := "/app/migrations/" + module
 		return "file://" + path, path
 	}
-	path := "internal/" + module + "/infrastructure/database/migrations"
+	path := "internal/modules/" + module + "/internal/migrations"
+	if _, err := os.Stat("internal/" + module); err == nil {
+		path = "internal/" + module + "/migrations"
+	}
 	return "file://" + path, path
 }
 

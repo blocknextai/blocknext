@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/blocknextai/platform-api/internal/prompts"
 	"github.com/caarlos0/env/v11"
+
+	"github.com/blocknextai/platform-api/internal/prompts"
 )
 
 type SharedConfig struct {

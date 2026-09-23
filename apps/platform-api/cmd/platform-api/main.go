@@ -6,15 +6,16 @@ import (
 	"os"
 	"time"
 
-	cachemiddleware "github.com/blocknextai/go-packages/fiber/middleware/cache"
-	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
-	"github.com/blocknextai/platform-api/internal/bootstrap"
-	commonPresentationAuth "github.com/blocknextai/platform-api/internal/common/presentation/auth"
-	commonHTTP "github.com/blocknextai/platform-api/internal/common/presentation/http"
-	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/healthcheck"
 	"github.com/gofiber/fiber/v3/middleware/limiter"
+
+	cachemiddleware "github.com/blocknextai/go-packages/fiber/middleware/cache"
+	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
+	"github.com/blocknextai/platform-api/internal/bootstrap"
+	commonAuth "github.com/blocknextai/platform-api/internal/common/auth"
+	commonHTTP "github.com/blocknextai/platform-api/internal/common/http"
+	"github.com/blocknextai/platform-api/internal/config"
 )
 
 const (
@@ -76,13 +77,13 @@ func main() {
 		}))
 	}
 
-	authMiddleware := commonPresentationAuth.NewAuthMiddleware(
+	authMiddleware := commonAuth.NewAuthMiddleware(
 		app.JWTService,
 		app.AccountModule.UserPermissionChecker,
 		app.OrganizationsModule.OrganizationPermissionChecker,
 		app.AccountModule.SessionService,
 	)
-	apiKeyMiddleware := commonPresentationAuth.NewAPIKeyMiddleware(
+	apiKeyMiddleware := commonAuth.NewAPIKeyMiddleware(
 		app.APIKeysModule.APIKeyValidator,
 	)
 	cacheMiddleware := cachemiddleware.New(core.CacheService, appName+":cache:")

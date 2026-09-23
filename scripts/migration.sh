@@ -134,7 +134,10 @@ case $COMMAND in
             usage
         fi
 
-        MIGRATION_PATH="$REPO_ROOT/apps/platform-api/internal/$MODULE/infrastructure/database/migrations"
+        MIGRATION_PATH="$REPO_ROOT/apps/platform-api/internal/modules/$MODULE/internal/migrations"
+        if [ -d "$REPO_ROOT/apps/platform-api/internal/$MODULE" ]; then
+            MIGRATION_PATH="$REPO_ROOT/apps/platform-api/internal/$MODULE/migrations"
+        fi
         TIMESTAMP=$(date +%Y%m%d%H%M%S)
 
         mkdir -p "$MIGRATION_PATH"

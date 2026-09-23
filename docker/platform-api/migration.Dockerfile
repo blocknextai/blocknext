@@ -32,16 +32,17 @@ WORKDIR /app
 
 COPY --from=build /build/platform-api-migration .
 
-COPY --from=build /build/apps/platform-api/internal/common/infrastructure/database/migrations /app/migrations/common/
-COPY --from=build /build/apps/platform-api/internal/account/infrastructure/database/migrations /app/migrations/account/
-COPY --from=build /build/apps/platform-api/internal/organizations/infrastructure/database/migrations /app/migrations/organizations/
-COPY --from=build /build/apps/platform-api/internal/executions/infrastructure/database/migrations /app/migrations/executions/
-COPY --from=build /build/apps/platform-api/internal/triggers/infrastructure/database/migrations /app/migrations/triggers/
-COPY --from=build /build/apps/platform-api/internal/workflows/infrastructure/database/migrations /app/migrations/workflows/
-COPY --from=build /build/apps/platform-api/internal/credentials/infrastructure/database/migrations /app/migrations/credentials/
-COPY --from=build /build/apps/platform-api/internal/apikeys/infrastructure/database/migrations /app/migrations/apikeys/
-COPY --from=build /build/apps/platform-api/internal/notifications/infrastructure/database/migrations /app/migrations/notifications/
-COPY --from=build /build/apps/platform-api/internal/eventbus/infrastructure/database/migrations /app/migrations/eventbus/
+COPY --from=build /build/apps/platform-api/internal/common/migrations /app/migrations/common/
+COPY --from=build /build/apps/platform-api/internal/modules/account/internal/migrations /app/migrations/account/
+COPY --from=build /build/apps/platform-api/internal/modules/organizations/internal/migrations /app/migrations/organizations/
+COPY --from=build /build/apps/platform-api/internal/modules/executions/internal/migrations /app/migrations/executions/
+COPY --from=build /build/apps/platform-api/internal/modules/triggers/internal/migrations /app/migrations/triggers/
+COPY --from=build /build/apps/platform-api/internal/modules/workflows/internal/migrations /app/migrations/workflows/
+COPY --from=build /build/apps/platform-api/internal/modules/credentials/internal/migrations /app/migrations/credentials/
+COPY --from=build /build/apps/platform-api/internal/modules/apikeys/internal/migrations /app/migrations/apikeys/
+COPY --from=build /build/apps/platform-api/internal/modules/mcpoauth/internal/migrations /app/migrations/mcpoauth/
+COPY --from=build /build/apps/platform-api/internal/modules/notifications/internal/migrations /app/migrations/notifications/
+COPY --from=build /build/apps/platform-api/internal/eventbus/migrations /app/migrations/eventbus/
 
 USER nonroot
 

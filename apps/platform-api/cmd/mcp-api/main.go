@@ -6,15 +6,16 @@ import (
 	"os"
 	"time"
 
-	cachemiddleware "github.com/blocknextai/go-packages/fiber/middleware/cache"
-	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
-	"github.com/blocknextai/platform-api/internal/bootstrap"
-	commonPresentationAuth "github.com/blocknextai/platform-api/internal/common/presentation/auth"
-	commonHTTP "github.com/blocknextai/platform-api/internal/common/presentation/http"
-	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/healthcheck"
 	"github.com/gofiber/fiber/v3/middleware/limiter"
+
+	cachemiddleware "github.com/blocknextai/go-packages/fiber/middleware/cache"
+	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
+	"github.com/blocknextai/platform-api/internal/bootstrap"
+	commonAuth "github.com/blocknextai/platform-api/internal/common/auth"
+	commonHTTP "github.com/blocknextai/platform-api/internal/common/http"
+	"github.com/blocknextai/platform-api/internal/config"
 )
 
 const (
@@ -75,12 +76,24 @@ func main() {
 		}))
 	}
 
-	apiKeyMiddleware := commonPresentationAuth.NewAPIKeyMiddleware(
+	authMiddleware := commonAuth.NewAuthMiddleware(
+		app.JWTService,
+		app.AccountModule.UserPermissionChecker,
+		app.OrganizationsModule.OrganizationPermissionChecker,
+		app.AccountModule.SessionService,
+	)
+	apiKeyMiddleware := commonAuth.NewAPIKeyMiddleware(
 		app.APIKeysModule.APIKeyValidator,
 	)
 	cacheMiddleware := cachemiddleware.New(core.CacheService, appName+":cache:")
 
-	app.MCPModule.Register(fiberApp, cacheMiddleware, apiKeyMiddleware)
+	accessTokenMiddleware := commonAuth.NewAccessTokenMiddleware(
+		app.MCPOAuthModule.AccessTokenValidator,
+		app.MCPOAuthModule.MetadataService.GetProtectedResourceMetadataURL(""),
+	)
+
+	app.MCPOAuthModule.Register(fiberApp, authMiddleware, cacheMiddleware)
+	app.MCPModule.Register(fiberApp, cacheMiddleware, apiKeyMiddleware, accessTokenMiddleware)
 
 	bootstrap.ListenAndWait(fiberApp, cfg.HTTPServer,
 		/*metricsShutdown,*/

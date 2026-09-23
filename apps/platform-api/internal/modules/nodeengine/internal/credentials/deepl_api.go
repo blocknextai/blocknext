@@ -1,0 +1,36 @@
+package credentials
+
+import (
+	gjs "github.com/google/jsonschema-go/jsonschema"
+
+	domain "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
+)
+
+func NewDeeplAPICredential() *domain.Credential {
+	return &domain.Credential{
+		ID:          "deepl_api",
+		PlatformID:  "deepl_api",
+		Name:        "DeepL",
+		Description: "DeepL API credentials for translation services.",
+		Icon: domain.CredentialIcon{
+			Brand: "deepl",
+		},
+		Schema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"apiKey": {
+					Type:        "string",
+					Title:       "API Key",
+					Description: "DeepL API key from your account settings.",
+					WriteOnly:   true,
+				},
+			},
+			Required: []string{
+				"apiKey",
+			},
+		},
+		SupportedNodes: &[]string{
+			"deepl_translate",
+		},
+	}
+}

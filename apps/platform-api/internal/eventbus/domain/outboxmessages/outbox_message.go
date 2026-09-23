@@ -4,8 +4,9 @@ import (
 	"strings"
 	"time"
 
-	bnuuid "github.com/blocknextai/go-packages/uuid"
 	"github.com/google/uuid"
+
+	bnuuid "github.com/blocknextai/go-packages/uuid"
 )
 
 type OutboxMessage struct {

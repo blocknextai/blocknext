@@ -1,0 +1,37 @@
+package credentials
+
+import (
+	gjs "github.com/google/jsonschema-go/jsonschema"
+
+	domain "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
+)
+
+func NewAirtableAPICredential() *domain.Credential {
+	return &domain.Credential{
+		ID:          "airtable_api",
+		PlatformID:  "airtable_api",
+		Name:        "Airtable",
+		Description: "Airtable personal access token domain.",
+		Icon: domain.CredentialIcon{
+			Brand: "airtable",
+		},
+		Schema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"accessToken": {
+					Type:        "string",
+					Title:       "Access Token",
+					Description: "Airtable personal access token used to authorize API requests.",
+					WriteOnly:   true,
+				},
+			},
+			Required: []string{
+				"accessToken",
+			},
+		},
+		SupportedNodes: &[]string{
+			"airtable_create_record",
+			"airtable_list_records",
+		},
+	}
+}

@@ -8,7 +8,7 @@ import (
 	"github.com/blocknextai/go-packages/cache"
 	"github.com/blocknextai/go-packages/database"
 	"github.com/blocknextai/go-packages/secretmanager"
-	cacheInfrastructure "github.com/blocknextai/platform-api/internal/cache/infrastructure"
+	platformCache "github.com/blocknextai/platform-api/internal/cache"
 	"github.com/blocknextai/platform-api/internal/config"
 	"github.com/blocknextai/platform-api/internal/eventbus"
 	"github.com/blocknextai/platform-api/internal/filegateway"
@@ -59,7 +59,7 @@ func NewCore(cfg *config.SharedConfig, opts ...Option) (*Core, error) {
 		return nil, err
 	}
 
-	cacheService, err := cacheInfrastructure.NewCacheService(cfg.Cache)
+	cacheService, err := platformCache.NewCacheService(cfg.Cache)
 	if err != nil {
 		return nil, err
 	}

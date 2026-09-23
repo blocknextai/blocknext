@@ -2,13 +2,11 @@ package memory
 
 import (
 	"context"
-	executionsDomainToolInvocations "github.com/blocknextai/platform-api/internal/executions/domain/toolinvocations"
 	"sync"
 
-	"github.com/blocknextai/platform-api/internal/realtime/events"
-	taskRunnerDomainNode "github.com/blocknextai/platform-api/internal/taskrunner/domain/node"
-	taskRunnerDomainTask "github.com/blocknextai/platform-api/internal/taskrunner/domain/task"
 	"github.com/google/uuid"
+
+	"github.com/blocknextai/platform-api/internal/realtime/events"
 )
 
 type memoryBroadcaster struct {
@@ -27,7 +25,7 @@ func (b *memoryBroadcaster) Ping(_ context.Context) error {
 	return nil
 }
 
-func (b *memoryBroadcaster) PublishTaskEvent(_ context.Context, event *taskRunnerDomainTask.TaskEvent) error {
+func (b *memoryBroadcaster) PublishTaskEvent(_ context.Context, event *events.TaskEvent) error {
 	payload, err := events.MarshalTask(event)
 	if err != nil {
 		return err
@@ -38,7 +36,7 @@ func (b *memoryBroadcaster) PublishTaskEvent(_ context.Context, event *taskRunne
 	return nil
 }
 
-func (b *memoryBroadcaster) PublishNodeEvent(_ context.Context, event *taskRunnerDomainNode.NodeEvent) error {
+func (b *memoryBroadcaster) PublishNodeEvent(_ context.Context, event *events.NodeEvent) error {
 	payload, err := events.MarshalNode(event)
 	if err != nil {
 		return err
@@ -49,7 +47,7 @@ func (b *memoryBroadcaster) PublishNodeEvent(_ context.Context, event *taskRunne
 	return nil
 }
 
-func (b *memoryBroadcaster) PublishToolInvocationEvent(_ context.Context, event *executionsDomainToolInvocations.ToolInvocationEvent) error {
+func (b *memoryBroadcaster) PublishToolInvocationEvent(_ context.Context, event *events.ToolInvocationEvent) error {
 	payload, err := events.MarshalToolInvocation(event)
 	if err != nil {
 		return err

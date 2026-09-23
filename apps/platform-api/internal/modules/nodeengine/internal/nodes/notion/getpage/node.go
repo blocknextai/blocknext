@@ -1,0 +1,88 @@
+package getpage
+
+import (
+	gjs "github.com/google/jsonschema-go/jsonschema"
+
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/nodes"
+)
+
+type NotionGetPageNode struct {
+	nodes.Node
+}
+
+func NewNotionGetPageNode(nodeID string) *NotionGetPageNode {
+	return &NotionGetPageNode{
+		ID:          nodeID,
+		Kind:        nodes.NodeKindAction,
+		Version:     "0.0.1",
+		Name:        "Notion Get Page",
+		Description: "Retrieve a page from a Notion workspace.",
+		Icon: nodes.NodeIcon{
+			Brand: "notion",
+			Glyph: "eye",
+		},
+		Inputs: []nodes.NodeHandle{
+			{Key: "in"},
+		},
+		Outputs: []nodes.NodeHandle{
+			{Key: "out"},
+		},
+		Categories:    []string{"Publishing"},
+		SubCategories: []string{"Notion"},
+		Tags: []string{
+			"page",
+			"get",
+			"retrieve",
+			"read",
+			"workspace",
+			"productivity",
+			"docs",
+		},
+		SupportedCredentials: []string{
+			"notion_oauth2",
+		},
+		InputSchema: &gjs.Schema{
+			Type: "object",
+			Properties: map[string]*gjs.Schema{
+				"pageId": {
+					Type:        "string",
+					Title:       "Page ID",
+					Description: "Identifier of the Notion page to retrieve.",
+				},
+			},
+			Required: []string{
+				"pageId",
+			},
+		},
+		OutputSchema: &gjs.Schema{
+			Type: "array",
+			Items: &gjs.Schema{
+				Type: "object",
+				Properties: map[string]*gjs.Schema{
+					"id": {
+						Type:        "string",
+						Description: "Identifier of the Notion page.",
+					},
+					"object": {
+						Type:        "string",
+						Description: "Object type of the resource.",
+					},
+					"url": {
+						Type:        "string",
+						Description: "URL of the Notion page.",
+						Format:      "uri",
+					},
+					"properties": {
+						Type:        "object",
+						Description: "Notion page properties keyed by name.",
+					},
+				},
+			},
+		},
+		HasNaturalLanguage: true,
+		Annotations: nodes.NodeAnnotations{
+			ReadOnly:   true,
+			Idempotent: true,
+		},
+	}
+}
