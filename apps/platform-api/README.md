@@ -23,12 +23,17 @@ Configuration lives in the single `.env` file at the monorepo root — run `make
 The codebase follows a modular monolith architecture with clear separation of concerns:
 
 ```
-internal/
+internal/modules/
 ├── [module]/
-│   ├── application/     # Use cases, command/query handlers
-│   ├── domain/          # Business entities and logic
-│   ├── infrastructure/  # External dependencies (DB, APIs)
-│   └── presentation/    # HTTP controllers and routing
+│   ├── module.go        # Dependencies + NewModule + Register — the bootstrap entry point
+│   ├── contract/        # Public API for other contexts (type aliases + interfaces)
+│   └── internal/
+│       ├── domain/      # Business entities and logic
+│       ├── application/ # Aggregate services re-exported by contract/
+│       ├── usecases/    # One Service per aggregate, one file per use case
+│       ├── postgres/    # Repositories
+│       ├── migrations/  # SQL migrations
+│       └── http/        # Fiber handlers and routing
 ```
 
 ### Modules

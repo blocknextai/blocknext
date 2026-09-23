@@ -1,0 +1,9 @@
+package contract
+
+import (
+	credentialoauthApplicationRegenerate "github.com/blocknextai/platform-api/internal/modules/credentialoauth/internal/application/regenerate"
+)
+
+type CredentialOAuthTokenRegenerateService = credentialoauthApplicationRegenerate.CredentialOAuthTokenRegenerateService
+
+var ErrRefreshTokenInvalid = credentialoauthApplicationRegenerate.ErrRefreshTokenInvalid

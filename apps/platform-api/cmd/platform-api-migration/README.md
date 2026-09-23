@@ -3,7 +3,7 @@
 > A one-shot CLI that runs golang-migrate database migrations per module, each tracked in its own `<module>_migrations` table.
 
 ## What it does
-Parses flags, connects to Postgres from `DATABASE_*` env vars, and applies (or rolls back) the `.up.sql` / `.down.sql` migrations found under each module's `infrastructure/database/migrations` directory. Modules are processed in the order of a hardcoded `modules` registry; `up` runs them forward, `down` rolls back one step in reverse order. A `-dry-run` mode reports current version, dirty state, and pending counts without applying anything. It runs once and exits.
+Parses flags, connects to Postgres from `DATABASE_*` env vars, and applies (or rolls back) the `.up.sql` / `.down.sql` migrations found under each module's `internal/migrations` directory (the kernel packages `common` and `eventbus` keep theirs under `internal/<pkg>/migrations`). Modules are processed in the order of a hardcoded `modules` registry; `up` runs them forward, `down` rolls back one step in reverse order. A `-dry-run` mode reports current version, dirty state, and pending counts without applying anything. It runs once and exits.
 
 ## Bootstrap & config
 - **Assembler:** none — does not use `bootstrap.NewCore`; opens its own `database.NewDB` connection (pool size 1/1).
@@ -18,5 +18,5 @@ Parses flags, connects to Postgres from `DATABASE_*` env vars, and applies (or r
 ## Notes
 - **Module registry requirement:** the hardcoded `modules` slice (common, account, organizations, executions, workflows, triggers, credentials, apikeys, notifications, eventbus) is the source of truth. A new module's migrations will NOT run unless it is added to this slice.
 - Each module uses a dedicated `<module>_migrations` tracking table.
-- Migration source path differs in Docker (`/app/migrations/<module>`) vs local (`internal/<module>/infrastructure/database/migrations`), auto-detected via `/app/migrations`.
+- Migration source path differs in Docker (`/app/migrations/<module>`) vs local (`internal/modules/<module>/internal/migrations`, or `internal/<pkg>/migrations` for the kernel packages), auto-detected via `/app/migrations`.
 - Exits non-zero on failure; logs structured slog with `component=migration`.

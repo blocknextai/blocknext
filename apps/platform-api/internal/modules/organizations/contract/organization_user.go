@@ -1,0 +1,14 @@
+package contract
+
+import (
+	organizationsApplicationOrganizationUsers "github.com/blocknextai/platform-api/internal/modules/organizations/internal/application/organizationusers"
+	organizationsDomainOrganizationUsers "github.com/blocknextai/platform-api/internal/modules/organizations/internal/domain/organizationusers"
+)
+
+type OrganizationUser = organizationsDomainOrganizationUsers.OrganizationUser
+type OrganizationUserCreatedDomainEvent = organizationsDomainOrganizationUsers.OrganizationUserCreatedDomainEvent
+type OrganizationUserRoleChangedDomainEvent = organizationsDomainOrganizationUsers.OrganizationUserRoleChangedDomainEvent
+
+type OrganizationUserService = organizationsApplicationOrganizationUsers.OrganizationUserService
+
+var ErrOrganizationUserNotFound = organizationsDomainOrganizationUsers.ErrOrganizationUserNotFound

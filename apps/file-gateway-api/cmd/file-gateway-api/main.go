@@ -9,18 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/blocknextai/file-gateway-api/internal/auth"
-	cacheInfrastructure "github.com/blocknextai/file-gateway-api/internal/cache/infrastructure"
-	"github.com/blocknextai/file-gateway-api/internal/config"
-	"github.com/blocknextai/file-gateway-api/internal/download"
-	"github.com/blocknextai/file-gateway-api/internal/storage"
-	"github.com/blocknextai/file-gateway-api/internal/upload"
-	"github.com/blocknextai/go-packages/apperror"
-	"github.com/blocknextai/go-packages/auth/jwt"
-	"github.com/blocknextai/go-packages/fiber/errorhandler"
-	"github.com/blocknextai/go-packages/fiber/middleware/recovery"
-	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
-	"github.com/blocknextai/go-packages/json"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/healthcheck"
@@ -28,6 +16,19 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/limiter"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
 	"github.com/gofiber/fiber/v3/middleware/static"
+
+	gatewayCache "github.com/blocknextai/file-gateway-api/internal/cache"
+	"github.com/blocknextai/file-gateway-api/internal/config"
+	"github.com/blocknextai/file-gateway-api/internal/modules/auth"
+	"github.com/blocknextai/file-gateway-api/internal/modules/download"
+	"github.com/blocknextai/file-gateway-api/internal/modules/storage"
+	"github.com/blocknextai/file-gateway-api/internal/modules/upload"
+	"github.com/blocknextai/go-packages/apperror"
+	"github.com/blocknextai/go-packages/auth/jwt"
+	"github.com/blocknextai/go-packages/fiber/errorhandler"
+	"github.com/blocknextai/go-packages/fiber/middleware/recovery"
+	cachestorage "github.com/blocknextai/go-packages/fiber/storage/cache"
+	"github.com/blocknextai/go-packages/json"
 )
 
 const (
@@ -63,7 +64,7 @@ func main() {
 
 	isProduction := configuration.AppEnv.IsProduction()
 
-	cacheService, err := cacheInfrastructure.NewCacheService(configuration.Cache)
+	cacheService, err := gatewayCache.NewCacheService(configuration.Cache)
 	if err != nil {
 		slog.Error("failed to create cache service", "error", err)
 		os.Exit(1)

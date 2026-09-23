@@ -1,8 +1,8 @@
 # `internal/` — Bounded Context Map
 
 This service follows Domain-Driven Design: each directory under `internal/` is either a
-**bounded context** (a `module.go` wires its `domain` / `application` / `infrastructure` /
-`presentation` layers) or a **shared/infrastructure package**. Contexts never reach into each
+**bounded context** (a `module.go` wires its `domain` / `application` / `usecases` / `postgres` /
+`http` layers under the module's sealed `internal/`, and exposes them through `contract/`) or a **shared/infrastructure package**. Contexts never reach into each
 other's repositories — they integrate only through exported **service interfaces** (synchronous)
 or **domain events** over the `eventbus` (asynchronous). See each directory's own `README.md` for
 its detailed scope.
@@ -101,7 +101,7 @@ flowchart TB
 
 `bootstrap` assembles the contexts into several processes (see `cmd/` + `internal/bootstrap`):
 
-- **PlatformAPI** — the main HTTP API (most contexts' `presentation` routes).
+- **PlatformAPI** — the main HTTP API (most contexts' `http` routes).
 - **MCPAPI** — the Model Context Protocol server (`mcp` + `nodeengine`).
 - **WebhookAPI** — the inbound webhook edge (`webhooks` → triggers).
 - **TaskWorker** — executes queued workflow tasks (`taskrunner` + `executions`).
@@ -110,7 +110,7 @@ flowchart TB
 ## Conventions
 
 - **No cross-context repository injection** — contexts integrate via service interfaces only.
-- **CQRS** — each use case is a handler under `application/<usecase>/`; reads use the mapper convention.
+- **Use cases** — each use case is a method on its aggregate's `usecases/<aggregate>.Service`, one file per use case; reads use the mapper convention.
 - **Events** — names follow `<context>.<entity>.<action>` (past tense); durable server→server flows
   go through `eventbus`, ephemeral server→client flows through `realtime`/`ws`.
 - **New modules** must be registered in the bootstrap wiring and the migration module registry.

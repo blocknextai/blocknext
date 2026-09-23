@@ -6,11 +6,11 @@ import (
 
 	"github.com/blocknextai/go-packages/database"
 	"github.com/blocknextai/platform-api/internal/config"
-	"github.com/blocknextai/platform-api/internal/eventbus/application/idempotency"
-	"github.com/blocknextai/platform-api/internal/eventbus/application/publishing"
-	"github.com/blocknextai/platform-api/internal/eventbus/application/relay"
-	inboxEntriesInfrastructure "github.com/blocknextai/platform-api/internal/eventbus/infrastructure/inboxentries"
-	outboxMessagesInfrastructure "github.com/blocknextai/platform-api/internal/eventbus/infrastructure/outboxmessages"
+	"github.com/blocknextai/platform-api/internal/eventbus/idempotency"
+	eventbusPostgresInboxEntries "github.com/blocknextai/platform-api/internal/eventbus/postgres/inboxentries"
+	eventbusPostgresOutboxMessages "github.com/blocknextai/platform-api/internal/eventbus/postgres/outboxmessages"
+	"github.com/blocknextai/platform-api/internal/eventbus/publishing"
+	"github.com/blocknextai/platform-api/internal/eventbus/relay"
 )
 
 type Dependencies struct {
@@ -29,8 +29,8 @@ type Module struct {
 }
 
 func NewModule(deps Dependencies) *Module {
-	outboxRepository := outboxMessagesInfrastructure.NewRepository(deps.DB)
-	inboxRepository := inboxEntriesInfrastructure.NewRepository(deps.DB)
+	outboxRepository := eventbusPostgresOutboxMessages.NewRepository(deps.DB)
+	inboxRepository := eventbusPostgresInboxEntries.NewRepository(deps.DB)
 
 	bus := NewBus()
 

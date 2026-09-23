@@ -27,4 +27,4 @@ This is shared infrastructure, not a business bounded context. It guarantees tha
 - **Infrastructure:** Postgres schema `eventbus` with tables `outbox_messages` (enum `eventbus_outbox_message_status`, partial indexes on due/locked rows) and `inbox_entries`; relay tuning via `config.EventBusOptions` (poll interval, batch size, max attempts, backoff, stuck timeout, reclaim interval).
 
 ## Layout
-Standard DDD layers present (no presentation), wired in `module.go`; relay started via `StartRelay`.
+Layout: `domain/`, `idempotency/`, `publishing/`, `relay/`, `postgres/`, `migrations/`, wired in `module.go`; relay started via `StartRelay`.
