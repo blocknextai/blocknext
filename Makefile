@@ -38,6 +38,10 @@ go-fix: ## run go fix in every Go module
 go-build: ## compile every Go module
 	@./scripts/go.sh build
 
+.PHONY: node-run
+node-run: ## run one node executor on the host without the stack (node=<id> input='<json>' credentials='<json>'; no node lists them)
+	@cd apps/platform-api && go run ./cmd/node-run -node "$(node)" -input '$(input)' -credentials '$(credentials)'
+
 .PHONY: go-test
 go-test: ## run tests in every Go module
 	@./scripts/go.sh test

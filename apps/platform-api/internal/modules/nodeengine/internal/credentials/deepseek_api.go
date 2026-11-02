@@ -29,8 +29,5 @@ func NewDeepseekAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"deepseek_chat",
-		},
 	}
 }

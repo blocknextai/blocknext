@@ -85,9 +85,5 @@ func NewXOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"x_publish_post",
-			"x_publish_media_post",
-		},
 	}
 }

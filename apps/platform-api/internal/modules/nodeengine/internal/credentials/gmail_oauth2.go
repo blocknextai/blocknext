@@ -93,10 +93,5 @@ func NewGmailOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"gmail_organize_emails",
-			"gmail_search_emails",
-			"gmail_send_email",
-		},
 	}
 }

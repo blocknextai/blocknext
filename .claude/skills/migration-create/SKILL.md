@@ -5,7 +5,6 @@ description: Use this skill when the user wants to add a new database migration 
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
 
-
 # Migration Create
 
 Creates a new database migration pair for a bounded context, edits both files with the schema change and its rollback, and (optionally) runs the project's verify/apply targets.
@@ -13,14 +12,14 @@ Creates a new database migration pair for a bounded context, edits both files wi
 ## When to use
 
 - User says "add a migration for `<module>`" / "create a new table" / "alter X" / "drop the Y column" / "add an index on Z"
-- A schema change is needed for one of the modules under `internal/`
+- A schema change is needed for one of the modules under `internal/modules/`
 - Do NOT use for data backfills as the only goal — those are typically scripts, not migrations. If a backfill is required *as part of* a schema change (e.g., adding a NOT NULL column), include it inside the same migration with the column add.
 
 ## Required information
 
 Confirm with the user (ask only what's missing):
 
-1. **Module** — bounded context that owns the affected schema (e.g., `account`, `organizations`, `credentials`, `workflows`). Must already exist under `internal/`. The Postgres schema name is identical to the module name.
+1. **Module** — bounded context that owns the affected schema (e.g., `account`, `organizations`, `credentials`, `workflows`). Must already exist under `internal/modules/`. The Postgres schema name is identical to the module name.
 2. **Migration name** — short snake_case description of the change. Imperative voice. Examples:
    - `add_users_table`
    - `add_email_index_to_users`
@@ -40,8 +39,8 @@ The skill drives Make targets — do NOT write files into `migrations/` directly
 make migration-create name=<migration_name> module=<module>
 ```
 
-This invokes `<repo-root>/scripts/migration.sh create` which (run `make` targets from the repo root):
-- Creates `internal/<module>/infrastructure/database/migrations/` if missing
+This invokes `scripts/migration.sh create` which:
+- Creates `internal/modules/<module>/internal/migrations/` if missing
 - Writes `<TIMESTAMP>_<module>_<name>.up.sql` and `<TIMESTAMP>_<module>_<name>.down.sql`
 - `<TIMESTAMP>` is `YYYYMMDDhhmmss` (UTC-ish, derived from `date +%Y%m%d%H%M%S`)
 - Each file gets a 4-line header comment with the migration name and creation date
@@ -79,7 +78,9 @@ This shows pending migrations for the module without applying them. Useful sanit
 make migration-up module=<module>
 ```
 
-This actually applies the migration to the database via Docker. **Do NOT run this without explicit user confirmation** — it mutates shared state (the dev database).
+This applies the migration to the dev database through Docker — **requires explicit user confirmation**; it mutates shared state.
+
+This actually applies the migration to the database via Docker. **Do NOT run this without explicit user confirmation** — it mutates shared state (the dev database). The Make target also requires a `GITHUB_TOKEN` to be set in env or `.env`; if missing, the script exits with instructions. Pass that information back to the user instead of trying to fix it yourself.
 
 For rollback testing during development:
 ```bash
@@ -89,7 +90,7 @@ make migration-down module=<module>
 ## File path & naming (controlled by the script — do not override)
 
 ```
-internal/<module>/infrastructure/database/migrations/
+internal/modules/<module>/internal/migrations/
 ├── <TIMESTAMP>_<module>_<name>.up.sql
 └── <TIMESTAMP>_<module>_<name>.down.sql
 ```
@@ -115,6 +116,8 @@ The matching down:
 DROP SCHEMA IF EXISTS <module> CASCADE;
 ```
 
+A new module's migrations silently never run unless the module is also added to the `modules` slice in `cmd/platform-api-migration/main.go` **and** the `COPY` list in `<repo-root>/docker/platform-api/migration.Dockerfile`. One `CREATE TABLE` per migration file; only column-adds fold into an existing table's migration.
+
 ### Standard table layout
 
 Every domain table includes UUID PK and the standard timestamp triplet:
@@ -130,7 +133,7 @@ CREATE TABLE IF NOT EXISTS <module>.<table> (
 ```
 
 Rules:
-- **`id` is `UUID PRIMARY KEY`** — generated in the application layer (the domain's `New(...)` constructor calls `uuid.New()`), NOT a Postgres `DEFAULT gen_random_uuid()`.
+- **`id` is `UUID PRIMARY KEY`** — generated in the application layer (the domain's `New(...)` constructor calls `bnuuid.NewV7()`), NOT a Postgres `DEFAULT gen_random_uuid()`.
 - **All timestamps are `TIMESTAMP WITHOUT TIME ZONE`** with the `(NOW() AT TIME ZONE 'UTC')` default. Never `TIMESTAMPTZ` and never plain `NOW()` — the project standardises on UTC at the application boundary.
 - **`deleted_at` is nullable** — soft-delete pattern; `NULL` means "active".
 - **`created_at` and `updated_at` are `NOT NULL`** with the UTC default.
@@ -239,9 +242,10 @@ For tables already deployed to production, do this in two migrations to avoid br
 1. **Use Make targets — do not bypass the script.** `make migration-create` is the only sanctioned way to generate the file pair; the timestamp + filename + dual-file structure is part of the contract with the migration runner. Hand-rolling the files risks getting the order or naming wrong.
 2. **Every up needs a matching down.** The script enforces the file pair; you fill both. A no-op down with an explanatory comment is acceptable when the change is genuinely irreversible.
 3. **Do not edit migrations after they have been applied to a shared environment.** Once `migration-up` has run on staging or production, the file is part of history. Make a new migration to fix issues; never amend an applied one. If unsure whether it has been applied, ask the user.
-4. **Schema name = module name.** Don't put `account` tables under the `public` schema or vice versa. The runner picks up files per-module from `internal/<module>/infrastructure/database/migrations/`.
-5. **UUIDs come from the application** (`uuid.New()` in domain `New(...)` constructors), not from `gen_random_uuid()`. Don't add Postgres-side UUID defaults.
+4. **Schema name = module name.** Don't put `account` tables under the `public` schema or vice versa. The runner picks up files per-module from `internal/modules/<module>/internal/migrations/`.
+5. **UUIDs come from the application** (`bnuuid.NewV7()` in domain `New(...)` constructors), not from `gen_random_uuid()`. Don't add Postgres-side UUID defaults.
 6. **All timestamps are UTC `TIMESTAMP WITHOUT TIME ZONE`.** Never `TIMESTAMPTZ`.
+7. **`make migration-up` requires `GITHUB_TOKEN`** in env or `.env`. If missing, the script exits with setup instructions; pass them to the user, do not try to bypass.
 8. **Do not run `migration-up` autonomously.** It mutates shared state. Always confirm with the user before applying. `migration-status` (dry-run) is safe to run.
 
 ## Final steps
@@ -250,7 +254,7 @@ After both files are filled in:
 
 1. Re-read both `.up.sql` and `.down.sql` end-to-end. Mental dry-run: run up, then down, then up — does the schema return to the expected state at each step?
 2. (Optional, safe) `make migration-status module=<module>` — confirms the file is picked up.
-3. (Optional, requires user confirmation) `make migration-up module=<module>` to apply.
+3. (Optional, requires user confirmation + `GITHUB_TOKEN`) `make migration-up module=<module>` to apply.
 4. If the migration adds tables/columns that domain code references, the matching domain entity, repository, and any new sentinels need to exist. Surface this to the user as the next step — migration alone doesn't ship a feature.
 
 ## What NOT to do

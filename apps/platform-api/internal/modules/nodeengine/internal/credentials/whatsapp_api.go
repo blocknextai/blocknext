@@ -35,9 +35,5 @@ func NewWhatsappAPICredential() *domain.Credential {
 				"phoneNumberId",
 			},
 		},
-		SupportedNodes: &[]string{
-			"whatsapp_send_text_message",
-			"whatsapp_send_template",
-		},
 	}
 }

@@ -85,8 +85,5 @@ func NewTiktokOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"tiktok_publish_post",
-		},
 	}
 }

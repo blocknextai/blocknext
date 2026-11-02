@@ -1,10 +1,9 @@
 ---
 name: go-standards-review
-description: Use this skill when the user wants to audit a Go file, package, or branch diff for project-specific Go standard violations in platform-api. Triggers on phrases like "review this file for go standards", "check the codebase for fmt usage", "audit my changes against project conventions", "scan for net/http usage", "fix go-standards violations". Greps the target for violations of every memory-tracked Go rule (no fmt, slog over log, strings.Builder, TrimSpace, httpclient, utils for JSON, append over index assign, new() over &, gofmt + lint, repository pagination/search param order, presentation pagination/search constructor calls, initialism casing in identifiers vs struct tag content), reports them as a punch list, and optionally applies fixes.
+description: Use this skill when the user wants to audit a Go file, package, or branch diff for project-specific Go standard violations in platform-api. Triggers on phrases like "review this file for go standards", "check the codebase for fmt usage", "audit my changes against project conventions", "scan for net/http usage", "fix go-standards violations". Greps the target for violations of every memory-tracked Go rule (no fmt, slog over log, strings.Builder, TrimSpace, httpclient, utils for JSON, append over index assign, new() over &, gofmt + lint, repository pagination/search param order, HTTP handler pagination/search `.Normalize()` calls, initialism casing in identifiers vs struct tag content), reports them as a punch list, and optionally applies fixes.
 ---
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
-
 
 # Go Standards Review
 
@@ -116,7 +115,7 @@ grep -rn --include='*.go' -E '"net/http"|http\.(Get|Post|NewRequest|Client\b|Def
 ```
 
 **Allowed exceptions:**
-- `internal/common/presentation/...` and any presentation-layer code that defines Fiber types (Fiber re-exports `http.Status*` constants — keep those)
+- `internal/common/{auth,http}` and fiber handler code under `internal/modules/<m>/internal/http/` (Fiber re-exports `http.Status*` constants — keep those)
 - `*_test.go` may use `httptest`
 - Webhook receivers and middleware that operate on incoming requests (these consume `*fiber.Ctx`, not `*http.Request`)
 
@@ -140,7 +139,7 @@ grep -rn --include='*.go' -E '"encoding/json"|json\.(Marshal|Unmarshal|NewDecode
 ```
 
 **Allowed exceptions:**
-- `gjs.Schema` defaults that require `json.RawMessage` (e.g., node `node.go` files under `internal/nodeengine/nodes/...` and credential `*.go` files under `internal/nodeengine/credentials/`)
+- `gjs.Schema` defaults that require `json.RawMessage` (e.g., node `node.go` files under `internal/modules/nodeengine/internal/nodes/...` and credential `*.go` files under `internal/modules/nodeengine/internal/credentials/`)
 - Any direct `json.RawMessage` field in a struct that is consumed by an external library that requires the stdlib type — keep the import scoped to that field
 
 **Suggested fix:**
@@ -205,7 +204,7 @@ e.DeletedAt = new(now)
 
 ### 9. `apperror` instead of `errors.New` / `fmt.Errorf`
 
-**Memory:** `project_apperror_pattern` — Kind+Message+Cause via go-packages/apperror; presentation maps Kind→HTTP; no Code field.
+**Memory:** `project_apperror_pattern` — Kind+Message+Cause via go-packages/apperror; the HTTP error handler maps Kind→HTTP; no Code field.
 
 **Detect:**
 ```bash
@@ -277,7 +276,7 @@ grep -rn --include='*.go' -B0 -A0 -E '^\s*Pagination\s+resultPkg\.PaginationRequ
 
 **Allowed exceptions:**
 - Functions that take only `offset, limit` with no `searchQuery` (e.g. `GetAllPublishers`) — already in the canonical order.
-- Functions that take only `limit` and have semantic reasons (e.g. a worker batch-size parameter, not a pagination window).
+- Functions that take only `limit` and have semantic reasons (e.g. `GetExpiredActiveSubscriptions(ctx, limit int)` — a worker batch size, not a pagination window).
 
 **Suggested fix (manual — touches signature + every call site):**
 ```go
@@ -286,11 +285,11 @@ GetAllByOwner(ctx, ownerType, ownerID, offset int, limit int, searchQuery string
 // After
 GetAllByOwner(ctx, ownerType, ownerID, searchQuery string, offset int, limit int)
 ```
-Update the matching domain interface, infrastructure impl, and every handler call site in the same change.
+Update the matching domain interface, postgres impl, and every use-case call site in the same change.
 
-### 13. Pagination/Search `.Normalize()` required in presentation
+### 13. Pagination/Search `.Normalize()` required in HTTP handlers
 
-**Memory:** `feedback_pagination_search_normalization` — `request.PaginationRequest.Normalize()` / `request.SearchRequest.Normalize()` MUST be called in presentation handlers; never pass the un-normalized embedded `request.PaginationRequest` / `request.SearchRequest` directly to the query. (The old `NewPaginationRequest` / `NewSearchRequest` constructors no longer exist — `.Normalize()` replaced them.)
+**Memory:** `feedback_pagination_search_normalization` — `request.PaginationRequest.Normalize()` / `request.SearchRequest.Normalize()` MUST be called in fiber handlers (`internal/http/<aggregate>/`); never pass the un-normalized embedded `request.PaginationRequest` / `request.SearchRequest` directly to the query. (The old `NewPaginationRequest` / `NewSearchRequest` constructors no longer exist — `.Normalize()` replaced them.)
 
 **Detect:**
 ```bash
@@ -304,7 +303,7 @@ grep -rn --include='*.go' -E 'Search:\s*request\.SearchRequest|Pagination:\s*req
 **Suggested fix (mechanical):**
 ```go
 // Before
-result, err := handler.Handle(ctx, &foo.Query{
+result, err := service.GetAllFoos(ctx, &fooUseCases.GetAllFoosQuery{
     Search:     request.SearchRequest,
     Pagination: request.PaginationRequest,
 })
@@ -313,7 +312,7 @@ result, err := handler.Handle(ctx, &foo.Query{
 searchRequest := request.SearchRequest.Normalize()
 paginationRequest := request.PaginationRequest.Normalize()
 
-result, err := handler.Handle(ctx, &foo.Query{
+result, err := service.GetAllFoos(ctx, &fooUseCases.GetAllFoosQuery{
     Search:     searchRequest,
     Pagination: paginationRequest,
 })
@@ -393,15 +392,15 @@ Format as a punch list:
 ### Rule violations (N)
 
 #### Rule 1: No `fmt` package (3 violations)
-- `internal/foo/bar.go:42` — `fmt.Sprintf("user %s", id)` → use `"user " + id` or `strings.Builder`
-- `internal/foo/baz.go:17` — `fmt.Errorf(...)` → convert to `apperror.Internal(...).WithCause(err)`
+- `internal/modules/foo/bar.go:42` — `fmt.Sprintf("user %s", id)` → use `"user " + id` or `strings.Builder`
+- `internal/modules/foo/baz.go:17` — `fmt.Errorf(...)` → convert to `apperror.Internal(...).WithCause(err)`
 - ...
 
 #### Rule 5: `httpclient` over `net/http` (1 violation)
-- `internal/qux/client.go:8` — imports `net/http` → migrate to `httpclient.NewClientBuilder()`
+- `internal/modules/qux/client.go:8` — imports `net/http` → migrate to `httpclient.NewClientBuilder()`
 
 ### Workflow checks
-- gofmt: 2 files need formatting (`internal/foo/bar.go`, `internal/foo/baz.go`)
+- gofmt: 2 files need formatting (`internal/modules/foo/bar.go`, `internal/modules/foo/baz.go`)
 - golangci-lint: 0 issues
 ```
 

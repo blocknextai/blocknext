@@ -72,13 +72,13 @@ One codebase, six entry points. Each binary assembles only the modules it needs 
 | Binary | Role |
 | --- | --- |
 | `platform-api` | Main HTTP/WebSocket API |
-| `mcp-api` | Exposes workflow nodes as MCP tools, API-key gated |
+| `mcp-api` | Exposes workflow nodes and the platform as MCP tools; OAuth 2.1 sign-in for MCP clients, API keys for node servers |
 | `webhook-api` | Inbound edge for workflow trigger webhooks |
 | `task-worker` | Consumes queued workflow tasks (queue mode only) |
 | `event-relay-worker` | Drains the transactional outbox out-of-process |
 | `platform-api-migration` | One-shot migration runner |
 
-**Bounded contexts.** `internal/` holds ~23 modules (workflows, nodeengine, taskrunner, triggers, executions, credentials, account, organizations, ...), each with DDD layering (`application/`, `domain/`, `infrastructure/`, `presentation/`). The full module map with a dependency diagram lives in [`apps/platform-api/internal/README.md`](apps/platform-api/internal/README.md).
+**Bounded contexts.** `internal/` holds ~23 modules (workflows, nodeengine, taskrunner, triggers, executions, credentials, account, organizations, ...), each sealed under `internal/modules/<module>/internal/` (`domain/`, `application/`, `usecases/`, `postgres/`, `http/`) and exposed through `contract/`. The full module map with a dependency diagram lives in [`apps/platform-api/internal/README.md`](apps/platform-api/internal/README.md).
 
 Two boundary rules keep the monolith modular:
 - Modules never share repositories — cross-module access goes through **service interfaces** injected in `bootstrap`.
@@ -129,12 +129,12 @@ The mechanics behind the headline features are documented next to the code:
 
 | Topic | Where |
 | --- | --- |
-| The canvas model — `$references`, credential references, deliberate simplicity | [`workflows`](apps/platform-api/internal/workflows/README.md) |
-| AI workflow generation from chat (SSE streaming) | [`workflows`](apps/platform-api/internal/workflows/README.md) |
-| One node descriptor → UI form, icon, connection points, validation, function calling, MCP tool | [`nodeengine`](apps/platform-api/internal/nodeengine/README.md) |
-| How a node becomes an MCP tool | [`mcp`](apps/platform-api/internal/mcp/README.md) |
-| Task scheduling, DAG execution order, prompt layering | [`taskrunner`](apps/platform-api/internal/taskrunner/README.md) |
-| Trigger types, webhook adapters, runtime config overlay | [`triggers`](apps/platform-api/internal/triggers/README.md) |
-| Credential encryption, masking, owner scoping | [`credentials`](apps/platform-api/internal/credentials/README.md) |
-| OAuth flow, single-flight token refresh | [`credentialoauth`](apps/platform-api/internal/credentialoauth/README.md) |
-| Auth methods & account security model | [`account`](apps/platform-api/internal/account/README.md) |
+| The canvas model — `$references`, credential references, deliberate simplicity | [`workflows`](apps/platform-api/internal/modules/workflows/README.md) |
+| AI workflow generation from chat (SSE streaming) | [`workflows`](apps/platform-api/internal/modules/workflows/README.md) |
+| One node descriptor → UI form, icon, connection points, validation, function calling, MCP tool | [`nodeengine`](apps/platform-api/internal/modules/nodeengine/README.md) |
+| How a node becomes an MCP tool | [`mcp`](apps/platform-api/internal/modules/mcp/README.md) |
+| Task scheduling, DAG execution order, prompt layering | [`taskrunner`](apps/platform-api/internal/modules/taskrunner/README.md) |
+| Trigger types, webhook adapters, runtime config overlay | [`triggers`](apps/platform-api/internal/modules/triggers/README.md) |
+| Credential encryption, masking, owner scoping | [`credentials`](apps/platform-api/internal/modules/credentials/README.md) |
+| OAuth flow, single-flight token refresh | [`credentialoauth`](apps/platform-api/internal/modules/credentialoauth/README.md) |
+| Auth methods & account security model | [`account`](apps/platform-api/internal/modules/account/README.md) |

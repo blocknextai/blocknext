@@ -29,9 +29,5 @@ func NewGeminiAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"gemini_nano_banana",
-			"gemini_chat",
-		},
 	}
 }

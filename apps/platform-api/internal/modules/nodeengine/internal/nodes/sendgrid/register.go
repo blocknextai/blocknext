@@ -2,10 +2,8 @@ package sendgrid
 
 import (
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/application/jsonschema"
-	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/executors"
-	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/functioncalling"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/mcp"
-	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/nodes"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/providers"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/sendgrid/sendemail"
 )
 
@@ -15,20 +13,18 @@ func Register() {
 	sendEmailValidator := jsonschema.New[sendemail.SendgridSendEmailExecutorInput](sendEmailNode.GetInputSchema())
 	sendEmailExecutor := sendemail.NewSendgridSendEmailExecutor(sendEmailNodeID, sendEmailValidator)
 
-	nodes.RegisterNode(sendEmailNode)
-	executors.RegisterExecutor(sendEmailExecutor)
-	functioncalling.RegisterFunctionCalling(functioncalling.Generate(sendEmailNode))
-
-	mcp.RegisterServer(&mcp.Server{
-		ID:          "sendgrid",
-		Name:        "SendGrid",
-		Description: "Tools for sending emails via SendGrid.",
-		Icon: mcp.ServerIcon{
-			Brand: "sendgrid",
+	providers.Register(providers.Provider{
+		Server: mcp.Server{
+			ID:          "sendgrid",
+			Name:        "SendGrid",
+			Description: "Tools for sending emails via SendGrid.",
+			Icon: mcp.ServerIcon{
+				Brand: "sendgrid",
+			},
+			Version: "0.0.1",
 		},
-		Version: "0.0.1",
-		Tools: []nodes.NodeManager{
-			sendEmailNode,
+		Actions: []providers.Action{
+			{Node: sendEmailNode, Executor: sendEmailExecutor},
 		},
 	})
 }

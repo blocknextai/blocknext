@@ -22,7 +22,7 @@ The node engine owns the **definitions** of everything a workflow can do: each n
 
 Nodes are organized as `nodes/<provider>/<action>/{node.go,executor.go}` with a per-provider `register.go` and shared `helpers/`. There are ~26 providers (`nodes/nodes.go`) spanning LLMs/AI (anthropic, chatgpt, gemini, deepseek, deepl), media generation (elevenlabs, veo, piapi, sunomusic, soundcloud), social/messaging (discord, slack, telegram, whatsapp, x, instagram, facebook, tiktok, linkedin), Google (docs, drive, gmail, sheets, keep, youtube), productivity/data (airtable, notion, coingecko, sendgrid), plus a `system` provider for engine primitives (`condition`, `sleep`, `starter`). Roughly ~80 node actions in total.
 
-A provider's `register.go` wires each action consistently: build the node, build a JSON-schema validator (`jsonschema.New[Input]`), build the executor, then `nodes.RegisterNode` + `executors.RegisterExecutor`, optionally `functioncalling.RegisterFunctionCalling(functioncalling.Generate(node))`, and a single `mcp.RegisterServer` grouping the provider's nodes as MCP tools. A node links to a credential by ID through `Node.SupportedCredentials`, and the credential mirrors the link via `Credential.SupportedNodes`. ~31 credentials live in `credentials/` as `<provider>_(api|oauth2).go`, registered in `credentials/credentials.go` (OAuth2 ones receive the OAuth redirect URL at registration).
+A provider's `register.go` builds each action (node, `jsonschema.New[Input]` validator, executor) and hands everything to one `providers.Register(providers.Provider{Server, Actions, Adapters})` call, which registers nodes and executors, generates function calling for nodes with `HasNaturalLanguage`, registers trigger adapters and mounts the actions with an executor as the provider's MCP tools. A node links to a credential by ID through `Node.SupportedCredentials`; the reverse `Credential.SupportedNodes` is derived at startup (`nodes.Register` → `linkCredentials`), and a node naming an unregistered credential panics on boot. ~31 credentials live in `credentials/` as `<provider>_(api|oauth2).go`, registered in `credentials/credentials.go` (OAuth2 ones receive the OAuth redirect URL at registration).
 
 ## Node anatomy
 
@@ -94,7 +94,7 @@ All routes are under `/node-engine` and wrapped with a 5-minute cache middleware
 
 ## Extending
 
-Add a node via `nodes/<provider>/<action>/` (a `node.go` + `executor.go`, registered in the provider `register.go`: node + executor + optional function-calling + MCP tool), keeping `SupportedCredentials` in sync with the credential's `SupportedNodes`; the `node-create` / `node-update` conventions automate this. Add a credential as `credentials/<provider>_(api|oauth2).go` and register it in `credentials/credentials.go` (the `credential-create` / `credential-update` conventions cover the registry wiring and cross-references).
+Add a node via `nodes/<provider>/<action>/` (a `node.go` + `executor.go`, one `providers.Action` in the provider `register.go`); `cmd/node-run` executes a single node without the stack (`make node-run node=<id> input='{…}' credentials='{…}'`). The `node-create` / `node-update` conventions automate the scaffold. Add a credential as `credentials/<provider>_(api|oauth2).go` and register it in `credentials/credentials.go` (the `credential-create` / `credential-update` conventions cover the registry wiring and cross-references).
 
 ## Layout
 

@@ -94,9 +94,5 @@ func NewSlackOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"slack_send_message",
-			"slack_send_media",
-		},
 	}
 }

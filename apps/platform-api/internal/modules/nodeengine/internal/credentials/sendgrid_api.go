@@ -29,8 +29,5 @@ func NewSendgridAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"sendgrid_send_email",
-		},
 	}
 }

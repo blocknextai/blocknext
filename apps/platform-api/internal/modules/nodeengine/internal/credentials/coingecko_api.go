@@ -29,9 +29,5 @@ func NewCoingeckoAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"coingecko_airdrop_tracker",
-			"coingecko_price_monitor",
-		},
 	}
 }

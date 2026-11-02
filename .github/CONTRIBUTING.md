@@ -54,12 +54,21 @@ make dev              # turbo run dev
 
 - Read `apps/platform-api/CLAUDE.md` and the `README.md` inside each
   `internal/<module>/` directory before changing a bounded context — the
-  architecture conventions (CQRS layout, cross-context service interfaces,
-  repository patterns) are documented there and enforced in review.
+  architecture conventions (module layout, `contract/` boundaries, use-case
+  and repository patterns) are documented there and enforced in review.
 - Format and lint before pushing: `make go-fmt && make go-lint`.
 - `make go-build` is the fastest correctness check across all modules.
 - Database changes go through `make migration-create name=<n> module=<m>`;
   never hand-write migration files.
+
+### Adding a node
+
+The most common contribution. [Adding a node](https://docs.blocknext.ai/development/adding-a-node/)
+is the full recipe: a `node.go` descriptor, an `executor.go`, one
+`providers.Action` in the provider's `register.go`, and (for a new provider)
+a credential file plus two icon SVGs. `make node-run node=<id> input='{…}'
+credentials='{…}'` runs a single node on the host without the stack. With
+Claude Code, the `node-create` skill in `.claude/skills/` scaffolds all of it.
 
 ### UI
 

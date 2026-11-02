@@ -29,9 +29,5 @@ func NewDiscordAPICredential() *domain.Credential {
 				"botToken",
 			},
 		},
-		SupportedNodes: &[]string{
-			"discord_send_message",
-			"discord_send_media",
-		},
 	}
 }

@@ -29,9 +29,5 @@ func NewAirtableAPICredential() *domain.Credential {
 				"accessToken",
 			},
 		},
-		SupportedNodes: &[]string{
-			"airtable_create_record",
-			"airtable_list_records",
-		},
 	}
 }

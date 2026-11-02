@@ -5,7 +5,6 @@ description: Use this skill when the user wants to convert raw Go errors (`error
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
 
-
 # Apperror Fix
 
 Converts raw Go error usage (`errors.New(...)`, `fmt.Errorf(...)`, plain inline strings, ad-hoc `error` returns) in a target file or package to the project's `apperror` pattern: domain sentinels + application sentinels + `WithCause(err)` wrapping.
@@ -29,8 +28,8 @@ Confirm with the user (ask only what's missing):
 1. **Target** — file path, package directory, or "diff" (changes vs `main`).
 2. **Mode** — `report` (default; show all findings as a punch list) or `apply` (rewrite each finding after Kind decision).
 3. **Sentinel placement strategy** — for each new sentinel:
-   - **Domain sentinel** (`apperror.Validation` / `apperror.NotFound`) → goes in `internal/<module>/domain/<aggregate>/errors.go`
-   - **App sentinel** (`apperror.Internal`) → goes in `internal/<module>/application/<aggregate>/errors.go`
+   - **Domain sentinel** (`apperror.Validation` / `apperror.NotFound`) → goes in `internal/modules/<module>/internal/domain/<aggregate>/errors.go`
+   - **App sentinel** (`apperror.Internal`) → goes in `internal/modules/<module>/internal/application/<aggregate>/errors.go`
    - **Inline anonymous** (rare, prefer named sentinels) → only if the error never bubbles outside the file
 
 ## The `apperror` taxonomy
@@ -46,7 +45,7 @@ The project uses six Kinds (verified from existing code):
 | `apperror.Conflict`       | Resource state conflicts with operation             | 409                    |
 | `apperror.Internal`       | Infra / external-service / unexpected failure       | 500                    |
 
-**Memory:** `project_apperror_pattern` — Kind + Message + Cause via `go-packages/apperror`; presentation maps Kind → HTTP; **no `Code` field**.
+**Memory:** `project_apperror_pattern` — Kind + Message + Cause via `go-packages/apperror`; the HTTP error handler maps Kind → HTTP; **no `Code` field**.
 
 ## Layering
 
@@ -54,10 +53,10 @@ The project uses six Kinds (verified from existing code):
 | ---------------- | ---------------------------------------------- | ----------------------------------- |
 | Domain           | `Validation`, `NotFound`, `Conflict`           | `ErrInvalid<Thing>`, `Err<Thing>NotFound`, `Err<Thing>Conflict` |
 | Application      | `Internal` (wraps infra), occasionally others  | `ErrFailedTo<Verb><Thing>`          |
-| Presentation     | usually doesn't add new sentinels              | reuses domain/app sentinels         |
-| Infrastructure   | doesn't define sentinels — translates SQL errors → domain `NotFound` | n/a                  |
+| HTTP             | usually doesn't add new sentinels              | reuses domain/app sentinels         |
+| Postgres         | doesn't define sentinels — translates SQL errors → domain `NotFound` | n/a                  |
 
-**Memory:** `feedback_validation_layering` — sentinels in domain, app `Validate()` runs BEFORE tx for fail-fast.
+**Memory:** `feedback_validation_layering` — sentinels in domain, the use-case method calls `command.Validate()` first, BEFORE the tx, for fail-fast.
 
 ## Detection
 
@@ -66,7 +65,7 @@ grep -rn --include='*.go' -E 'errors\.New\(|fmt\.Errorf\(|return .*errors\.New|r
 ```
 
 For each match, read 5–10 surrounding lines to determine:
-- **Layer** (domain / app / presentation / infrastructure)
+- **Layer** (domain / application / usecases / http / postgres)
 - **Cause** (is there a wrapped `err`? `%w` in `fmt.Errorf` is the give-away)
 - **Semantic Kind** (validation / not-found / internal / etc.)
 
@@ -106,7 +105,7 @@ This is a wrap. Use an app-level sentinel + `.WithCause(err)`.
 // Before:
 return fmt.Errorf("failed to insert user: %w", err)
 
-// After (handler.go inside transaction):
+// After (`<usecase>.go` inside the transaction):
 return ErrFailedToCreateUser.WithCause(err)
 // where application/<aggregate>/errors.go declares:
 var ErrFailedToCreateUser = apperror.Internal("failed to create user")
@@ -155,7 +154,7 @@ if strings.TrimSpace(k.Name) == "" {
 
 ### Pattern E: `errors.Is(err, sql.ErrNoRows)` translation in repository
 
-Standard infrastructure pattern. Translate to the domain not-found sentinel:
+Standard postgres repository pattern (`database.GetOne` / `ExecWithRowCheck` do this for you when passed the sentinel). Translate to the domain not-found sentinel:
 
 ```go
 // Before:
@@ -186,7 +185,7 @@ Filter out:
 ### Step 2: Classify each match
 
 For each match, read the surrounding code and assign:
-- **Layer** (D = domain, A = application, P = presentation, I = infrastructure)
+- **Layer** (D = domain, A = application, U = usecases, H = http, P = postgres)
 - **Pattern** (A / B / C / D / E from above)
 - **Recommended Kind** + **Recommended sentinel name** + **Recommended location**
 
@@ -194,7 +193,7 @@ If you cannot confidently assign, mark the match as `??` and surface to the user
 
 ### Step 3: Locate / create errors.go
 
-For each new sentinel, check whether `internal/<module>/domain/<aggregate>/errors.go` (domain) or `internal/<module>/application/<aggregate>/errors.go` (application) exists.
+For each new sentinel, check whether `internal/modules/<module>/internal/domain/<aggregate>/errors.go` (domain) or `internal/modules/<module>/internal/application/<aggregate>/errors.go` (application) exists.
 
 - If it exists, append the sentinel to the `var (...)` block. Group by Kind: keep all Validation sentinels together, then NotFound, then Conflict (rarely), then Internal in the app file.
 - If it does not exist, create it with the standard header:
@@ -218,7 +217,7 @@ var (
 
 ### Findings (N)
 
-#### `internal/foo/bar/handler.go:42` — Pattern B (wrapped infra failure)
+#### `internal/modules/foo/internal/usecases/users/createuser.go:42` — Pattern B (wrapped infra failure)
 ```go
 // Before:
 return fmt.Errorf("failed to save user: %w", err)
@@ -226,9 +225,9 @@ return fmt.Errorf("failed to save user: %w", err)
 return ErrFailedToSaveUser.WithCause(err)
 ```
 - New sentinel: `ErrFailedToSaveUser = apperror.Internal("failed to save user")`
-- Location: `internal/foo/application/users/errors.go` (file does not exist; will be created)
+- Location: `internal/modules/foo/internal/application/users/errors.go` (file does not exist; will be created)
 
-#### `internal/foo/domain/users/user.go:73` — Pattern A (validation in constructor)
+#### `internal/modules/foo/internal/domain/users/user.go:73` — Pattern A (validation in constructor)
 ```go
 // Before:
 return errors.New("user email is required")
@@ -236,10 +235,10 @@ return errors.New("user email is required")
 return ErrInvalidUserEmail
 ```
 - New sentinel: `ErrInvalidUserEmail = apperror.Validation("invalid user email")`
-- Location: `internal/foo/domain/users/errors.go` (existing; appending)
+- Location: `internal/modules/foo/internal/domain/users/errors.go` (existing; appending)
 
 ### Ambiguous (M) — please confirm Kind
-- `internal/foo/bar/baz.go:88` — `errors.New("token mismatch")` — Validation? Unauthorized? Conflict?
+- `internal/modules/foo/bar/baz.go:88` — `errors.New("token mismatch")` — Validation? Unauthorized? Conflict?
 ```
 
 ### Step 5 (apply mode): Edit

@@ -93,8 +93,5 @@ func NewYoutubeOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"youtube_upload_video",
-		},
 	}
 }

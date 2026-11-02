@@ -84,11 +84,5 @@ func NewNotionOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"notion_create_page",
-			"notion_update_page",
-			"notion_search_pages",
-			"notion_get_page",
-		},
 	}
 }

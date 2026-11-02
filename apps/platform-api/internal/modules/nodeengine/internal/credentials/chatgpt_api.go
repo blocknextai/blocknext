@@ -29,8 +29,5 @@ func NewChatgptAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"chatgpt_chat",
-		},
 	}
 }
