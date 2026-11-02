@@ -29,8 +29,5 @@ func NewAnthropicAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"anthropic_chat",
-		},
 	}
 }

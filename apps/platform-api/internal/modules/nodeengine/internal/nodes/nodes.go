@@ -1,7 +1,12 @@
 package nodes
 
 import (
+	"errors"
+
+	"github.com/blocknextai/go-packages/apperror"
 	"github.com/blocknextai/platform-api/internal/filegateway"
+	nodeEngineDomainCredentials "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
+	nodeEngineDomainNodes "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/nodes"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/airtable"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/anthropic"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/chatgpt"
@@ -32,6 +37,10 @@ import (
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/veo"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/whatsapp"
 	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/x"
+)
+
+var (
+	ErrUnknownCredential = apperror.Internal("node references a credential that is not registered")
 )
 
 func Register(fileGatewayService filegateway.FileGateway) {
@@ -65,4 +74,17 @@ func Register(fileGatewayService filegateway.FileGateway) {
 	sendgrid.Register()
 	airtable.Register()
 	keep.Register()
+	linkCredentials()
+}
+
+func linkCredentials() {
+	for _, node := range nodeEngineDomainNodes.GetAllNodes() {
+		for _, credentialID := range node.GetSupportedCredentials() {
+			credential, ok := nodeEngineDomainCredentials.GetCredential(credentialID)
+			if !ok {
+				panic(ErrUnknownCredential.WithCause(errors.New(node.GetID() + " -> " + credentialID)))
+			}
+			credential.AddSupportedNode(node.GetID())
+		}
+	}
 }

@@ -93,12 +93,5 @@ func NewGoogleSheetsOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"sheets_create_spreadsheet",
-			"sheets_read_spreadsheet",
-			"sheets_delete_spreadsheet",
-			"sheets_add_data_to_spreadsheet",
-			"sheets_update",
-		},
 	}
 }

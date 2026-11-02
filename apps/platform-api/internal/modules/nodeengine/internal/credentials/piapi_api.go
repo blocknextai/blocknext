@@ -29,10 +29,5 @@ func NewPiapiAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"piapi_image_gen",
-			"piapi_video_gen",
-			"piapi_audio_gen",
-		},
 	}
 }

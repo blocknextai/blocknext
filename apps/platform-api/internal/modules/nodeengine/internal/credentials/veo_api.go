@@ -29,8 +29,5 @@ func NewVeoAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"veo",
-		},
 	}
 }

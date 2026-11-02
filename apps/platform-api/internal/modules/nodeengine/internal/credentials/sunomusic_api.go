@@ -29,9 +29,5 @@ func NewSunomusicAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"sunomusic_create_music",
-			"sunomusic_create_lyrics",
-		},
 	}
 }

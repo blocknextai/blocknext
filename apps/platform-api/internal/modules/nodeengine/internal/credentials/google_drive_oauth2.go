@@ -93,11 +93,5 @@ func NewGoogleDriveOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"google_drive_create_folder",
-			"google_drive_create_text_file",
-			"google_drive_get_file",
-			"google_drive_upload_file",
-		},
 	}
 }

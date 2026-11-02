@@ -1,6 +1,6 @@
 ---
 name: credential-create
-description: Use this skill when the user wants to add a new credential (third-party integration auth) to platform-api. Triggers on phrases like "add a credential for X", "create a new credential", "register a new API key type", "add OAuth2 for X". Generates the credential file under internal/nodeengine/credentials/ and wires it into the registry.
+description: Use this skill when the user wants to add a new credential (third-party integration auth) to platform-api. Triggers on phrases like "add a credential for X", "create a new credential", "register a new API key type", "add OAuth2 for X". Generates the credential file under internal/modules/nodeengine/internal/credentials/ and wires it into the registry.
 ---
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
@@ -33,7 +33,7 @@ Before generating files, confirm with the user (ask only what's missing):
 
 ## File layout
 
-Single file: `internal/nodeengine/credentials/<provider>_<authtype>.go`
+Single file: `internal/modules/nodeengine/internal/credentials/<provider>_<authtype>.go`
 
 Examples:
 - `anthropic_api.go` → `NewAnthropicApiCredential`
@@ -61,7 +61,7 @@ that has none. Nothing registers a brand in code.
 package credentials
 
 import (
-	domain "github.com/blocknextai/platform-api/internal/nodeengine/domain/credentials"
+	domain "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
 	gjs "github.com/google/jsonschema-go/jsonschema"
 )
 
@@ -88,9 +88,6 @@ func New<Provider>ApiCredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			// "<provider>_<action>", ...
-		},
 	}
 }
 ```
@@ -98,7 +95,7 @@ func New<Provider>ApiCredential() *domain.Credential {
 Rules:
 - Secret-bearing fields (`apiKey`, `apiSecret`, `clientSecret`, `password`, `privateKey`) MUST set `WriteOnly: true`.
 - `Required` lists every property in `Properties`; do not omit non-secret fields.
-- `SupportedNodes` is `*[]string` — always a pointer. Empty pointer-to-slice is fine if no nodes exist yet.
+- Do NOT declare `SupportedNodes`: the node → credential link is derived at startup from every node's `SupportedCredentials`.
 
 ### OAuth2 credential
 
@@ -107,7 +104,7 @@ package credentials
 
 import (
 	"github.com/blocknextai/go-packages/json"
-	domain "github.com/blocknextai/platform-api/internal/nodeengine/domain/credentials"
+	domain "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
 	gjs "github.com/google/jsonschema-go/jsonschema"
 )
 
@@ -189,9 +186,6 @@ func New<Provider>OAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			// "<provider>_<action>", ...
-		},
 	}
 }
 ```
@@ -212,7 +206,7 @@ Rules specific to OAuth2:
 
 ## Wiring
 
-After creating the file, register the credential in `internal/nodeengine/credentials/credentials.go`'s `Register(oauth2RedirectURL string)` function:
+After creating the file, register the credential in `internal/modules/nodeengine/internal/credentials/credentials.go`'s `Register(oauth2RedirectURL string)` function:
 
 1. Open `credentials.go`.
 2. Add the registration line in the `Register(...)` body:
@@ -224,14 +218,14 @@ After creating the file, register the credential in `internal/nodeengine/credent
 
 After writing the file and updating `credentials.go`:
 
-1. Run `gofmt -w internal/nodeengine/credentials/<provider>_<authtype>.go internal/nodeengine/credentials/credentials.go`
+1. Run `gofmt -w internal/modules/nodeengine/internal/credentials/<provider>_<authtype>.go internal/modules/nodeengine/internal/credentials/credentials.go`
 2. Run `go build ./...` to verify the package compiles.
-3. Run `golangci-lint run ./internal/nodeengine/credentials/...` to catch lint issues.
-4. If you also added `SupportedNodes: &[]string{"<id>"}`, double-check those node IDs exist or will be added in the same change. A non-existent node ID here is harmless at runtime but is a documentation lie.
+3. Run `golangci-lint run ./internal/modules/nodeengine/credentials/...` to catch lint issues.
+4. Nodes reference the credential by its `ID` in their `SupportedCredentials`; nothing on the credential side lists nodes.
 
 ## What NOT to do
 
 - Do NOT create a separate `register.go` per credential — credentials are registered centrally in `credentials.go`.
 - Do NOT add `// TODO` placeholders for fields the user did not specify; ask instead.
-- Do NOT add HTTP client helpers in this file — those live in `internal/nodeengine/nodes/<provider>/helpers/client.go` and are concerns of the node, not the credential.
+- Do NOT add HTTP client helpers in this file — those live in `internal/modules/nodeengine/internal/nodes/<provider>/helpers/client.go` and are concerns of the node, not the credential.
 - Do NOT use `fmt.Sprintf` for the `Default` JSON values; the existing pattern is string concatenation with `+` which is fine for cold init code.

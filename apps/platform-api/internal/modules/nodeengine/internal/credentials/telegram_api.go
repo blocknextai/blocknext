@@ -29,9 +29,5 @@ func NewTelegramAPICredential() *domain.Credential {
 				"botToken",
 			},
 		},
-		SupportedNodes: &[]string{
-			"telegram_send_message",
-			"telegram_send_media",
-		},
 	}
 }

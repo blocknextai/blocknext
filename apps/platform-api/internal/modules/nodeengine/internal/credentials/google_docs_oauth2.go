@@ -93,9 +93,5 @@ func NewGoogleDocsOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"google_docs_create_or_update",
-			"google_docs_read_docs",
-		},
 	}
 }

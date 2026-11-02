@@ -84,9 +84,5 @@ func NewSoundcloudOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"soundcloud_create_track",
-			"soundcloud_create_playlist",
-		},
 	}
 }

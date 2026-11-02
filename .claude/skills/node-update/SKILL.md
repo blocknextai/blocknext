@@ -1,6 +1,6 @@
 ---
 name: node-update
-description: Use this skill when the user wants to modify an existing workflow node under `internal/nodeengine/nodes/<provider>/<action>/`. Triggers on phrases like "update the X node", "add a new input field to Y", "change Z's category / tags / annotations", "add a credential to the node", "disable a node", "update the node's HTTP endpoint", "rename a node field". Edits node.go and/or executor.go in place, keeps the input struct + validator in sync with the schema, and propagates cross-references (credentials' `SupportedNodes`, MCP server's Tools slice).
+description: Use this skill when the user wants to modify an existing workflow node under `internal/modules/nodeengine/internal/nodes/<provider>/<action>/`. Triggers on phrases like "update the X node", "add a new input field to Y", "change Z's category / tags / annotations", "add a credential to the node", "disable a node", "update the node's HTTP endpoint", "rename a node field". Edits node.go and/or executor.go in place, keeps the input struct + validator in sync with the schema, and propagates cross-references (credentials'MCP server's Tools slice).
 ---
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
@@ -8,7 +8,7 @@ description: Use this skill when the user wants to modify an existing workflow n
 
 # Node Update
 
-Edits an existing workflow node under `internal/nodeengine/nodes/<provider>/<action>/` (`node.go` and/or `executor.go`) and keeps the input schema, validator, executor input struct, credential cross-references, and MCP server consistent.
+Edits an existing workflow node under `internal/modules/nodeengine/internal/nodes/<provider>/<action>/` (`node.go` and/or `executor.go`) and keeps the input schema, validator, executor input struct, credential cross-references, and MCP server consistent.
 
 ## When to use
 
@@ -19,7 +19,7 @@ Edits an existing workflow node under `internal/nodeengine/nodes/<provider>/<act
 
 Confirm with the user (ask only what's missing):
 
-1. **Node ID** — `<provider>_<action>` (e.g., `anthropic_chat`, `linear_createissue`). Underscore separator. Files live at `internal/nodeengine/nodes/<provider>/<action>/`.
+1. **Node ID** — `<provider>_<action>` (e.g., `anthropic_chat`, `linear_createissue`). Underscore separator. Files live at `internal/modules/nodeengine/internal/nodes/<provider>/<action>/`.
 2. **Change type** — one or more of:
    - **Add input field** (schema + validator input struct + executor uses)
    - **Remove input field** (schema + struct + every executor read)
@@ -40,7 +40,7 @@ Confirm with the user (ask only what's missing):
 ### Step 1: Locate and read
 
 ```
-internal/nodeengine/nodes/<provider>/<action>/
+internal/modules/nodeengine/internal/nodes/<provider>/<action>/
 ├── node.go        # schema + metadata + annotations
 └── executor.go    # input struct + validator + Execute logic
 ```
@@ -163,10 +163,10 @@ After adding, verify the credential file exists. After removing, verify no execu
 
 ```bash
 # Confirm the credential exists:
-grep -n 'ID:.*"anthropic_bedrock"' internal/nodeengine/credentials/
+grep -n 'ID:.*"anthropic_bedrock"' internal/modules/nodeengine/internal/credentials/
 
 # After removing — confirm executor no longer reads it:
-grep -n 'GetCredentials(credentials, "<removed_credential>")' internal/nodeengine/nodes/<provider>/<action>/executor.go
+grep -n 'GetCredentials(credentials, "<removed_credential>")' internal/modules/nodeengine/internal/nodes/<provider>/<action>/executor.go
 ```
 
 #### Change annotations
@@ -193,7 +193,7 @@ Surface the implication to the user: changing destructive/readOnly hints affects
 Disabled: true,  // node hidden + skipped from registration
 ```
 
-Disabled nodes are filtered out by all four registries: `nodes.RegisterNode`, `executors.RegisterExecutor`, and `mcp.RegisterServer` (which calls `filterEnabledTools` on the Tools slice). The function calling registry also skips disabled nodes.
+Disabled nodes are skipped everywhere `providers.Register` wires them: the node registry, the executor registry, function calling, and the MCP server's tools (`filterEnabledTools`).
 
 The flag is independent of any "coming soon" UI state — there is no separate `IsComingSoon` field; presentation handles that.
 
@@ -220,29 +220,20 @@ If the executor's HTTP flow needs to change (different endpoint, different auth 
 | Rename input field                    | Update struct field + `schema:"..."` tag + every executor read                    |
 | Add output field                      | Edit inside `OutputSchema.Items.Properties` (not top level); add to every `results = append(results, ...)` in executor.go |
 | Change annotations                    | Pick correct group from `node-create` skill; surface UX implication                |
-| Add supported credential              | Verify credential file exists; consider adding node to credential's `SupportedNodes` |
+| Add supported credential              | Verify the credential file exists — an unknown ID panics at startup; the reverse link is derived |
 | Remove supported credential           | Verify executor no longer reads from that credential                              |
 | Disable node                          | Tell user the node will disappear from UI, function calling, AND MCP server tools list |
 | Toggle HasNaturalLanguage             | No `register.go` edit needed — function calling registry auto-filters             |
-| Rename node ID (rare; breaks clients) | Update credential `SupportedNodes` references; warn re: stored workflows; tool name in MCP also changes |
+| Rename node ID (rare; breaks clients) | Warn re: stored workflows; tool name in MCP also changes                           |
 
-#### Update credential's `SupportedNodes` (optional but recommended)
-
-When a node gains or loses a credential, the credential's `SupportedNodes` list often needs the inverse update. The skill should surface the suggested edit:
-
-```bash
-grep -n 'SupportedNodes' internal/nodeengine/credentials/<provider>_<authtype>.go
-```
-
-Show the user the credential file's current list and ask whether to add/remove the node ID. The list is metadata used by the UI for credential pickers — keeping it consistent prevents UI surprise.
 
 ### Step 5: Final verification
 
 ```bash
-gofmt -w internal/nodeengine/nodes/<provider>/<action>/
+gofmt -w internal/modules/nodeengine/internal/nodes/<provider>/<action>/
 gofmt -w <any other modified files>
 go build ./...
-golangci-lint run ./internal/nodeengine/...
+golangci-lint run ./internal/modules/nodeengine/...
 ```
 
 All three must be clean.

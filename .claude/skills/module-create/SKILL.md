@@ -1,14 +1,13 @@
 ---
 name: module-create
-description: Use this skill when the user wants to add a new bounded context (module) to platform-api. Triggers on phrases like "create a new module for X", "scaffold a `<module>` bounded context", "let's add the `<module>` module", "I need a new module to handle Y". Generates the full DDD layout (`application/`, `domain/`, `infrastructure/`, `presentation/`, `module.go`), the first aggregate, the schema migration, and the wiring in `internal/bootstrap/platform_api.go` (instantiation) + `cmd/platform-api/main.go` (route registration). Delegates per-endpoint scaffolding to the `command-create`, `query-create`, and `migration-create` skills.
+description: Use this skill when the user wants to add a new bounded context (module) to platform-api. Triggers on phrases like "create a new module for X", "scaffold a `<module>` bounded context", "let's add the `<module>` module", "I need a new module to handle Y". Generates the full module layout (`module.go`, `contract/`, `internal/domain`, `internal/application`, `internal/usecases`, `internal/postgres`, `internal/migrations`, `internal/http`), the first aggregate, the schema migration, the migration registries, and the wiring in `internal/bootstrap/platform_api.go` (instantiation) + `cmd/platform-api/main.go` (route registration). Delegates per-endpoint scaffolding to the `usecase-create` and `migration-create` skills.
 ---
 
 > **Working directory:** all relative paths in this skill (`internal/...`, `cmd/...`, `go build ./...`) are relative to `apps/platform-api/` in the monorepo. Make targets run from the repo root.
 
-
 # Module Create
 
-Scaffolds a new bounded context under `internal/<module>/` with the project's standard DDD layout, creates the first aggregate's domain entity + repository interface + SQL repository, generates the schema-init migration, exposes a `Module` type with `Dependencies`, instantiates it in `internal/bootstrap/platform_api.go`, and registers its routes in `cmd/platform-api/main.go`.
+Scaffolds a new bounded context under `internal/modules/<module>/` with the project's standard layout, creates the first aggregate's domain entity + repository interface + Postgres repository, an empty `usecases` service, empty route registration, the schema-init migration, exposes a `Module` type with `Dependencies`, instantiates it in `internal/bootstrap/platform_api.go`, and registers its routes in `cmd/platform-api/main.go`.
 
 ## When to use
 
@@ -17,10 +16,9 @@ Scaffolds a new bounded context under `internal/<module>/` with the project's st
 
 ## What this skill does NOT do
 
-This skill produces a **minimal viable module**: one aggregate, no commands or queries, just the structure. It does **not** scaffold individual endpoints. After running this skill, run:
-- `migration-create` for the first table (the skill creates the schema-init migration; data tables are separate)
-- `command-create` for write-side endpoints (create, update, delete)
-- `query-create` for read-side endpoints (get, list)
+This skill produces a **minimal viable module**: one aggregate, no use cases, just the structure. It does **not** scaffold individual endpoints. After running this skill, run:
+- `migration-create` for the first table (this skill creates the schema-init migration; data tables are separate)
+- `usecase-create` for every endpoint (commands and queries)
 
 If the user asks for a full module with endpoints in one go, delegate the per-endpoint work to those skills sequentially after this one is done.
 
@@ -31,42 +29,45 @@ Confirm with the user (ask only what's missing):
 1. **Module name** — lowercase, single word, plural. Examples: `apikeys`, `credentials`, `organizations`, `webhooks`. Avoid hyphens, underscores, and singular nouns. The module name is reused as:
    - Go package name
    - Postgres schema name
-   - Directory name under `internal/`
+   - Directory name under `internal/modules/`
 2. **Aggregate name** — the first aggregate root inside the module. Often matches the module name (e.g., `apikeys` module owns the `apikeys` aggregate). For modules with multiple aggregates (e.g., `organizations` owns `organizations`, `organizationusers`, `organizationsocials`), pick the primary one.
 3. **Entity name** — singular Go type for the aggregate root (e.g., `APIKey`, `Credential`, `Organization`). PascalCase, acronyms uppercase.
 4. **Entity fields** — domain attributes (besides the standard `BaseEntity` triplet of ID + timestamps). For each: name, Go type, whether it's nullable.
-5. **Cross-module dependencies** — does this module need data or services from other modules? Repositories from other modules are NEVER injected (memory: `feedback_no_repository_injection_across_contexts`); only the other module's **service interface** can come in via `Dependencies`. Common examples: `account.UserService`, `organizations.OrganizationService`.
-6. **Public surface** — does this module expose a service to other modules? If yes, the `Module` struct gets a public `<X>Service` field; if no, all fields stay private. (Memory: `feedback_module_field_pattern`.)
+5. **Cross-module dependencies** — does this module need data or services from other modules? Repositories from other modules are NEVER injected; only the other module's **service interface**, imported from its `contract/` package, can come in via `Dependencies`. Common examples: `accountContract.UserService`, `quotaContract.PlanLimitService`.
+6. **Public surface** — does this module expose a service to other modules? If yes, `internal/application/<aggregate>/service.go` defines it, `contract/` re-exports it, and the `Module` struct gets a public `<X>Service` field; if no, all fields stay private and `contract/` is omitted.
 7. **HTTP routes** — does the module expose endpoints? (Almost always yes.) If so, what's the URL prefix (e.g., `/users/me/<entity>`, `/organizations/:organizationId/<entity>`, or both)?
 
 ## Directory layout
 
 ```
-internal/<module>/
-├── application/
-│   ├── <aggregate>/
-│   │   ├── service.go          # only if module exposes a service interface to other modules
-│   │   └── errors.go           # app-level apperror.Internal sentinels (wrapped repo failures)
-├── domain/
-│   ├── <aggregate>/
-│   │   ├── <entity>.go         # aggregate root: BaseEntity + New + Update + Delete + validateThenReturn
-│   │   ├── repository.go       # interface only — no implementation
-│   │   └── errors.go           # apperror.Validation / apperror.NotFound sentinels
-├── infrastructure/
-│   ├── database/
-│   │   └── migrations/         # populated by migration-create skill (NOT this skill, beyond the schema-init)
-│   ├── <aggregate>/
-│   │   └── repository.go       # SQL implementation (database.BaseRepository + BuildQuery)
-│   └── infrastructure.go       # Handlers struct + RegisterInfrastructure (initially empty)
-├── presentation/
-│   ├── <aggregate>/            # populated by command-create / query-create (initially empty)
-│   └── presentation.go         # RegisterPresentation (initially empty body)
-└── module.go                   # Module + Dependencies + NewModule + Register
+internal/modules/<module>/
+├── module.go                          # Dependencies + Module + NewModule + Register — the only entry point for bootstrap
+├── contract/                          # only when other modules consume this one: type aliases + interfaces, leaf package
+│   └── <entity>.go                    # one file per aggregate, snake_case singular (linked_account.go): domain aliases first, then the service alias
+└── internal/                          # sealed by the compiler; nothing outside the module can import it
+    ├── domain/<aggregate>/
+    │   ├── <entity>.go                # aggregate root: BaseEntity + New + Update + Delete + validateThenReturn
+    │   ├── repository.go              # interface only
+    │   └── errors.go                  # apperror.Validation / NotFound / Conflict sentinels
+    ├── application/<aggregate>/
+    │   ├── errors.go                  # apperror.Internal sentinels (wrapped repo failures)
+    │   └── service.go                 # only when the module exposes a service to other modules
+    ├── usecases/
+    │   ├── services.go                # Services + ServiceDependencies + NewServices
+    │   └── <aggregate>/service.go     # Service + NewService; use-case files added by usecase-create
+    ├── postgres/<aggregate>/
+    │   └── repository.go              # SQL implementation (database.BaseRepository + BuildQuery)
+    ├── migrations/                    # <TS>_<module>_<name>.{up,down}.sql, generated by make migration-create
+    └── http/
+        ├── routes.go                  # RegisterRoutes + Register<Scope><Aggregate>Routes (initially empty bodies)
+        └── <aggregate>/               # fiber handlers, added by usecase-create
 ```
 
-Plus two changes outside the module:
-- `cmd/platform-api/main.go` — import + instantiate + register routes.
-- `internal/<module>/infrastructure/database/migrations/<TS>_<module>_init_schema.up.sql` — generated via `make migration-create`.
+Plus changes outside the module:
+- `internal/bootstrap/platform_api.go` — import + field + instantiate.
+- `cmd/platform-api/main.go` — `app.<Module>Module.Register(...)`.
+- `cmd/platform-api-migration/main.go` — `modules` slice entry.
+- `<repo-root>/docker/platform-api/migration.Dockerfile` — `COPY` line for `internal/modules/<module>/internal/migrations`.
 
 ## Naming conventions
 
@@ -80,13 +81,16 @@ Plus two changes outside the module:
 | Repository impl type        | `<Entity>Repository` (same — different pkg) | `APIKeyRepository`                   |
 | Repository ctor             | `New<Entity>Repository`                     | `NewAPIKeyRepository`                |
 | Service interface           | `<Aggregate>Service`                        | `CredentialService`                  |
+| Use-case service            | `Service` / `NewService` in `usecases/<aggregate>` | `apikeysUseCases.Service`     |
 | Module dependencies struct  | `Dependencies` (always, no prefix)          | `apikeys.Dependencies`               |
 | Module struct               | `Module` (always, no prefix)                | `apikeys.Module`                     |
 | Migration filename prefix   | `<TS>_<module>_<change>`                    | `..._apikeys_init_schema`            |
 
+Import aliases are verbose by convention: `<module>Domain<Aggregate>`, `<module>Application<Aggregate>`, `<module>Postgres<Aggregate>`, `<module>UseCases` (module-level `usecases`), `<aggregate>UseCases` (aggregate-level), `<module>HTTP`; cross-module always `<module>Contract "…/internal/modules/<module>/contract"`.
+
 ## Templates
 
-### `domain/<aggregate>/<entity>.go`
+### `internal/domain/<aggregate>/<entity>.go`
 
 ```go
 package <aggregate>
@@ -107,7 +111,6 @@ type <Entity> struct {
 	OwnerType commonDomain.OwnerType
 	OwnerID   uuid.UUID
 	Name      string
-	// ... other domain fields
 }
 
 func New(
@@ -162,15 +165,14 @@ func (e *<Entity>) validateThenReturn() (*<Entity>, error) {
 ```
 
 Rules:
-- **Embed `database.BaseEntity`** (from `github.com/blocknextai/go-packages/database`) for ID + CreatedAt + UpdatedAt + DeletedAt. Don't redeclare these.
-- **`bnuuid.NewV7()`** (alias of `github.com/blocknextai/go-packages/uuid`) generates the ID — UUIDv7 is time-ordered, which the project standardises on. Don't use `uuid.New()` (v4) or Postgres-side defaults. (`github.com/google/uuid` is still imported for the `uuid.UUID` type and `uuid.Nil`.)
-- **All timestamps are `time.Now().UTC()`**. The migrations enforce UTC at the DB layer; the domain enforces it at the application layer.
-- **`validateThenReturn()` is the canonical pattern**: every state transition (`New`, `Update`, `Delete`, etc.) ends with `return e.validateThenReturn()`. The function checks every invariant and returns the entity on success. This is how the domain enforces invariants — do NOT scatter validation across constructors.
-- **Soft delete via `DeletedAt`** — set to `new(time.Now().UTC())`, never `nil` reset. Deletion is reversible at the data layer; the application chooses to ignore soft-deleted rows in queries.
-- **`new(value)` over `&value`** for pointer literals (memory: `feedback_go_new_keyword`).
-- **`strings.TrimSpace(s) == ""`** for empty-string checks (memory: `feedback_strings_trimspace_for_empty_check`).
+- **Embed `database.BaseEntity`** for ID + CreatedAt + UpdatedAt + DeletedAt. Don't redeclare these.
+- **`bnuuid.NewV7()`** generates the ID — UUIDv7 is time-ordered. Don't use `uuid.New()` (v4) or Postgres-side defaults.
+- **All timestamps are `time.Now().UTC()`**. The DB stays dumb; UTC is enforced in the app.
+- **`validateThenReturn()` is the canonical pattern**: every state transition ends with `return e.validateThenReturn()`.
+- **Soft delete via `DeletedAt`** — set to `new(time.Now().UTC())`.
+- **Field order matters**: `id`, business fields, then `created_at`, `updated_at`, `deleted_at`. The `columns` const, the scan, `Create`, and the migration all mirror it.
 
-### `domain/<aggregate>/repository.go`
+### `internal/domain/<aggregate>/repository.go`
 
 ```go
 package <aggregate>
@@ -192,35 +194,12 @@ type <Entity>Repository interface {
 ```
 
 Rules:
-- **Repository lives in `domain/`**, the interface is the contract; the implementation lives in `infrastructure/`. This is the dependency inversion that lets the application depend on domain only.
-- **Methods are minimal at first.** Add new methods (`GetByName`, `GetAllByStatus`, etc.) when the first command/query needs them, not preemptively.
-- **`GetAllByOwner` returns `(items, total, error)`** — pagination is two-call style (data + count) because most lists need totals for the UI.
-- **Pagination/search param order is fixed**: `(ctx, ...domainKeys, searchQuery string, offset int, limit int)` — search FIRST. Always include `searchQuery string` even if the first version of the SQL ignores it; future search support drops in without a signature break. (Memory: `feedback_offset_limit_param_order`.)
-- **`Create` / `Update` / `Delete` take the full entity**, not just IDs. The repo trusts the entity is already validated (constructors enforce that).
+- **The interface lives in `domain/`, the implementation in `postgres/`.**
+- **Methods are minimal at first.** Add `GetByName`, `GetAllByStatus`, etc. when the first use case needs them.
+- **Pagination/search param order is fixed**: `(ctx, ...domainKeys, searchQuery string, offset int, limit int)`.
+- **`Create` / `Update` / `Delete` take the full entity**, not just IDs.
 
-### `domain/<aggregate>/errors.go`
-
-```go
-package <aggregate>
-
-import (
-	"github.com/blocknextai/go-packages/apperror"
-)
-
-var (
-	Err<Entity>NotFound      = apperror.NotFound("<entity> not found")
-	ErrInvalid<Entity>Name   = apperror.Validation("invalid <entity> name")
-	ErrInvalidOwnerType      = apperror.Validation("invalid owner type")
-	ErrInvalidOwnerID        = apperror.Validation("invalid owner id")
-)
-```
-
-Rules:
-- **Domain sentinels use `apperror.Validation` or `apperror.NotFound`** — these map to the right HTTP status codes via the presentation layer's apperror handler.
-- **Lowercase messages**, no trailing punctuation.
-- **No `Code` field** — the project's apperror pattern is Kind + Message + Cause only (memory: `project_apperror_pattern`).
-
-### `application/<aggregate>/errors.go`
+### `internal/domain/<aggregate>/errors.go`
 
 ```go
 package <aggregate>
@@ -230,20 +209,37 @@ import (
 )
 
 var (
-	ErrFailedToCreate<Entity>     = apperror.Internal("failed to create <entity>")
-	ErrFailedToUpdate<Entity>     = apperror.Internal("failed to update <entity>")
-	ErrFailedToDelete<Entity>     = apperror.Internal("failed to delete <entity>")
-	ErrFailedToGet<Entity>ByID    = apperror.Internal("failed to get <entity> by id")
+	Err<Entity>NotFound    = apperror.NotFound("<entity> not found")
+	ErrInvalid<Entity>Name = apperror.Validation("invalid <entity> name")
+	ErrInvalidOwnerType    = apperror.Validation("invalid owner type")
+	ErrInvalidOwnerID      = apperror.Validation("invalid owner id")
 )
 ```
 
-Rules:
-- **App-level sentinels are `apperror.Internal(...)`** — wrappers for repository / external-service failures. The application calls them with `.WithCause(err)` to attach the underlying error.
-- **Distinct from domain sentinels.** Domain says "this is invalid" (Validation) or "this doesn't exist" (NotFound); app says "the infra layer broke" (Internal).
+Domain sentinels use `apperror.Validation` / `apperror.NotFound` / `apperror.Conflict`. Lowercase messages, no trailing punctuation, no `Code` field.
 
-### `application/<aggregate>/service.go` (only when module exposes a service)
+### `internal/application/<aggregate>/errors.go`
 
-If no other module needs to call into this one, **skip this file entirely.** Otherwise:
+```go
+package <aggregate>
+
+import (
+	"github.com/blocknextai/go-packages/apperror"
+)
+
+var (
+	ErrFailedToCreate<Entity>  = apperror.Internal("failed to create <entity>")
+	ErrFailedToUpdate<Entity>  = apperror.Internal("failed to update <entity>")
+	ErrFailedToDelete<Entity>  = apperror.Internal("failed to delete <entity>")
+	ErrFailedToGet<Entity>ByID = apperror.Internal("failed to get <entity> by id")
+)
+```
+
+App-level sentinels are `apperror.Internal(...)`, used with `.WithCause(err)` from use cases when a repository or external call fails.
+
+### `internal/application/<aggregate>/service.go` (only when the module exposes a service)
+
+If no other module needs to call into this one, **skip this file and `contract/` entirely.** Otherwise:
 
 ```go
 package <aggregate>
@@ -251,37 +247,58 @@ package <aggregate>
 import (
 	"context"
 
-	"github.com/blocknextai/platform-api/internal/<module>/domain/<aggregate>"
+	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/domain/<aggregate>"
 	"github.com/google/uuid"
 )
 
 type <Aggregate>Service interface {
-	GetByID(ctx context.Context, id uuid.UUID) (*<aggregate>.<Entity>, error)
+	GetByID(ctx context.Context, id uuid.UUID) (*<module>Domain<Aggregate>.<Entity>, error)
 }
 
 type <aggregate>Service struct {
-	<aggregate>Repository <aggregate>.<Entity>Repository
+	<aggregate>Repository <module>Domain<Aggregate>.<Entity>Repository
 }
 
 func New<Aggregate>Service(
-	<aggregate>Repository <aggregate>.<Entity>Repository,
+	<aggregate>Repository <module>Domain<Aggregate>.<Entity>Repository,
 ) <Aggregate>Service {
 	return &<aggregate>Service{
 		<aggregate>Repository: <aggregate>Repository,
 	}
 }
 
-func (s *<aggregate>Service) GetByID(ctx context.Context, id uuid.UUID) (*<aggregate>.<Entity>, error) {
+func (s *<aggregate>Service) GetByID(ctx context.Context, id uuid.UUID) (*<module>Domain<Aggregate>.<Entity>, error) {
 	return s.<aggregate>Repository.GetByID(ctx, id)
 }
 ```
 
 Rules:
-- **The interface is the public surface**, the struct is private (lowercase). Only the constructor is public.
-- **Service methods are coarse-grained.** They expose what other modules legitimately need, not arbitrary repo passthroughs.
-- **Returning a domain entity across module boundaries is fine** — domain types are part of the contract. Returning a repository is not (memory: `feedback_no_repository_injection_across_contexts`).
+- **The interface is the public surface**, the struct is private. Only the constructor is exported.
+- **Service methods are coarse-grained** — what other modules legitimately need, not repo passthroughs.
+- **Domain types cross the boundary only as parameters / results of this interface**, and are re-exported from `contract/` alongside it.
 
-### `infrastructure/<aggregate>/repository.go`
+### `contract/` (only when the module exposes a service)
+
+```go
+// contract/<entity>.go
+package contract
+
+import (
+	<module>Application<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/application/<aggregate>"
+	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/domain/<aggregate>"
+)
+
+type <Entity> = <module>Domain<Aggregate>.<Entity>
+
+type <Aggregate>Service = <module>Application<Aggregate>.<Aggregate>Service
+```
+
+Rules:
+- **Type aliases and interfaces only** — no wiring, no logic, no constructors. `contract/` is a leaf: it imports only its own module's `internal/` packages.
+- **Do not widen a contract** with sentinels, constants or helpers just because a consumer wants them; the consumer owns those locally. Re-export a constant only when it is part of the service interface's vocabulary (`ScopeMCPInvoke`).
+- **Consumers import `<module>Contract` and nothing else** from this module. The goal is that the module can be extracted into its own service by swapping `contract/` for a client.
+
+### `internal/postgres/<aggregate>/repository.go`
 
 ```go
 package <aggregate>
@@ -289,11 +306,10 @@ package <aggregate>
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"github.com/blocknextai/go-packages/database"
-	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/<module>/domain/<aggregate>"
 	commonDomain "github.com/blocknextai/platform-api/internal/common/domain"
+	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/domain/<aggregate>"
 	"github.com/google/uuid"
 )
 
@@ -313,25 +329,15 @@ var (
 	`)
 
 	queryGetAllByOwner = database.BuildQuery(`
-		SELECT `, columns, `
+		SELECT `, columns, `, COUNT(*) OVER() AS total
 		FROM `, tableName, `
 		WHERE
 			owner_type = $1
 			AND owner_id = $2
-			AND ($3 = '' OR name ILIKE '%' || $3 || '%')
 			AND deleted_at IS NULL
+			AND ($3 = '' OR name ILIKE '%' || $3 || '%')
 		ORDER BY created_at DESC
 		LIMIT $4 OFFSET $5
-	`)
-
-	queryCountByOwner = database.BuildQuery(`
-		SELECT COUNT(*)
-		FROM `, tableName, `
-		WHERE
-			owner_type = $1
-			AND owner_id = $2
-			AND ($3 = '' OR name ILIKE '%' || $3 || '%')
-			AND deleted_at IS NULL
 	`)
 
 	queryCreate = database.BuildQuery(`
@@ -370,11 +376,11 @@ func New<Entity>Repository(db *sql.DB) <module>Domain<Aggregate>.<Entity>Reposit
 	}
 }
 
-func (r *<Entity>Repository) scan(row interface{ Scan(dest ...any) error }) (*<module>Domain<Aggregate>.<Entity>, error) {
+func (r *<Entity>Repository) scan(row interface{ Scan(dest ...any) error }, extras ...any) (*<module>Domain<Aggregate>.<Entity>, error) {
 	var e <module>Domain<Aggregate>.<Entity>
 	var deletedAt sql.NullTime
 
-	err := row.Scan(
+	dest := []any{
 		&e.ID,
 		&e.OwnerType,
 		&e.OwnerID,
@@ -382,69 +388,32 @@ func (r *<Entity>Repository) scan(row interface{ Scan(dest ...any) error }) (*<m
 		&e.CreatedAt,
 		&e.UpdatedAt,
 		&deletedAt,
-	)
-	if err != nil {
+	}
+	dest = append(dest, extras...)
+
+	if err := row.Scan(dest...); err != nil {
 		return nil, err
 	}
 
-	if deletedAt.Valid {
-		e.DeletedAt = new(deletedAt.Time)
-	}
+	e.DeletedAt = database.ScanNullTime(deletedAt)
 
 	return &e, nil
 }
 
 func (r *<Entity>Repository) getOne(ctx context.Context, query string, args ...any) (*<module>Domain<Aggregate>.<Entity>, error) {
-	row := r.GetExecutor(ctx).QueryRowContext(ctx, query, args...)
-	e, err := r.scan(row)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, <module>Domain<Aggregate>.Err<Entity>NotFound
-		}
-		return nil, err
-	}
-	return e, nil
+	return database.GetOne(ctx, r.Executor(ctx), query, r.scan, <module>Domain<Aggregate>.Err<Entity>NotFound, args...)
 }
 
-func (r *<Entity>Repository) getMany(ctx context.Context, query string, args ...any) ([]*<module>Domain<Aggregate>.<Entity>, error) {
-	rows, err := r.GetExecutor(ctx).QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func (r *<Entity>Repository) getManyWithTotal(ctx context.Context, query string, args ...any) ([]*<module>Domain<Aggregate>.<Entity>, int64, error) {
+	return database.GetManyWithTotal(ctx, r.Executor(ctx), query, r.scan, args...)
+}
 
-	var result []*<module>Domain<Aggregate>.<Entity>
-	for rows.Next() {
-		e, err := r.scan(rows)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, e)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+func (r *<Entity>Repository) exec(ctx context.Context, query string, args ...any) error {
+	return database.Exec(ctx, r.Executor(ctx), query, args...)
 }
 
 func (r *<Entity>Repository) execWithRowCheck(ctx context.Context, query string, args ...any) error {
-	result, err := r.GetExecutor(ctx).ExecContext(ctx, query, args...)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return <module>Domain<Aggregate>.Err<Entity>NotFound
-	}
-
-	return nil
+	return database.ExecWithRowCheck(ctx, r.Executor(ctx), query, <module>Domain<Aggregate>.Err<Entity>NotFound, args...)
 }
 
 func (r *<Entity>Repository) GetByID(ctx context.Context, id uuid.UUID) (*<module>Domain<Aggregate>.<Entity>, error) {
@@ -452,26 +421,11 @@ func (r *<Entity>Repository) GetByID(ctx context.Context, id uuid.UUID) (*<modul
 }
 
 func (r *<Entity>Repository) GetAllByOwner(ctx context.Context, ownerType commonDomain.OwnerType, ownerID uuid.UUID, searchQuery string, offset int, limit int) ([]*<module>Domain<Aggregate>.<Entity>, int64, error) {
-	var total int64
-	err := r.GetExecutor(ctx).QueryRowContext(ctx, queryCountByOwner, ownerType, ownerID, searchQuery).Scan(&total)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	if total == 0 {
-		return []*<module>Domain<Aggregate>.<Entity>{}, 0, nil
-	}
-
-	result, err := r.getMany(ctx, queryGetAllByOwner, ownerType, ownerID, searchQuery, limit, offset)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return result, total, nil
+	return r.getManyWithTotal(ctx, queryGetAllByOwner, ownerType, ownerID, searchQuery, limit, offset)
 }
 
 func (r *<Entity>Repository) Create(ctx context.Context, entity *<module>Domain<Aggregate>.<Entity>) error {
-	_, err := r.GetExecutor(ctx).ExecContext(ctx, queryCreate,
+	return r.exec(ctx, queryCreate,
 		entity.ID,
 		entity.OwnerType,
 		entity.OwnerID,
@@ -480,7 +434,6 @@ func (r *<Entity>Repository) Create(ctx context.Context, entity *<module>Domain<
 		entity.UpdatedAt,
 		entity.DeletedAt,
 	)
-	return err
 }
 
 func (r *<Entity>Repository) Update(ctx context.Context, entity *<module>Domain<Aggregate>.<Entity>) error {
@@ -493,63 +446,100 @@ func (r *<Entity>Repository) Delete(ctx context.Context, entity *<module>Domain<
 ```
 
 Rules:
-- **`database.BaseRepository`** provides `GetExecutor(ctx)` which returns the right executor (transaction-aware via context propagation). NEVER call `r.db.QueryContext(...)` directly.
-- **`database.BuildQuery(...)`** is the project's query helper. Its variadic-string form composes table names + columns + literal SQL fragments without runtime concatenation.
-- **`scan` / `getOne` / `getMany` / `execWithRowCheck`** are duplicated per repository on purpose — they reference the entity's specific columns. Don't try to abstract them into common.
-- **`sql.ErrNoRows` → domain not-found sentinel.** The repo translates the SQL-layer signal into a domain error so the application layer doesn't need to import `database/sql`.
-- **`execWithRowCheck` returns `Err<Entity>NotFound` on zero rows affected** — UPDATE / DELETE on a missing or already-deleted row is treated as not-found, not as silent success.
-- **Soft delete is an UPDATE.** `Delete` sets `deleted_at`, it doesn't `DELETE FROM`. All queries filter `deleted_at IS NULL`.
+- **`database.BaseRepository`** provides `Executor(ctx)` (transaction-aware via context). Never hold or call `*sql.DB` directly.
+- **`database.GetOne` / `GetManyWithTotal` / `Exec` / `ExecWithRowCheck`** are the query helpers; `GetOne` and `ExecWithRowCheck` translate no-row cases into the domain not-found sentinel you pass in.
+- **`COUNT(*) OVER() AS total`** in list queries feeds `GetManyWithTotal` — one round trip for items + total. `scan` accepts `extras` so the total column can be appended to the destination list.
+- **`scan` is duplicated per repository on purpose** — it references the entity's specific columns.
+- **Unique-violation mapping**: `database.IsUniqueViolationOn(err, "<index>")` → domain `apperror.Conflict` sentinel, when the table has a unique index.
+- **Soft delete is an UPDATE.** All queries filter `deleted_at IS NULL`.
 
-### `infrastructure/infrastructure.go`
+### `internal/usecases/<aggregate>/service.go`
 
 ```go
-package infrastructure
+package <aggregate>
 
 import (
 	"github.com/blocknextai/go-packages/database"
-	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/<module>/domain/<aggregate>"
+	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/domain/<aggregate>"
 )
 
-type Handlers struct {
-	// Populated by command-create / query-create skills as endpoints are added.
+type Service struct {
+	<aggregate>Repository <module>Domain<Aggregate>.<Entity>Repository
+	transactionManager    database.TransactionManager
 }
 
-type RegisterInfrastructureDeps struct {
+func NewService(
+	<aggregate>Repository <module>Domain<Aggregate>.<Entity>Repository,
+	transactionManager database.TransactionManager,
+) *Service {
+	return &Service{
+		<aggregate>Repository: <aggregate>Repository,
+		transactionManager:    transactionManager,
+	}
+}
+```
+
+Holds the union of dependencies every use case of the aggregate needs. `usecase-create` adds one `<usecase>.go` method per endpoint here and extends the fields when a use case needs more.
+
+### `internal/usecases/services.go`
+
+```go
+package usecases
+
+import (
+	"github.com/blocknextai/go-packages/database"
+	<module>Domain<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/domain/<aggregate>"
+	<aggregate>UseCases "github.com/blocknextai/platform-api/internal/modules/<module>/internal/usecases/<aggregate>"
+)
+
+type Services struct {
+	<Aggregate> *<aggregate>UseCases.Service
+}
+
+type ServiceDependencies struct {
 	TransactionManager database.TransactionManager
 
 	<Aggregate>Repository <module>Domain<Aggregate>.<Entity>Repository
 }
 
-func RegisterInfrastructure(deps RegisterInfrastructureDeps) *Handlers {
-	return &Handlers{}
+func NewServices(deps ServiceDependencies) *Services {
+	return &Services{
+		<Aggregate>: <aggregate>UseCases.NewService(deps.<Aggregate>Repository, deps.TransactionManager),
+	}
 }
 ```
 
-Initially empty. The `command-create` and `query-create` skills add `Handlers` fields and instantiations as endpoints are scaffolded. Even an empty `Handlers` struct is correct — it's the boundary the presentation layer plugs into. When those skills add endpoints, the `Handlers` fields are typed as `cqrs.Handler[*Command, *Response]` interfaces and each handler is wrapped with `cqrs.ValidationBehavior(...)` (from `internal/common/application/cqrs`) so validation runs uniformly via the behavior decorator — they add the `cqrs` import then. (Memory: `project_cqrs_validation_behavior`.)
+`ServiceDependencies` lists the core infra dep (`TransactionManager`) first, then a blank line, then repositories and cross-module services. This file and `module.go` are the only places a module's wiring lives.
 
-`RegisterInfrastructure` takes a single `RegisterInfrastructureDeps` struct (NOT positional params) — the core infra dep (`TransactionManager database.TransactionManager`, from `go-packages/database`) goes first, then a blank line, then repositories and cross-module services. If the module needs additional dependencies (secret manager, cross-module services), add them to `RegisterInfrastructureDeps` AND to the module's `Dependencies` struct. They stay unused until the first endpoint reads them.
-
-### `presentation/presentation.go`
+### `internal/http/routes.go`
 
 ```go
-package presentation
+package http
 
 import (
-	<module>Infrastructure "github.com/blocknextai/platform-api/internal/<module>/infrastructure"
-	commonPresentationAuth "github.com/blocknextai/platform-api/internal/common/presentation/auth"
+	commonAuth "github.com/blocknextai/platform-api/internal/common/auth"
+	<module>UseCases "github.com/blocknextai/platform-api/internal/modules/<module>/internal/usecases"
 	"github.com/gofiber/fiber/v3"
 )
 
-func RegisterPresentation(
+func RegisterOrganization<Aggregate>Routes(
 	router fiber.Router,
-	authMiddleware *commonPresentationAuth.AuthMiddleware,
-	handlers *<module>Infrastructure.Handlers,
+	authMiddleware *commonAuth.AuthMiddleware,
+	useCases *<module>UseCases.Services,
 ) {
-	// Routes are added by command-create / query-create skills.
+	router.Group("/organizations/:organizationId/<aggregate>")
+}
+
+func RegisterRoutes(
+	router fiber.Router,
+	authMiddleware *commonAuth.AuthMiddleware,
+	useCases *<module>UseCases.Services,
+) {
+	RegisterOrganization<Aggregate>Routes(router, authMiddleware, useCases)
 }
 ```
 
-Same shape as `infrastructure.go` — initially empty, fills up as endpoints are scaffolded. Sub-functions for user vs organization route groups (`RegisterUser<Aggregate>Presentation`, `RegisterOrganization<Aggregate>Presentation`) are introduced when the first endpoint that needs them is added.
+Initially empty groups; `usecase-create` adds route lines (`authMiddleware.Authenticate()` → `RequireOrganizationPermission` / `RequireUserPermission` → `<aggregate>.New…Handler(useCases.<Aggregate>)`). Add `RegisterUser<Aggregate>Routes` (group `/users/me/<aggregate>`) when the module serves user-scoped routes. Assign the group to `<aggregate>RouterGroup` when the first route lands.
 
 ### `module.go`
 
@@ -560,166 +550,135 @@ import (
 	"database/sql"
 
 	"github.com/blocknextai/go-packages/database"
-	"github.com/blocknextai/platform-api/internal/common/presentation/auth"
-	<module>Infrastructure "github.com/blocknextai/platform-api/internal/<module>/infrastructure"
-	<module>Infrastructure<Aggregate> "github.com/blocknextai/platform-api/internal/<module>/infrastructure/<aggregate>"
-	<module>Presentation "github.com/blocknextai/platform-api/internal/<module>/presentation"
+	"github.com/blocknextai/platform-api/internal/common/auth"
+	<module>HTTP "github.com/blocknextai/platform-api/internal/modules/<module>/internal/http"
+	<module>Postgres<Aggregate> "github.com/blocknextai/platform-api/internal/modules/<module>/internal/postgres/<aggregate>"
+	<module>UseCases "github.com/blocknextai/platform-api/internal/modules/<module>/internal/usecases"
 	"github.com/gofiber/fiber/v3"
 )
 
 type Dependencies struct {
 	DB                 *sql.DB
 	TransactionManager database.TransactionManager
-	// ... cross-module service interfaces if any
 }
 
 type Module struct {
-	// Public fields ONLY when consumed by another module.
-	// Add (e.g.) `<Aggregate>Service <module>Application<Aggregate>.<Aggregate>Service` here only if some other module's Dependencies needs it.
-
-	handlers *<module>Infrastructure.Handlers
+	useCases *<module>UseCases.Services
 }
 
 func NewModule(deps Dependencies) *Module {
-	repository := <module>Infrastructure<Aggregate>.New<Entity>Repository(deps.DB)
-	handlers := <module>Infrastructure.RegisterInfrastructure(<module>Infrastructure.RegisterInfrastructureDeps{
+	repository := <module>Postgres<Aggregate>.New<Entity>Repository(deps.DB)
+	useCases := <module>UseCases.NewServices(<module>UseCases.ServiceDependencies{
 		TransactionManager: deps.TransactionManager,
 
 		<Aggregate>Repository: repository,
 	})
 	return &Module{
-		handlers: handlers,
+		useCases: useCases,
 	}
 }
 
 func (m *Module) Register(router fiber.Router, authMiddleware *auth.AuthMiddleware) {
-	<module>Presentation.RegisterPresentation(router, authMiddleware, m.handlers)
+	<module>HTTP.RegisterRoutes(router, authMiddleware, m.useCases)
 }
 ```
 
-Rules (project memory):
-- **`Dependencies` struct lists every external input.** DB and `TransactionManager` are the baseline; cross-module service interfaces, secret manager, etc. extend it as needed.
-- **`Module` struct fields are private by default.** A field becomes public ONLY when it is read in another module's `NewModule` call. (Memory: `feedback_module_field_pattern`.) Do not preemptively expose services "in case someone needs them later." No getters, no aliases.
-- **No two-phase init.** If you find yourself wanting to construct the module in one call and "wire it up" in a second, you're hitting a cycle — break it via composition, events, or rethinking the dependency direction. Two-phase init is debt, not a pattern. (Memory: `feedback_module_two_phase_init`.)
-- **No lazy supplier / decorator wrapping** to break cycles. (Memory: `feedback_lazy_supplier_rejected`.)
-- **`NewModule` returns `*Module`**, not an interface. The caller is `cmd/platform-api/main.go` and a few other entry points; they all use the concrete type.
-- **`Register(router, authMiddleware, ...)`** signature can vary slightly per module (some take `cacheMiddleware`, some don't). Match the existing modules' styles when there's a similar one.
+When the module exposes a service, `NewModule` also builds it (`<module>Application<Aggregate>.New<Aggregate>Service(repository)`) and stores it in a public field `<Aggregate>Service <module>Application<Aggregate>.<Aggregate>Service` that bootstrap passes into consumers' `Dependencies`.
+
+Rules:
+- **`Dependencies` lists every external input.** `DB` and `TransactionManager` are the baseline; cross-module `<module>Contract` service interfaces, secret manager, options structs extend it. Cross-module deps go after a blank line.
+- **`Module` fields are private by default.** A field becomes public only when another module's `NewModule` reads it. No getters, no speculative exposure.
+- **No two-phase init.** Construct fully in `NewModule`. The only sanctioned exception is the existing `workflowsModule.SetMarketplaceWorkflowService(...)` read-enrichment cycle; do not add another.
+- **`NewModule` returns `*Module`** (add an `error` return only when construction can genuinely fail).
+- **`Register(router, authMiddleware, ...)`** may also take `cacheMiddleware` / `apiKeyMiddleware`; match a similar existing module.
 
 ### Schema-init migration
 
-Use the `migration-create` skill (or run `make migration-create` directly) to generate the first migration:
+Use the `migration-create` skill (or run `make migration-create` directly):
 
 ```bash
 make migration-create name=init_schema module=<module>
 ```
 
-Then fill the generated `.up.sql`:
+`.up.sql`:
 
 ```sql
--- Migration: init_schema
--- Created: ...
-
 CREATE SCHEMA IF NOT EXISTS <module>;
 ```
 
-And `.down.sql`:
+`.down.sql`:
 
 ```sql
--- Rollback: init_schema
--- Created: ...
-
 DROP SCHEMA IF EXISTS <module> CASCADE;
 ```
 
-This is the only migration this skill produces. The first table migration (`<TS>_<module>_add_<tables>_table`) is a separate `migration-create` invocation — defer to that skill.
+This is the only migration this skill produces. The first table migration (`<TS>_<module>_add_<tables>_table`) is a separate `migration-create` invocation.
+
+**A new module's migrations silently never run unless it is added to both registries:**
+1. the `modules` slice in `cmd/platform-api-migration/main.go`
+2. the `COPY --from=builder /build/internal/modules/<module>/internal/migrations /app/migrations/<module>/` line in `<repo-root>/docker/platform-api/migration.Dockerfile`
 
 ## Wiring
 
-Wiring is split across **two files**:
-- **`internal/bootstrap/platform_api.go`** — instantiation (the modules are constructed here in `NewPlatformAPI`, NOT in `cmd/platform-api/main.go`).
-- **`cmd/platform-api/main.go`** — route registration off the `app` (`*bootstrap.PlatformAPI`) returned by `NewPlatformAPI`.
+- **`internal/bootstrap/platform_api.go`** — instantiation inside `NewPlatformAPI`.
+- **`cmd/platform-api/main.go`** — route registration off the `app` (`*bootstrap.PlatformAPI`).
 
 ### `internal/bootstrap/platform_api.go` — three edits
 
-**1. Import** (alphabetically placed in the import block):
-
-```go
-"github.com/blocknextai/platform-api/internal/<module>"
-```
-
-**2. Add a field to the `PlatformAPI` struct** (`<Module>Module *<module>.Module`), matching the column-aligned style of the existing fields.
-
-**3. Instantiate inside `NewPlatformAPI`.** The existing instantiations follow a rough dependency order — modules that produce services come before modules that consume them. Place the new `<module>Module := <module>.NewModule(...)` right before the first module that depends on it (or near the end if nothing depends on it yet). `deps` come from `core` (`core.DB`, `core.TransactionManager`, `core.EventBus.Bus`, `core.CacheService`, ...) and `shared`/`cfg` for options:
+1. **Import** `"github.com/blocknextai/platform-api/internal/modules/<module>"` (alphabetical).
+2. **Field** on the `PlatformAPI` struct: `<Module>Module *<module>.Module`, column-aligned with the existing fields.
+3. **Instantiate** inside `NewPlatformAPI`, after every module whose public service it consumes and before any module that consumes it:
 
 ```go
 <module>Module := <module>.NewModule(<module>.Dependencies{
 	DB:                 core.DB,
 	TransactionManager: core.TransactionManager,
-	// + any cross-module services this module needs (e.g. accountModule.UserService)
 })
 ```
 
-If `NewModule` returns an error (some modules do — e.g., `account`, `llm`, `workflows`), use the early-return pattern (`NewPlatformAPI` returns `(*PlatformAPI, error)`):
-
-```go
-<module>Module, err := <module>.NewModule(<module>.Dependencies{...})
-if err != nil {
-	return nil, err
-}
-```
-
-For the minimal scaffold this skill produces, `NewModule` does NOT return an error. Only add an error return if construction can genuinely fail (e.g., connecting to an external broker).
-
-**Also add the field to the returned struct literal** at the bottom of `NewPlatformAPI` (`<Module>Module: <module>Module,`).
+Cross-module services come from the producer module's public field (`UserService: accountModule.UserService`). If `NewModule` returns an error, use the early-return form. Add `<Module>Module: <module>Module,` to the returned struct literal.
 
 ### `cmd/platform-api/main.go` — register routes
-
-Add a `app.<Module>Module.Register(...)` line to the block of `Register` calls (the `app` variable is the `*bootstrap.PlatformAPI`). Match the existing line style:
 
 ```go
 app.<Module>Module.Register(fiberApp, authMiddleware)
 ```
 
-If the module needs `cacheMiddleware`, match modules like `account`, `organizations`, `plans`:
+Add `cacheMiddleware` / `apiKeyMiddleware` arguments when the module's `Register` takes them.
 
-```go
-app.<Module>Module.Register(fiberApp, authMiddleware, cacheMiddleware)
-```
+## Critical rules
 
-## Critical rules (project memory)
-
-1. **Module migration one at a time.** This is part of a larger refactor — apply the module pattern to one module per turn, verify it builds, then move on. (Memory: `feedback_module_migration_pace`.)
-2. **Private by default, public only when consumed.** No speculative exposure. No getters. No `main.go`-side aliases. (Memory: `feedback_module_field_pattern`.)
-3. **No two-phase init.** Construct fully in `NewModule`. If a cycle forces this, redesign. (Memory: `feedback_module_two_phase_init`.)
-4. **No lazy supplier / decorator pattern.** Rejected as too ugly; don't propose it. (Memory: `feedback_lazy_supplier_rejected`.)
-5. **No repository injection across bounded contexts.** Cross-module dependency = service interface, period. (Memory: `feedback_no_repository_injection_across_contexts`.)
-6. **`apperror` everywhere.** Domain: Validation/NotFound. App: Internal + WithCause. No `errors.New` / `fmt.Errorf` in business code. (Memory: `project_apperror_pattern`.)
-7. **Validation runs via the `cqrs.ValidationBehavior` decorator, not in the handler.** When commands are added later, the `Validate()` method lives in `validator.go` but is NOT called in `Handle`; the `cqrs.ValidationBehavior(...)` wrapper applied in `infrastructure.go` runs it (runtime `Validatable` check) before the inner handler / transaction. Handler types and constructors use the idiomatic `Handler` / `New` form (not `<Verb><Entity>CommandHandler` / `New...`), since the package name carries the context. (Memory: `project_cqrs_validation_behavior`, `feedback_validation_layering`, `feedback_event_handler_new_naming`.)
-8. **`bnuuid.NewV7()`** (`go-packages/uuid`) for IDs. **`time.Now().UTC()`** for timestamps. **`json.Marshal`/`Unmarshal`** from `go-packages/json` (NOT `encoding/json`, NOT a `utils` package). **`slog`** for logging. **`strings.TrimSpace(s) == ""`** for empty checks. **`new(value)`** over `&value`.
-9. **Don't use `fmt`.** (Memory: `feedback_no_fmt_package`.)
+1. **One module per turn.** Scaffold, verify it builds, then move on.
+2. **Sealed `internal/`.** Nothing outside the module imports it; other contexts consume `contract/` only, which re-exports type aliases and interfaces. `contract/` stays a leaf.
+3. **Private by default, public only when consumed.** No getters, no aliases in bootstrap.
+4. **No two-phase init, no lazy suppliers.** Redesign the dependency direction instead.
+5. **No repository injection across bounded contexts.** Cross-module dependency = `<module>Contract` service interface.
+6. **The wiring chain is fixed:** `bootstrap` → `NewModule(Dependencies)` → `usecases.NewServices(ServiceDependencies)` → `http.RegisterRoutes(router, authMiddleware, useCases)`.
+7. **`apperror` everywhere.** Domain: Validation / NotFound / Conflict. App: Internal + `.WithCause`. No `errors.New` / `fmt.Errorf` in business code.
+8. **`bnuuid.NewV7()`** for IDs, **`time.Now().UTC()`** for timestamps, **`go-packages/json`** for JSON, **`slog`** for logging, **`strings.TrimSpace(s) == ""`** for empty checks, **`new(value)`** over `&value`, no `fmt`.
+9. **Migrations register twice** (`cmd/platform-api-migration/main.go` + `<repo-root>/docker/platform-api/migration.Dockerfile`) or they never run.
 
 ## Final steps
 
-After the scaffold + migration + wiring:
-
 1. `gofmt -w` on every new file + `internal/bootstrap/platform_api.go` + `cmd/platform-api/main.go`.
-2. `go build ./...` — must compile. If it fails, the most common causes are:
-   - Forgot to add the import / struct field / instantiation / returned-literal entry in `internal/bootstrap/platform_api.go`
-   - Forgot the `app.<Module>Module.Register(...)` line in `cmd/platform-api/main.go`
-   - Cross-module dependency in `Dependencies` references a service that doesn't exist yet
-   - Repository scan column order doesn't match the table's column order
-3. `golangci-lint run ./internal/<module>/...` — must be clean.
-4. (Optional, requires user confirmation) `make migration-up module=<module>` to apply the schema-init migration.
-5. Hand off to the user with the next steps spelled out:
-   - "The module scaffold is ready. To add the first table, run the `migration-create` skill. To add the first endpoint, run `command-create` (write) or `query-create` (read)."
+2. `go build ./...` — must compile. Common failures:
+   - Missing import / struct field / instantiation / returned-literal entry in `platform_api.go`
+   - Missing `app.<Module>Module.Register(...)` in `cmd/platform-api/main.go`
+   - A `Dependencies` field referencing a contract service that doesn't exist yet
+   - Repository scan column order not matching the domain struct / table
+3. `golangci-lint run ./internal/modules/<module>/...` — must be clean.
+4. Confirm the module appears in both migration registries.
+5. (Optional, requires `GITHUB_TOKEN` + user confirmation) `make migration-up module=<module>`.
+6. Hand off: "The module scaffold is ready. Run `migration-create` for the first table, then `usecase-create` for each endpoint."
 
 ## What NOT to do
 
-- Do NOT add multiple aggregates in this skill. One aggregate per module on initial scaffold; additional aggregates are separate work.
-- Do NOT pre-populate `application/<aggregate>/` with empty `create<entity>/`, `get<entity>/` folders. Those come from `command-create` / `query-create` and contain real code.
-- Do NOT expose `Module.Repository<Entity>` as a public field unless another module is genuinely about to consume it. Speculative exposure violates the visibility rule.
-- Do NOT inject `database.TransactionManager` into the service or query handlers — only command handlers need it. Putting it in the wrong place is a tell that the boundary is confused.
-- Do NOT add `// TODO` placeholders in the scaffold. Either the scaffold compiles and runs (empty Handlers + empty routes is fine) or it does not — half-done is worse than missing.
-- Do NOT skip the wiring. A module that is not instantiated in `internal/bootstrap/platform_api.go` AND registered in `cmd/platform-api/main.go` is dead code; the user has no way to reach it.
-- Do NOT run `make migration-up` autonomously even though the schema-init is a "small" change. The DB mutation rule applies regardless of size.
-- Do NOT introduce new common helpers (`internal/common/...`) as part of this skill. If the user asks for one, that's a separate change with its own justification.
+- Do NOT add multiple aggregates in this skill. One aggregate per initial scaffold.
+- Do NOT pre-populate `usecases/<aggregate>/` with use-case files or `http/<aggregate>/` with handlers. Those come from `usecase-create` and contain real code.
+- Do NOT create `contract/` or `application/<aggregate>/service.go` unless another module is genuinely about to consume this one.
+- Do NOT put anything but type aliases and interfaces in `contract/`.
+- Do NOT inject `database.TransactionManager` into the application service — only the use-case `Service` needs it.
+- Do NOT add `// TODO` placeholders. Either the scaffold compiles (empty route groups are fine) or it does not.
+- Do NOT skip the wiring or the migration registries. An unwired module is dead code; an unregistered migration never runs.
+- Do NOT run `make migration-up` autonomously.
+- Do NOT introduce new kernel helpers (`internal/common/...`) as part of this skill.

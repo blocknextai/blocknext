@@ -85,9 +85,5 @@ func NewLinkedinOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"linkedin_publish_post",
-			"linkedin_publish_media_post",
-		},
 	}
 }

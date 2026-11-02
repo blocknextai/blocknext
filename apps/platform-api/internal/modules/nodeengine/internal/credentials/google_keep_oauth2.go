@@ -93,11 +93,5 @@ func NewGoogleKeepOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"google_keep_create_note",
-			"google_keep_get_note",
-			"google_keep_list_notes",
-			"google_keep_delete_note",
-		},
 	}
 }

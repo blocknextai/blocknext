@@ -36,6 +36,7 @@ type CredentialManager interface {
 	SetIsSupportPlatform(value bool)
 	GetSchema() *gjs.Schema
 	GetSupportedNodes() *[]string
+	AddSupportedNode(nodeID string)
 	GetDisabled() bool
 }
 
@@ -93,6 +94,13 @@ func (c *Credential) GetSchema() *gjs.Schema {
 
 func (c *Credential) GetSupportedNodes() *[]string {
 	return c.SupportedNodes
+}
+
+func (c *Credential) AddSupportedNode(nodeID string) {
+	if c.SupportedNodes == nil {
+		c.SupportedNodes = new([]string{})
+	}
+	*c.SupportedNodes = append(*c.SupportedNodes, nodeID)
 }
 
 func (c *Credential) GetDisabled() bool {

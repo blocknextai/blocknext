@@ -85,10 +85,5 @@ func NewFacebookOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"facebook_publish_post",
-			"facebook_publish_media_post",
-			"facebook_publish_story",
-		},
 	}
 }

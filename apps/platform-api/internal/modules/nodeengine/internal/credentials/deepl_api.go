@@ -29,8 +29,5 @@ func NewDeeplAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"deepl_translate",
-		},
 	}
 }

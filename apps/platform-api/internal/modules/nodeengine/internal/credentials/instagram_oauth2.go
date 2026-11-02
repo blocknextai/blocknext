@@ -85,10 +85,5 @@ func NewInstagramOAuth2Credential(redirectURL string) *domain.Credential {
 				"clientSecret",
 			},
 		},
-		SupportedNodes: &[]string{
-			"instagram_publish_post",
-			"instagram_publish_story",
-			"instagram_publish_reels",
-		},
 	}
 }

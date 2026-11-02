@@ -14,7 +14,7 @@ Keeps `internal/config/**.go` and `<repo-root>/.env.example` in lockstep. Projec
 
 - User edited an `*Options` struct under `internal/config/` (added a field, renamed a tag, removed a field)
 - User says "sync env example" / "what's missing from .env.example" / "audit config drift"
-- After running `command-create` / `module-create` if the new code reads a configuration value
+- After running `usecase-create` / `module-create` if the new code reads a configuration value
 - Before committing changes that touch `internal/config/`
 
 ## What this skill produces

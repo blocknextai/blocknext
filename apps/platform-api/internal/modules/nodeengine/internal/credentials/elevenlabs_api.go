@@ -29,8 +29,5 @@ func NewElevenlabsAPICredential() *domain.Credential {
 				"apiKey",
 			},
 		},
-		SupportedNodes: &[]string{
-			"elevenlabs_text_to_speech",
-		},
 	}
 }

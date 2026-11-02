@@ -8,7 +8,7 @@ description: Use this skill when the user wants to add a new node (workflow acti
 
 # Create Node
 
-Scaffolds a new workflow node under `internal/nodeengine/nodes/<provider>/<action>/`, wires it into the provider's `register.go` (which registers it in 4 places: nodes registry, executors registry, function calling, and MCP server), and verifies the credential it consumes exists.
+Scaffolds a new workflow node under `internal/modules/nodeengine/internal/nodes/<provider>/<action>/`, wires it into the provider's `register.go` (a single `providers.Register(...)` call registers the node, its executor, function calling and the MCP tool), and verifies the credential it consumes exists.
 
 ## When to use
 
@@ -19,7 +19,7 @@ Scaffolds a new workflow node under `internal/nodeengine/nodes/<provider>/<actio
 
 Confirm with the user (ask only what's missing):
 
-1. **Provider** — e.g., `mistral`, `notion`. Lowercase. Matches an existing folder under `internal/nodeengine/nodes/` if extending, or creates a new one.
+1. **Provider** — e.g., `mistral`, `notion`. Lowercase. Matches an existing folder under `internal/modules/nodeengine/internal/nodes/` if extending, or creates a new one.
 2. **Action** — e.g., `chat`, `sendmessage`, `createrecord`. Lowercase, single word. Becomes the directory and the package name.
 3. **Display name** — e.g., "Mistral Chat", "Notion Create Page".
 4. **Description** — one-line description of what the node does at runtime.
@@ -27,7 +27,7 @@ Confirm with the user (ask only what's missing):
    - `AI`, `Audio`, `Blockchain`, `CRM`, `Database`, `Ecommerce`, `Google Workspace`, `Image`, `Mailing`, `Publishing`, `System`, `Utility`, `Video`
 6. **Sub-category** — usually the provider's display name (e.g., "Mistral", "Notion", "CoinGecko").
 7. **Tags** — 3–7 lowercase keywords for search.
-8. **Credential ID** — which credential this node consumes (e.g., `mistral_api`, `notion_oauth2`). Underscore separator. MUST already exist in `internal/nodeengine/credentials/`. If it doesn't, run the `credential-create` skill first.
+8. **Credential ID** — which credential this node consumes (e.g., `mistral_api`, `notion_oauth2`). Underscore separator. MUST already exist in `internal/modules/nodeengine/internal/credentials/`. If it doesn't, run the `credential-create` skill first.
 9. **Input fields** — names, types, descriptions, optional defaults, optional enums. These become both the JSON schema and the executor input struct.
 10. **Output fields** — names, types, descriptions. Shape of the **per-record** output map; the executor returns an array of these and the OutputSchema wraps it accordingly (see template below).
 11. **MCP annotations group** — pick one based on what the tool does (see "Annotations classification" below).
@@ -40,7 +40,7 @@ Node IDs use **underscore separator**: `<provider>_<action>` (e.g., `facebook_pu
 ## File layout
 
 ```
-internal/nodeengine/nodes/<provider>/
+internal/modules/nodeengine/internal/nodes/<provider>/
 ├── helpers/
 │   └── client.go        # shared HTTP client; one per provider folder
 ├── <action>/
@@ -49,9 +49,9 @@ internal/nodeengine/nodes/<provider>/
 └── register.go          # wires nodes + executors + functioncalling + MCP server
 ```
 
-When **adding a new action to an existing provider**, only create `<action>/node.go` and `<action>/executor.go`, then extend `register.go` (append a new action block AND add the new node to the provider's existing `mcp.RegisterServer(...)` Tools slice). Do NOT recreate `helpers/client.go`.
+When **adding a new action to an existing provider**, only create `<action>/node.go` and `<action>/executor.go`, then extend `register.go` (build the node/validator/executor and append one `providers.Action` to the existing `Actions` slice). Do NOT recreate `helpers/client.go`.
 
-When **adding a new provider from scratch**, create the entire tree above, then add the provider's `Register()` call to `internal/nodeengine/nodes/nodes.go`.
+When **adding a new provider from scratch**, create the entire tree above, then add the provider's `Register()` call to `internal/modules/nodeengine/internal/nodes/nodes.go`.
 
 ## Icon and handles
 
@@ -173,7 +173,7 @@ package <action>
 
 import (
 	"github.com/blocknextai/go-packages/json"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/nodes"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/nodes"
 	gjs "github.com/google/jsonschema-go/jsonschema"
 )
 
@@ -272,10 +272,10 @@ import (
 
 	"github.com/blocknextai/go-packages/apperror"
 
-	"github.com/blocknextai/platform-api/internal/nodeengine/application/jsonschema"
-	nodeEngineDomainCredentials "github.com/blocknextai/platform-api/internal/nodeengine/domain/credentials"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/executors"
-	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/<provider>/helpers"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/application/jsonschema"
+	nodeEngineDomainCredentials "github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/credentials"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/executors"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/<provider>/helpers"
 )
 
 var (
@@ -402,18 +402,16 @@ For nodes that upload/download files via `filegateway`, the helper signature acc
 
 ### `register.go` (provider-level)
 
-When **creating a new provider**, write `internal/nodeengine/nodes/<provider>/register.go`. The register call wires the node into 4 registries: nodes, executors, function calling, AND MCP server.
+When **creating a new provider**, write `internal/modules/nodeengine/internal/nodes/<provider>/register.go`. One call, `providers.Register(...)`, does all the wiring: it registers every action's node and executor, generates the function-calling entry for nodes with `HasNaturalLanguage: true`, registers any trigger adapters, and mounts the actions with an executor as the tools of the provider's MCP server. There is nothing else to register.
 
 ```go
 package <provider>
 
 import (
-	"github.com/blocknextai/platform-api/internal/nodeengine/application/jsonschema"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/executors"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/functioncalling"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/mcp"
-	"github.com/blocknextai/platform-api/internal/nodeengine/domain/nodes"
-	"github.com/blocknextai/platform-api/internal/nodeengine/nodes/<provider>/<action>"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/application/jsonschema"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/mcp"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/domain/providers"
+	"github.com/blocknextai/platform-api/internal/modules/nodeengine/internal/nodes/<provider>/<action>"
 )
 
 func Register() {
@@ -424,48 +422,51 @@ func Register() {
 	<action>Validator := jsonschema.New[<action>.<Provider><Action>ExecutorInput](<action>Node.GetInputSchema())
 	<action>Executor := <action>.New<Provider><Action>Executor(<action>NodeID, <action>Validator)
 
-	nodes.RegisterNode(<action>Node)
-	executors.RegisterExecutor(<action>Executor)
-	functioncalling.RegisterFunctionCalling(functioncalling.Generate(<action>Node))
-
-	mcp.RegisterServer(&mcp.Server{
-		ID:          nodeID,
-		Name:        "<Provider Display Name>",
-		Description: "Tools for <what the provider does>.",
-		Version:     "0.0.1",
-		Tools: []nodes.NodeManager{
-			<action>Node,
+	providers.Register(providers.Provider{
+		Server: mcp.Server{
+			ID:          nodeID,
+			Name:        "<Provider Display Name>",
+			Description: "Tools for <what the provider does>.",
+			Icon: mcp.ServerIcon{
+				Brand: "<provider>",
+			},
+			Version: "0.0.1",
+		},
+		Actions: []providers.Action{
+			{Node: <action>Node, Executor: <action>Executor},
 		},
 	})
 }
 ```
 
+A provider with webhook trigger adapters adds `Adapters: []adapters.TriggerAdapter{webhook.New<Provider>Adapter(nodeID)}` to the same literal (see `slack`). A canvas-only `note` node has no executor: `{Node: annotationNode}` — it is registered but never becomes a tool (see `system`).
+
 When **adding a new action to an existing provider**:
-1. Add a new action block matching the existing pattern (Node + Validator + Executor + 3× Register calls).
-2. **Append the new node to the existing `mcp.RegisterServer` Tools slice** — do NOT add a second `RegisterServer` call. There is exactly one MCP server per provider.
+1. Build the node, validator and executor like the existing actions.
+2. **Append `{Node: <action>Node, Executor: <action>Executor}` to the existing `Actions` slice.** Do NOT add a second `providers.Register` call — one provider, one MCP server.
 
 ### `nodes/nodes.go` (only for new providers)
 
-If the provider is new, append `<provider>.Register()` to the body of `Register(fileGatewayService filegateway.FileGateway)` in `internal/nodeengine/nodes/nodes.go`. Add the corresponding import. The list is intentionally not strictly alphabetized — append at the end.
+If the provider is new, append `<provider>.Register()` to the body of `Register(fileGatewayService filegateway.FileGateway)` in `internal/modules/nodeengine/internal/nodes/nodes.go`. Add the corresponding import. The list is intentionally not strictly alphabetized — append at the end.
 
 If the provider needs `filegateway` (file uploads/downloads), its `Register` signature accepts the gateway: `Register(fileGatewayService)` (see `gemini.Register`, `drive.Register`).
 
 ## Function calling
 
-`functioncalling.RegisterFunctionCalling(functioncalling.Generate(node))` makes the node available to LLM nodes for tool use. Always include this call. To opt a node out of LLM function calling, set `HasNaturalLanguage: false` on the node — `functioncalling.Generate(node)` checks this internally and yields a disabled FunctionCalling entry that the registry filters out.
+`providers.Register` generates the function-calling entry for every action whose node has `HasNaturalLanguage: true`; nothing to call. To keep a node out of LLM function calling, set `HasNaturalLanguage: false` on the node.
 
 ## MCP exposure
 
-Every node is automatically exposed as an MCP tool when its provider's `mcp.RegisterServer(...)` includes it in `Tools`. The MCP adapter:
+Every action with an executor is exposed as an MCP tool of its provider's server by `providers.Register`. The MCP adapter:
 - Reads `node.GetAnnotations()` and forwards to MCP `ToolAnnotations`
 - Wraps `OutputSchema` in `{type: "object", properties: {items: <node-output-schema>}}` so SDK accepts it (SDK rejects top-level non-object schemas)
 - Resolves `credential:<scope>:<uuid>` references from the tool's `credentials` parameter
 
-No additional work in node.go / executor.go is required to expose to MCP — register.go's `mcp.RegisterServer` call is the only touchpoint.
+No additional work in node.go / executor.go is required to expose to MCP — the `providers.Action` entry in register.go is the only touchpoint.
 
 ## Critical rules
 
-1. **Credential must exist** before the node is registered. Verify the credential ID listed in `SupportedCredentials` is present in `internal/nodeengine/credentials/credentials.go`. If not, run the `credential-create` skill first.
+1. **Credential must exist** before the node is registered. Verify the credential ID listed in `SupportedCredentials` is present in `internal/modules/nodeengine/internal/credentials/credentials.go`. If not, run the `credential-create` skill first.
 2. **`SupportedCredentials` is always multi-line.**
 3. **`OutputSchema` always wraps in array** — `{type: "array", items: {type: "object", properties: {...}}}`. Domain truth: executors return `[]map[string]any`.
 4. **`Annotations` is always set explicitly** — pick one of 5 groups. Never leave unset.
@@ -481,13 +482,13 @@ After all files exist:
 
 1. Run `gofmt -w` on every new/modified `.go` file.
 2. Run `go build ./...` — must compile.
-3. Run `golangci-lint run ./internal/nodeengine/...` — fix issues; lint catches things `go build` misses.
+3. Run `golangci-lint run ./internal/modules/nodeengine/...` — fix issues; lint catches things `go build` misses.
 4. Manually verify:
-   - The node ID in `Register()` matches the credential's `SupportedNodes` list (in the credential file). If not, append it there.
+   - Every ID in the node's `SupportedCredentials` is a registered credential — the link back (`SupportedNodes`) is derived at startup, and an unknown credential ID panics on boot.
    - Tags are lowercase and contain no duplicates.
    - `Required` includes every field the runtime should guarantee is populated (the validator fills defaults). Truly optional fields (no default, safe to omit — e.g., `description`) stay out. A field with a `Default` is usually still in `Required`.
-   - For new providers: `mcp.RegisterServer(...)` includes ALL of the provider's nodes in `Tools`.
-   - For existing providers gaining a new action: the new node was appended to the existing `mcp.RegisterServer` Tools slice.
+   - The new action is in the provider's `Actions` slice — that is the only place a node becomes a tool.
+5. Try it without the stack: `make node-run node=<provider>_<action> input='{...}' credentials='{"<credential_id>":{...}}'` (repo root) runs the executor once and prints the output.
 
 ## What NOT to do
 
@@ -496,5 +497,5 @@ After all files exist:
 - Do NOT manually marshal/unmarshal HTTP bodies — let `httpclient.Body(map[string]any{...}).Do(&success, &error)` handle it.
 - Do NOT swallow errors with `_ = err`. If an error truly cannot affect outcome (rare), explain why with a one-line comment.
 - Do NOT reference `$<something>` patterns or workflow JSON in the node — those are runtime concerns handled by the executor framework, not the node implementation.
-- Do NOT add a second `mcp.RegisterServer` call for an existing provider — extend the existing one's Tools slice.
+- Do NOT add a second `providers.Register` call for an existing provider — extend the existing `Actions` slice.
 - Do NOT use dot separator in nodeID (`<provider>.<action>` is WRONG); always underscore.
