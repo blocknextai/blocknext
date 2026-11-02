@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.12](https://github.com/blocknextai/blocknext/releases/tag/v0.0.12) - 2026-11-02
+
+### Refactoring
+- **nodeengine:** Register nodes via providers.Register, add node-run command and sync skills/docs ([a0d57a3](https://github.com/blocknextai/blocknext/commit/a0d57a37441c9179a1dddf90968721db2c545cca))
+
+### Documentation
+- **changelog:** Update for v0.0.11 ([c0a6a53](https://github.com/blocknextai/blocknext/commit/c0a6a53b58192c71387a23a66e54dffc2ddd58a3))
+
 ## [0.0.11](https://github.com/blocknextai/blocknext/releases/tag/v0.0.11) - 2026-09-23
 
 ### Features
